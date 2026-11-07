@@ -1,0 +1,12 @@
+[Unit]
+Description=Pleiades: run scoring model
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=pleiades
+Group=pleiades
+WorkingDirectory=/opt/pleiades/backend
+EnvironmentFile=/opt/pleiades/.env
+ExecStart=/opt/pleiades/backend/.venv/bin/python -m app.ingest score

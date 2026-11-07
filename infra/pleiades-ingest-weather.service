@@ -1,0 +1,14 @@
+[Unit]
+Description=Pleiades: ingest Open-Meteo forecast
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=pleiades
+Group=pleiades
+WorkingDirectory=/opt/pleiades/backend
+EnvironmentFile=/opt/pleiades/.env
+ExecStart=/opt/pleiades/backend/.venv/bin/python -m app.ingest weather
+# Re-score right after fresh weather lands ('+' runs this line as root so it may start units).
+ExecStartPost=+/bin/systemctl start --no-block pleiades-score.service

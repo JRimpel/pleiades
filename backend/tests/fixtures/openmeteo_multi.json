@@ -1,0 +1,58 @@
+[
+  {
+    "latitude": 42.9,
+    "longitude": -78.9,
+    "generationtime_ms": 0.42,
+    "utc_offset_seconds": 0,
+    "timezone": "GMT",
+    "timezone_abbreviation": "GMT",
+    "elevation": 183.0,
+    "location_id": 0,
+    "hourly_units": {
+      "time": "unixtime", "cloud_cover_low": "%", "cloud_cover_mid": "%", "cloud_cover_high": "%",
+      "cloud_cover": "%", "visibility": "m", "relative_humidity_2m": "%", "dew_point_2m": "°C",
+      "temperature_2m": "°C", "wind_speed_10m": "km/h", "precipitation_probability": "%"
+    },
+    "hourly": {
+      "time": [1794027600, 1794031200, 1794034800],
+      "cloud_cover_low": [10, 0, 55],
+      "cloud_cover_mid": [0, 0, 20],
+      "cloud_cover_high": [35, 12, 80],
+      "cloud_cover": [40, 12, 90],
+      "visibility": [24140.0, 24140.0, 9800.0],
+      "relative_humidity_2m": [71, 74, 88],
+      "dew_point_2m": [-1.2, -1.5, 0.4],
+      "temperature_2m": [3.8, 2.9, 2.3],
+      "wind_speed_10m": [12.4, 9.7, 15.1],
+      "precipitation_probability": [0, 0, null]
+    }
+  },
+  {
+    "latitude": 42.1,
+    "longitude": -78.7,
+    "generationtime_ms": 0.39,
+    "utc_offset_seconds": 0,
+    "timezone": "GMT",
+    "timezone_abbreviation": "GMT",
+    "elevation": 650.0,
+    "location_id": 1,
+    "hourly_units": {
+      "time": "unixtime", "cloud_cover_low": "%", "cloud_cover_mid": "%", "cloud_cover_high": "%",
+      "cloud_cover": "%", "visibility": "m", "relative_humidity_2m": "%", "dew_point_2m": "°C",
+      "temperature_2m": "°C", "wind_speed_10m": "km/h", "precipitation_probability": "%"
+    },
+    "hourly": {
+      "time": [1794027600, 1794031200, 1794034800],
+      "cloud_cover_low": [0, 0, 5],
+      "cloud_cover_mid": [0, 0, 0],
+      "cloud_cover_high": [5, 0, 10],
+      "cloud_cover": [5, 0, 12],
+      "visibility": [null, 24140.0, 24140.0],
+      "relative_humidity_2m": [65, 68, 70],
+      "dew_point_2m": [-4.0, -4.3, -4.1],
+      "temperature_2m": [1.9, 1.2, 0.8],
+      "wind_speed_10m": [6.1, 5.4, 4.9],
+      "precipitation_probability": [0, 0, 0]
+    }
+  }
+]

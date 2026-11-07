@@ -1,0 +1,13 @@
+flask>=3.0
+gunicorn>=22.0
+psycopg[binary]>=3.2
+psycopg-pool>=3.2
+pydantic>=2.7
+python-dotenv>=1.0
+boto3>=1.34
+Pillow>=10.3
+numpy>=1.26
+requests>=2.32
+# Used by AI/ML-owned modules (app/scoring, app/astro, app/ai)
+skyfield>=1.49
+google-genai>=1.0

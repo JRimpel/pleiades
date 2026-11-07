@@ -1,0 +1,21 @@
+# Local development database: PostgreSQL + TimescaleDB + PostGIS (same stack as Tiger Cloud).
+#   docker compose up -d db
+#   DATABASE_URL=postgres://postgres:password@localhost:5432/pleiades
+services:
+  db:
+    image: timescale/timescaledb-ha:pg17
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: pleiades
+    ports:
+      - "5432:5432"
+    volumes:
+      - pleiades-db:/home/postgres/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d pleiades"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  pleiades-db:

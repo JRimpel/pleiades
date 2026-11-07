@@ -1,0 +1,79 @@
+"""Ingest & scoring jobs (run by systemd timers).
+
+    python -m app.ingest weather            # Open-Meteo forecast -> weather_forecast (every 3 h)
+    python -m app.ingest astro              # ephemeris + sky events (daily)
+    python -m app.ingest score [--no-refresh]  # scoring model -> score_snapshots (hourly)
+    python -m app.ingest all                # astro, weather, score
+"""
+from __future__ import annotations
+
+import argparse
+import logging
+import sys
+from typing import Callable
+
+import psycopg
+
+from ..config import Settings, get_settings
+from ..db import connect_direct
+from ..repo import ingest_log
+from ..timeutil import utcnow
+
+log = logging.getLogger("app.ingest")
+
+JobFn = Callable[[psycopg.Connection, Settings], int]
+
+
+def run_job(name: str, fn: JobFn, settings: Settings) -> int:
+    """Run one job inside an ingest_runs start/finish record. Returns the row count; re-raises on failure."""
+    with connect_direct(settings) as conn:
+        run_id = ingest_log.start(conn, name, utcnow())
+        try:
+            rows = fn(conn, settings)
+        except Exception as e:
+            conn.rollback()
+            ingest_log.finish(conn, run_id, status="error", details={"error": f"{type(e).__name__}: {e}"[:1000]})
+            raise
+        ingest_log.finish(conn, run_id, status="ok", rows=rows)
+        return rows
+
+
+def _jobs(args: argparse.Namespace) -> list[tuple[str, JobFn]]:
+    from . import astro, score, weather
+
+    def score_job(conn: psycopg.Connection, settings: Settings) -> int:
+        return score.run(conn, settings, refresh=not getattr(args, "no_refresh", False))
+
+    table: dict[str, JobFn] = {"weather": weather.run, "astro": astro.run, "score": score_job}
+    if args.job == "all":
+        return [(n, table[n]) for n in ("astro", "weather", "score")]
+    return [(args.job, table[args.job])]
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(prog="python -m app.ingest", description="Pleiades ingest & scoring jobs")
+    sub = parser.add_subparsers(dest="job", required=True)
+    sub.add_parser("weather", help="fetch Open-Meteo forecast for every grid cell")
+    sub.add_parser("astro", help="compute hourly sun/moon conditions and sky events")
+    p_score = sub.add_parser("score", help="run the scoring model over the forecast window")
+    p_score.add_argument("--no-refresh", action="store_true", help="skip continuous-aggregate refresh")
+    p_all = sub.add_parser("all", help="astro, weather, then score")
+    p_all.add_argument("--no-refresh", action="store_true", help="skip continuous-aggregate refresh")
+    args = parser.parse_args(argv)
+
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+    settings = get_settings()
+
+    for name, fn in _jobs(args):
+        log.info("job %s: starting", name)
+        try:
+            rows = run_job(name, fn, settings)
+        except Exception:
+            log.exception("job %s: failed", name)
+            return 1
+        log.info("job %s: ok (%d rows)", name, rows)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -1,0 +1,10 @@
+[Unit]
+Description=Pleiades: ingest weather every 3 hours
+
+[Timer]
+OnCalendar=*-*-* 00/3:05:00
+Persistent=true
+RandomizedDelaySec=120
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,26 @@
+UB Hacking 2026:
+
+
+Theme: Space
+
+Sponsored Track: Radial Atoms
+    Build an AI project that connects to the real world using hardware, sensors, data, or a simulation. 
+    No hardware is required, and projects that help Buffalo or Western New York may get extra consideration
+
+Track 1: Best General Hack
+    The best project of the weekend.
+
+Track 2: Best UI/UX Hack
+    The hack that's a joy to use: clear, accessible, and thoughtfully designed from first click to last.
+
+Track 3: Best AI/ML
+    The strongest use of machine learning, LLMs, or agents, with real engineering behind it.
+
+Track 4: Spirit of the Hackathon
+    The best project built around this year's theme, deep space. 
+    Space exploration, astronomy, satellites, life beyond Earth: show us your take.
+
+Track 5: Best Use of Tiger Data
+    Use Tiger Data, PostgreSQL for real-time and time-series data, as your database.
+    
+

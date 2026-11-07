@@ -1,0 +1,22 @@
+Pleiades Description:
+An AI model finds the best places to stargaze in western new york using light pollution, weather, elevation, and moon data. Users can then upload images of the night sky to the app and view other users uploads 
+
+UI:
+Interactive map frontend similar to a google maps, or snap map, should show a visual representation of our “score”
+Score: culmination of light pollution data, real time weather data, moon data, and elevation? An AI should take this data and culminate it into a numerical value. The higher the score, the better experience stargazing from that location should be
+
+User Image Upload: 
+Users should be able to upload images from the night sky. Two things should happen
+Other users can see these images displayed on the map to see what the night sky might look like from that location
+Potential upvote system
+AI should be able to see the image and describe the celestial bodies in them
+Potentially 
+
+Tech Stack: 
+Weather Data: Use the open-meteo open source weather api
+
+Backend: simple Python Flask 
+
+Frontend: not sure yet (React or React Native)
+
+Database: tiger data? This gives us a chance at that prize

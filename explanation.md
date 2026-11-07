@@ -1,142 +1,336 @@
-# What I Built (Explained Like You're Little)
+# Pleiades Backend: A Guide for New Developers
 
-Hi! This is the story of the back part of Pleiades. You can't see the back part, but it does all the thinking. 🌟
+This guide assumes you have never seen this project before. It explains what Pleiades does, how the backend is organized, the handful of ideas you need to understand the code, and where to start reading. It is an orientation, not a reference. When you need exact details, go to:
 
----
-
-## What is Pleiades?
-
-Pleiades is a map. 🗺️
-It shows you where the stars look the **prettiest** tonight.
-Each square gets a number. A big number means "go here, lots of stars!" A small number means "too bright, not many stars."
-You can also share pictures of the night sky. A smart robot tells you what's in your picture.
-
-> *(Grown-up words: a web app that scores stargazing conditions across Western New York from 0–100 and hosts community sky photos analyzed by AI.)*
+- [README.md](README.md): quickstart commands.
+- [Architecture.md](Architecture.md): the full product and system design, including the scoring math.
+- [backend-documentation.md](backend-documentation.md): the integration contract, with every route, request and response shape, and seam function.
 
 ---
 
-## The big pieces
+## 1. What Pleiades is
 
-### 🍳 The Kitchen
-When you open the app, it's like ordering food at a restaurant.
-You say "I want the star map, please!" and the kitchen cooks it up and sends it back.
-The kitchen has a **menu** with 14 things you can order.
+Pleiades helps people in **Western New York (WNY)** find the best place and time to go stargazing. It does two things:
 
-> *(Grown-up words: a Flask REST API with 14 routes under `/api`.)*
+1. **The score map.** It divides the region into a grid and gives every grid cell a **Stargazing Score from 0 to 100** for every hour of the next ~72 hours. The score combines:
+   - light pollution
+   - the weather forecast (clouds, haze, humidity)
+   - the sun and moon positions
+   - elevation
 
-### 📓 The Giant Memory Notebook
-We have a huge notebook that remembers **everything**.
-It never erases old pages. Every time the weather changes its mind, we write the new guess on a **new** page.
-So later we can flip back and say, "Yesterday we thought it would be cloudy, but today we think it'll be clear!"
+   A web map colors each cell by its score, and a time slider lets you scrub through the forecast.
+2. **Community sky photos.** Users upload night-sky photos and pin them to the map. An AI model (Google Gemini) describes each photo and identifies the stars and planets in it. Other users can upvote or downvote photos.
 
-> *(Grown-up words: a Tiger Data / TimescaleDB Postgres database. Forecasts and scores are stored in "hypertables", and every revision is kept, like a sensor log.)*
+Pleiades is a hackathon project (UB Hacking 2026) with three roles:
 
-### 🟩 The Map Squares
-We cut Western New York into about 350 little squares, like a checkerboard.
-Each square gets its own star score.
-Some special places, like big parks, get a ⭐ pin instead of a square.
+| Role | Owns |
+|---|---|
+| Frontend | The React + MapLibre web app (`frontend/`, not written yet) |
+| **Backend** | Everything in this repo today: the API, database, data pipeline, storage, and deployment |
+| AI/ML | The "smart" parts: the scoring model, the astronomy calculations, and the Gemini prompts |
 
-> *(Grown-up words: a 0.1° grid stored in the `grid_cells` table, plus curated spots.)*
-
-### 🤖 The Weather Robot
-Every 3 hours, a little robot wakes up and asks the weather station:
-"Will it be cloudy? Foggy? Windy?"
-It asks about **every** square, then writes the answers in the notebook.
-
-> *(Grown-up words: an ingest job that pulls Open-Meteo forecasts in batches, run by a systemd timer.)*
-
-### 🌙 The Sun-and-Moon Clock
-Once a day, another helper figures out where the sun and moon will be, hour by hour.
-The sun has to be **way** down for stars to show. A big bright moon makes stars harder to see.
-It also writes down fun sky events, like shooting-star showers! 🌠
-
-> *(Grown-up words: the astro job writes sun/moon altitude and moon phase to `astro_conditions`, and meteor showers to `sky_events`.)*
-
-### 🧮 The Star-Score Calculator
-Every hour, the calculator looks at:
-- clouds ☁️
-- the moon 🌙
-- city lights 💡
-- haze 🌫️
-- how high up the place is ⛰️
-
-Then it gives every square a number from 0 to 100.
-It also says **why**, like "you lost 20 points because of clouds."
-
-> *(Grown-up words: the score job runs a vectorized scoring model and writes `score_snapshots`, including a factor breakdown. The model itself is a placeholder until the AI teammate finishes it.)*
-
-### 📋 The Cheat-Sheet Pages
-Reading the whole notebook would take forever.
-So the notebook makes **cheat sheets**: "the best score for each square, every hour" and "the best score for each square, every night."
-When you slide the time slider, the kitchen just reads the cheat sheet. Super fast! ⚡
-
-> *(Grown-up words: TimescaleDB continuous aggregates, `cell_hourly_score` and the hierarchical `cell_nightly_best`.)*
-
-### 📦 The Photo Cubbies
-When you share a picture, it goes into a cubby, like at school.
-The kitchen gives you a **special one-time key** that only opens one empty cubby.
-You put your picture right in. The kitchen never has to carry it.
-
-> *(Grown-up words: Vultr Object Storage, using presigned upload URLs so the browser uploads directly.)*
-
-### 🧝 The Helper Elves
-After your picture is in its cubby, little elves get to work:
-1. They make a tiny copy of it, for the map.
-2. They check which stars and planets were up in the sky when you took it.
-3. They ask the smart robot, "What do you see?" They also tell it which stars were really there, so it doesn't make things up!
-4. If the robot says "that's not the night sky," the picture gets hidden.
-
-If something goes wrong, the elves try again (3 tries total) before they give up.
-
-> *(Grown-up words: a background thread pool makes a thumbnail, builds an ephemeris-grounded list of candidate objects, and calls Gemini vision. Status: `pending` → `done`, `rejected` or `failed`.)*
-
-### 🏷️ The Name Tags
-To share pictures or vote 👍👎, you pick a name. You get a secret name tag.
-Show the name tag and the kitchen knows it's you.
-
-> *(Grown-up words: lightweight bearer-token auth. Only a hash of the token is stored.)*
+**This document covers the backend.**
 
 ---
 
-## Who builds what?
+## 2. Tech stack at a glance
 
-There are three friends on the team:
-
-- **Me (the back part):** the kitchen, notebook, robots, cubbies and elves.
-- **The AI friend:** the *really smart* brains: the star-score math, the sun-and-moon math, and the robot that looks at pictures.
-- **The screen friend:** the pretty map you actually touch and see.
-
-I didn't know exactly how my friends would build their parts. So for the AI friend, I made **toy blanks**: pretend versions that work well enough to play with. My friend can swap in the real ones later, and nothing else breaks.
-
-> *(Grown-up words: "seams". These are interface functions with placeholder bodies in `scoring/model.py`, `astro/ephemeris.py`, `ai/vision.py` and `ai/explain.py`.)*
-
-For the screen friend, I wrote down the **menu**: exactly what you can order and what the food looks like.
-
-> *(Grown-up words: Pydantic schemas form the API contract. It is documented in `backend-documentation.md`.)*
-
----
-
-## How I built it
-
-1. **First, I built the floor and walls myself:** the settings, the notebook pages, the menu, and the toy blanks.
-2. **Then I made two helper copies of me.** They built at the same time, like two kids building two halves of a Lego castle.
-   - Helper A built the kitchen, the cubbies and the elves.
-   - Helper B built the weather robot, the calculator job, and the moving-in instructions for the real server.
-3. **Then I checked their work.** I ran **112 little tests**, and they all passed! ✅
-
-> *(Grown-up words: I wrote the foundation, ran two parallel subagents for the API and ingest/infra workstreams, then did an integration review and ran pytest: 112 passed, 1 skipped.)*
+| Concern | Technology | Where you'll see it |
+|---|---|---|
+| Language | Python 3.11+ | `backend/` |
+| Web framework | Flask, served in production by gunicorn | [backend/app/__init__.py](backend/app/__init__.py), [backend/app/api/](backend/app/api/) |
+| Request/response validation | Pydantic v2 | [backend/app/schemas/](backend/app/schemas/) |
+| Database | PostgreSQL with the **TimescaleDB** (time-series) and **PostGIS** (geospatial) extensions. "Tiger Data" / Tiger Cloud is the hosted version. | [db/migrations/](db/migrations/) |
+| DB driver | `psycopg` 3 with a connection pool. Raw SQL, **no ORM**. | [backend/app/db.py](backend/app/db.py), [backend/app/repo/](backend/app/repo/) |
+| Weather data | Open-Meteo (free forecast API) | [backend/app/ingest/openmeteo.py](backend/app/ingest/openmeteo.py) |
+| Astronomy | `skyfield` (sun, moon, planets). Currently a placeholder. | [backend/app/astro/](backend/app/astro/) |
+| AI | Google Gemini via `google-genai`. Currently a placeholder. | [backend/app/ai/](backend/app/ai/) |
+| Photo storage | Vultr Object Storage (S3-compatible), accessed with `boto3` | [backend/app/storage/](backend/app/storage/) |
+| Numerical work | NumPy | [backend/app/scoring/](backend/app/scoring/) |
+| Hosting | One Vultr Linux VM: nginx in front, gunicorn for the API, systemd timers for scheduled jobs | [infra/](infra/) |
+| Local DB | Docker Compose (TimescaleDB + PostGIS image) | [docker-compose.yml](docker-compose.yml) |
 
 ---
 
-## What's not done yet
+## 3. The big picture
 
-- 🧸 **We haven't played with the real big toy box yet.** The notebook has never been opened for real, because the toy box (Docker) was turned off. All the tests used pretend notebooks. The first real try might find a few oopsies.
-  > *(Grown-up words: none of the SQL has been run against a real TimescaleDB yet.)*
-- 🌙 **The moon guesser is wobbly.** It knows how full the moon is, but it's bad at guessing *where* the moon is. The AI friend will fix that with a real one.
-  > *(Grown-up words: the placeholder ephemeris has a crude moon altitude.)*
-- 📅 **One cheat sheet needs a newer notebook.** The "best of each night" cheat sheet might need a newer version of the notebook software.
-  > *(Grown-up words: the nightly aggregate likely needs TimescaleDB 2.13 or later.)*
-- 💾 **Nothing is saved yet.** All the work is on the table, but it isn't put away in the toy chest yet.
-  > *(Grown-up words: nothing is committed to git.)*
+The backend has two halves that share one database:
 
-The end! 🌌
+- **The API** answers requests from the browser.
+- **The jobs** run on a schedule, pull in outside data, and compute scores.
+
+```
+                         ┌────────────────────── Vultr VM ──────────────────────┐
+ Browser ──HTTPS──> nginx ──/api──> Flask API (gunicorn)                         │
+    │                    │              │   └─ background threads: photo AI ─────┼──> Gemini
+    │                    │              │                                        │
+    │                    │   systemd timers ──> python -m app.ingest ... ────────┼──> Open-Meteo
+    │                    └──────────────┼────────────────┼───────────────────────┘
+    │                                   ▼                ▼
+    │                         PostgreSQL + TimescaleDB + PostGIS
+    │
+    └──── presigned PUT/GET ────> Vultr Object Storage (photos, thumbnails)
+```
+
+The **jobs write** data, and the **API mostly reads** it. The two halves never call each other directly. They only communicate through the database. This is the most useful fact to keep in mind while you read the code.
+
+---
+
+## 4. Repository tour
+
+```
+pleiades/
+├── README.md, Architecture.md, backend-documentation.md   # docs (read in that order)
+├── .env.example            # every config variable; copy to .env (never commit .env)
+├── docker-compose.yml      # local TimescaleDB + PostGIS
+├── db/migrations/          # SQL schema, applied in order by app.migrate
+├── infra/                  # nginx config, systemd units/timers, deploy.sh
+└── backend/
+    ├── requirements*.txt
+    ├── scripts/seed_dev_grid.py   # creates a fake grid for local development
+    ├── tests/                     # pytest; offline by default
+    └── app/                       # the Python package
+```
+
+Inside `backend/app/`:
+
+| Path | What it does | Open first |
+|---|---|---|
+| `__init__.py` | `create_app()`, the **app factory**: builds the Flask app, sets up the DB pool, error handlers, routes, and the photo workers | [__init__.py](backend/app/__init__.py) |
+| `config.py` | `Settings` dataclass loaded from environment variables | [config.py](backend/app/config.py) |
+| `db.py` | Connection pool (`get_conn()` for the API) and `connect_direct()` for jobs | [db.py](backend/app/db.py) |
+| `errors.py` | `ApiError` and the handlers that turn every error into the standard JSON shape | [errors.py](backend/app/errors.py) |
+| `auth.py` | Bearer-token helpers and the `@require_auth` decorator | [auth.py](backend/app/auth.py) |
+| `migrate.py` | Applies `db/migrations/*.sql` and records them in `schema_migrations` | [migrate.py](backend/app/migrate.py) |
+| `geo.py`, `timeutil.py` | Small helpers: bounding boxes and GeoJSON shapes; UTC, hours, and "tonight" | |
+| `api/` | **Flask blueprints**, one per area: `scores`, `spots`, `photos`, `users`, `sky`, `health`. Thin route handlers. | [api/scores.py](backend/app/api/scores.py) |
+| `schemas/` | Pydantic models for every request and response. **This is the API contract** with the frontend. | [schemas/scores.py](backend/app/schemas/scores.py) |
+| `repo/` | **All SQL lives here.** One module per area. The functions return plain dicts. | [repo/scores.py](backend/app/repo/scores.py) |
+| `ingest/` | The scheduled jobs: `weather`, `astro`, `score`. The entry point is `python -m app.ingest`. | [ingest/__main__.py](backend/app/ingest/__main__.py) |
+| `scoring/` | The scoring model (AI/ML seam) and its input/output types | [scoring/model.py](backend/app/scoring/model.py) |
+| `astro/` | Sun, moon, planets, and sky events (AI/ML seam) | [astro/ephemeris.py](backend/app/astro/ephemeris.py) |
+| `ai/` | Gemini photo analysis and score explanations (AI/ML seams) | [ai/vision.py](backend/app/ai/vision.py) |
+| `storage/` | S3 presigned URLs, downloads, and thumbnail generation (Pillow) | [storage/s3.py](backend/app/storage/s3.py) |
+| `workers/` | Background thread pool that analyzes uploaded photos | [workers/photo_analysis.py](backend/app/workers/photo_analysis.py) |
+
+---
+
+## 5. Key concepts
+
+### 5.1 The grid and curated spots
+The region (roughly lat 42.0–43.4, lon −79.8 to −77.0) is split into a **0.1° grid**, about 8–11 km per cell. Cells over Lake Erie and Lake Ontario are dropped. Each cell is a row in the `grid_cells` table, and its location is stored as a **PostGIS `geography` point** at the cell's center. The API draws each cell as a square around that point.
+
+A few well-known stargazing locations, such as Allegany State Park, are **curated spots**. They live in the same table with `is_curated = true`, and the API returns them as map **Points** instead of squares.
+
+Each cell has static attributes that never change:
+- elevation
+- sky brightness (light pollution), in **mag/arcsec²**: higher means darker, and ~22 is pristine
+- **Bortle class**: a 1–9 darkness scale, where 1 is darkest
+
+**Why it matters:** almost every table references `grid_cells.id`, so cell IDs must never be renumbered once data exists.
+
+### 5.2 The Stargazing Score
+For each cell and hour, the model estimates how many stars a person could actually see. It uses **NELM** (naked-eye limiting magnitude, the faintest star visible) and reduces it for clouds, haze, twilight, and moonlight. The result is a number from 0 to 100, plus a label: Excellent ≥ 75, Good ≥ 50, Fair ≥ 25, otherwise Poor.
+
+Along with the score, the model returns a **factor breakdown**: how many points each cause cost or added, for example `{"clouds": -20, "moon": -12, "elevation": +2}`. The UI draws these as bars, and the `top_factor` field on the map is the biggest loss. The full math is in [Architecture.md §6](Architecture.md).
+
+### 5.3 Time-series storage: keep every revision
+Weather forecasts change every few hours. Most apps overwrite the old forecast. **Pleiades keeps every version.**
+
+- `weather_forecast` is keyed by `(cell_id, valid_time, fetched_at)`:
+  - `valid_time` is the hour being forecast.
+  - `fetched_at` is when we asked for the forecast.
+- `score_snapshots` works the same way, using `computed_at`.
+
+This turns the database into a "sensor log." It lets the app answer questions like "how did tonight's predicted score change over the last two days?" (the `/spots/:id/drift` route).
+
+These big, append-only, time-keyed tables are TimescaleDB **hypertables**. To you, a hypertable looks like a normal Postgres table. Behind the scenes it is split into time chunks, so time-range queries stay fast, and old chunks can be compressed or dropped by policy. See [db/migrations/003_policies.sql](db/migrations/003_policies.sql).
+
+### 5.4 Continuous aggregates: precomputed read models
+Because every revision is kept, the "current" score for a cell and hour is *the latest snapshot*. Computing that on every map request would be slow. Instead, TimescaleDB keeps two **continuous aggregates**, which are materialized views that refresh incrementally:
+
+- `cell_hourly_score`: the freshest score per cell per hour. The map and time slider read from this.
+- `cell_nightly_best`: the best score per cell per night, built on top of the hourly aggregate. The "Tonight's best spots" feature reads from this.
+
+Both are defined in [db/migrations/002_aggregates.sql](db/migrations/002_aggregates.sql). The score job refreshes them right after it writes new snapshots.
+
+### 5.5 Presigned uploads
+Photos never pass through the Flask server. Instead:
+
+1. The API generates a **presigned URL**: a short-lived URL that grants permission to upload one specific file to the storage bucket.
+2. The browser uploads the file directly to that URL.
+
+This keeps large uploads off our server. The presigned URL locks in the content type and size, so the browser must send exactly the headers the API returned.
+
+### 5.6 Auth: bearer tokens
+There are no passwords:
+
+1. `POST /api/users {username}` returns a random **token**.
+2. The browser stores the token and sends `Authorization: Bearer <token>` on routes that need a user (uploading and voting).
+
+The database stores only a SHA-256 **hash** of the token, so a leaked database doesn't leak working tokens. See [auth.py](backend/app/auth.py).
+
+### 5.7 Seams (placeholder functions)
+The backend was built before the AI/ML work was done. To unblock everyone, the AI/ML entry points are **seams**: functions with fixed signatures and simple placeholder bodies. The pipeline runs end to end today, and the AI/ML teammate can later replace the bodies without touching anything else.
+
+| Seam | Used by |
+|---|---|
+| `scoring/model.py` → `score_batch` | the score job |
+| `astro/ephemeris.py` → `hourly_conditions`, `sky_events`, `night_summary`, `visible_objects` | the astro job, `/api/sky-events`, the photo worker |
+| `ai/vision.py` → `analyze_photo` | the photo worker |
+| `ai/explain.py` → `explain_score` | `/api/spots/:id` |
+
+Each seam file starts with an `OWNER: AI/ML` comment, and its input and output types live in the package's `types.py`. **Don't change seam signatures.** [backend-documentation.md §3](backend-documentation.md) is the full contract.
+
+---
+
+## 6. How data moves
+
+### 6.1 The scheduled pipeline
+Each job is a CLI command run by a systemd timer (see [infra/](infra/)). You can also run them by hand.
+
+| Order | Command | Production schedule | Reads | Writes |
+|---|---|---|---|---|
+| 1 | `python -m app.ingest astro` | daily at 12:00 UTC, and 2 min after boot | `astro.ephemeris` | `astro_conditions`, `sky_events` |
+| 2 | `python -m app.ingest weather` | every 3 h at :05 | `grid_cells`, Open-Meteo API | `weather_forecast` (new revision) |
+| 3 | `python -m app.ingest score` | hourly at :15, and right after each weather run | latest forecast + `astro_conditions` + `grid_cells` | `score_snapshots`, then refreshes both aggregates |
+
+`python -m app.ingest all` runs all three in order, which is what you'll use locally.
+
+Every run is wrapped by `run_job()` in [ingest/__main__.py](backend/app/ingest/__main__.py), which records it in the `ingest_runs` table with status `ok` or `error`. `/api/health` uses that table to report when data was last refreshed.
+
+The score job ([ingest/score.py](backend/app/ingest/score.py)) is the most interesting one:
+1. It loads every cell × hour in the forecast window, about 26k rows.
+2. It packs them into NumPy arrays (a `FeatureBatch`).
+3. It calls `score_batch` once.
+4. It validates the output and bulk-inserts it with `COPY`.
+
+### 6.2 The photo pipeline
+```
+Browser                         API                              Background worker
+───────                         ───                              ─────────────────
+POST /photos/presign  ───────>  returns upload_url + s3_key
+PUT file to upload_url ──────>  (goes straight to Vultr storage)
+POST /photos {s3_key, lat, …} > inserts row, ai_status=pending ─> 1. download original
+                                returns 201 {id}                  2. write 512px thumbnail
+GET /photos/:id (poll ~2s)                                        3. visible_objects(lat, lon, time)
+   until status ≠ pending                                         4. analyze_photo(image, candidates)
+                                                                  5. status = done | rejected
+```
+
+**Grounding:** step 3 computes which planets and bright stars were actually above the horizon at that time and place. The worker passes that list to Gemini as the only allowed candidates, which reduces made-up answers.
+
+The final status depends on the result:
+- `rejected`: Gemini says the photo isn't a night sky. The photo is hidden from the map.
+- `failed`: every attempt raised an error. There are **3 attempts**, with backoff between them.
+
+On startup, the worker also re-queues photos that have been `pending` for more than 10 minutes. This recovers from a server restart in the middle of an analysis. See [workers/photo_analysis.py](backend/app/workers/photo_analysis.py).
+
+---
+
+## 7. Tracing one request: `GET /api/scores`
+
+Following one request through the code is the fastest way to learn the layering. This is the route that draws the map.
+
+1. **App setup.** [create_app()](backend/app/__init__.py) builds the Flask app, then:
+   - loads `Settings`
+   - registers error handlers
+   - opens the DB pool
+   - calls `register_blueprints()` in [api/__init__.py](backend/app/api/__init__.py), which mounts every blueprint under `/api`
+2. **Route.** `get_scores()` in [api/scores.py](backend/app/api/scores.py) runs and does three things:
+   - `hour_arg()` from [api/params.py](backend/app/api/params.py) parses `?time=` and rounds it down to the hour. If the parameter is missing, it uses the current hour.
+   - `parse_bbox()` from [geo.py](backend/app/geo.py) parses `?bbox=`. If the parameter is missing, it uses the whole region.
+   - Bad input raises `bad_request(...)`, which is an `ApiError`.
+3. **Repo / SQL.** `scores_repo.scores_at(hour, bbox)` in [repo/scores.py](backend/app/repo/scores.py):
+   - Gets a pooled connection with `get_conn()`.
+   - Selects `grid_cells` inside the bounding box using the PostGIS `&&` operator.
+   - LEFT JOINs `cell_hourly_score` for that hour. Unscored cells still come back, with `score = NULL`.
+   - Returns a list of dicts.
+4. **Shaping the response.** Back in the route, each row becomes a GeoJSON feature:
+   - Curated spots become Points and grid cells become Polygons.
+   - The Pydantic models `ScoreFeatureProperties`, `ScoreFeature`, and `ScoresResponse` from [schemas/scores.py](backend/app/schemas/scores.py) build the payload.
+   - `score_label()` and `top_factor()` fill in the derived fields.
+5. **Serialization.** The route returns `ScoresResponse(...).model_dump(mode="json")`, and Flask sends it as JSON.
+6. **Errors.** Any `ApiError` or Pydantic `ValidationError` raised along the way is caught by the handlers in [errors.py](backend/app/errors.py). They return `{"error": {"code", "message", "details"}}` with the right HTTP status. An unexpected exception becomes a 500 with code `internal_error`.
+
+Every other route follows the same **route → repo → schema** pattern.
+
+---
+
+## 8. Conventions to follow
+
+- **SQL goes in `repo/` only.** Routes parse input, call repo functions, and build Pydantic responses. Nothing else.
+- **`schemas/` is a team contract.** The frontend codes against it. Change it only after telling the team.
+- **Never change seam signatures**, or the types in `scoring/types.py`, `astro/types.py`, and `ai/types.py`, without the same heads-up.
+- **Schema changes go in a new migration file**, for example `db/migrations/004_something.sql`. Never edit a migration that has already been applied.
+- **Errors:** raise `ApiError` (or `bad_request`, `not_found`, `unauthorized`). Don't build error JSON by hand.
+- **Settings:** add new ones to `config.py` *and* `.env.example`.
+  - Inside a request, read them with `current_settings()`.
+  - In jobs, use `get_settings()`.
+- **Time:** everything is timezone-aware **UTC**. Convert to `America/New_York` only for "which night is it" logic, using the helpers in [timeutil.py](backend/app/timeutil.py).
+- **Tests run offline.** API tests use the `client` fixture from [tests/conftest.py](backend/tests/conftest.py), which builds the app with no DB, and **monkeypatch the repo function**. See `test_scores_geojson` in [tests/test_api_scores.py](backend/tests/test_api_scores.py) for the pattern. Tests that need a real database are marked `db` and run only when you ask for them with `-m db`.
+
+---
+
+## 9. Running it locally (short version)
+
+```bash
+docker compose up -d db                       # local TimescaleDB + PostGIS
+cd backend && python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
+cp ../.env.example ../.env                    # defaults point at the docker DB
+.venv/bin/python -m app.migrate               # create tables
+.venv/bin/python scripts/seed_dev_grid.py --no-elevation   # fake grid
+.venv/bin/python -m app.ingest all            # astro -> weather -> score
+.venv/bin/flask --app app run --debug         # http://localhost:5000/api/health
+.venv/bin/python -m pytest -q                 # offline tests
+```
+
+The app starts even without a database or storage configured. In that case `/api/health` reports `degraded`, and DB-backed routes return 500. Photo uploads need real S3 credentials. The [README](README.md) has the full instructions, including how to run the integration tests safely.
+
+---
+
+## 10. Suggested reading order for day one
+
+1. [README.md](README.md), then skim [Architecture.md](Architecture.md) §1–5.
+2. [db/migrations/001_init.sql](db/migrations/001_init.sql): the tables are the clearest map of the domain.
+3. [backend/app/__init__.py](backend/app/__init__.py) and [config.py](backend/app/config.py).
+4. The `GET /api/scores` trace from §7, then [tests/test_api_scores.py](backend/tests/test_api_scores.py).
+5. [ingest/__main__.py](backend/app/ingest/__main__.py) → [ingest/score.py](backend/app/ingest/score.py) → [scoring/model.py](backend/app/scoring/model.py).
+6. [api/photos.py](backend/app/api/photos.py) → [workers/photo_analysis.py](backend/app/workers/photo_analysis.py).
+7. [backend-documentation.md](backend-documentation.md) as a reference whenever you touch a route or seam.
+
+---
+
+## 11. Glossary
+
+| Term | Meaning |
+|---|---|
+| **App factory** | A function (`create_app`) that builds and configures the Flask app on demand, so tests can create one with different settings. |
+| **Blueprint** | A Flask group of related routes, registered on the app with a URL prefix. |
+| **Bortle class** | A 1–9 scale of night-sky darkness. 1 is a pristine dark site, 9 is an inner city. |
+| **mag/arcsec²** | Unit of sky surface brightness. It is logarithmic, and **higher is darker**. |
+| **NELM** | Naked-eye limiting magnitude: the faintest star you can see. ~6.5+ is a dark sky. |
+| **Ephemeris** | Calculated positions of the sun, moon, and planets at a given time and place. |
+| **Hypertable** | A TimescaleDB table automatically split into time chunks, which enables fast time queries, compression, and retention. |
+| **Continuous aggregate** | A TimescaleDB materialized view that refreshes incrementally as new data arrives. |
+| **PostGIS / `geography`** | The Postgres geospatial extension. `geography` columns store lat/lon points and support distance and bounding-box queries. |
+| **Presigned URL** | A temporary URL that lets the holder upload or download one object in a storage bucket without credentials. |
+| **Bearer token** | A secret string sent in the `Authorization` header. Whoever has it is treated as that user. |
+| **Seam** | A function boundary with a fixed signature and a placeholder body, meant to be replaced by another teammate. |
+| **Revision** | One fetched forecast or one score computation. Pleiades keeps all of them. |
+
+---
+
+## 12. Current status and known gaps
+
+- **The SQL has never run against a real database.** All offline tests mock the repo layer. Running `docker compose up` and then `pytest -m db` will be the first real check, so expect some fixes.
+- **The AI/ML seams are placeholders.**
+  - The sun position is roughly right, but the moon altitude is crude, and moonrise/moonset and planets are empty. Moon-related scores aren't realistic yet.
+  - Vision and explanations return neutral or template text.
+- **`cell_nightly_best` needs a recent TimescaleDB (about 2.13+)** because it uses a time-zone-aware daily bucket.
+- **Not built yet:**
+  - the frontend (`frontend/`)
+  - the real grid builder (`data/build_grid.py`), which will sample the real light-pollution atlas. Until then, [scripts/seed_dev_grid.py](backend/scripts/seed_dev_grid.py) creates a fake grid.
+- **The integration tests truncate tables.** Always point `TEST_DATABASE_URL` at a throwaway database.
+
+For the full list, see [backend-documentation.md §9](backend-documentation.md).

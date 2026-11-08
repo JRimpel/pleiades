@@ -7,15 +7,20 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "test:unit": "node --experimental-strip-types --test tests/astronomy.test.ts",
+    "test:browser": "playwright test",
+    "test:browser:install": "node scripts/install-browser.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@google/model-viewer": "^4.4.0",
     "maplibre-gl": "^6.17.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.65.0",
     "@types/node": "^24.19.2",
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",

@@ -36,9 +36,15 @@ function StargazingMap() {
         maxZoom: 18,
       })
     } catch {
-      setStatus('')
-      setError('The map could not start. Try a browser with WebGL enabled.')
-      return
+      // Report the external renderer failure asynchronously; cancel on unmount.
+      let disposed = false
+      queueMicrotask(() => {
+        if (!disposed) {
+          setStatus('')
+          setError('The map could not start. Try a browser with WebGL enabled.')
+        }
+      })
+      return () => { disposed = true }
     }
 
     mapRef.current = map

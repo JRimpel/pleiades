@@ -1,0 +1,68 @@
+{
+  "source": "https://raw.githubusercontent.com/astronexus/HYG-Database/main/hyg/CURRENT/hygdata_v40.csv.gz",
+  "license": "CC BY-SA 4.0",
+  "epoch": "J2000",
+  "stars": [
+    {
+      "name": "Celaeno",
+      "ra_hours": 3.746726,
+      "dec_deg": 24.28947,
+      "magnitude": 5.45
+    },
+    {
+      "name": "Electra",
+      "ra_hours": 3.747927,
+      "dec_deg": 24.113339,
+      "magnitude": 3.72
+    },
+    {
+      "name": "Taygeta",
+      "ra_hours": 3.75347,
+      "dec_deg": 24.467278,
+      "magnitude": 4.3
+    },
+    {
+      "name": "Maia",
+      "ra_hours": 3.763779,
+      "dec_deg": 24.367748,
+      "magnitude": 3.87
+    },
+    {
+      "name": "Asterope",
+      "ra_hours": 3.765132,
+      "dec_deg": 24.554511,
+      "magnitude": 5.76
+    },
+    {
+      "name": "Merope",
+      "ra_hours": 3.772104,
+      "dec_deg": 23.948358,
+      "magnitude": 4.14
+    },
+    {
+      "name": "Alcyone",
+      "ra_hours": 3.79141,
+      "dec_deg": 24.105137,
+      "magnitude": 2.85
+    },
+    {
+      "name": "Atlas",
+      "ra_hours": 3.819373,
+      "dec_deg": 24.053415,
+      "magnitude": 3.62
+    },
+    {
+      "name": "Pleione",
+      "ra_hours": 3.819782,
+      "dec_deg": 24.136712,
+      "magnitude": 5.05
+    },
+    {
+      "name": "Vega",
+      "ra_hours": 18.61564,
+      "dec_deg": 38.783692,
+      "magnitude": 0.03
+    }
+  ],
+  "cluster_depth": "illustrative; not a measured 3-D reconstruction"
+}

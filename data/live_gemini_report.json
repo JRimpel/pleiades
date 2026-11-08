@@ -5,18 +5,18 @@
       "status": "failed",
       "details": {
         "error_type": "ClientError",
-        "code": 400,
-        "status": "Bad Request",
-        "message": "<html><title>Error 400 (Bad Request)!!1</title></html>"
+        "code": 401,
+        "status": "UNAUTHENTICATED",
+        "message": "API key not valid. Please pass a valid API key."
       }
     },
     "vision_non_sky": {
       "status": "failed",
       "details": {
         "error_type": "ClientError",
-        "code": 400,
-        "status": "Bad Request",
-        "message": "<html><title>Error 400 (Bad Request)!!1</title></html>"
+        "code": 401,
+        "status": "UNAUTHENTICATED",
+        "message": "API key not valid. Please pass a valid API key."
       }
     }
   }

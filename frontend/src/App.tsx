@@ -1,4 +1,5 @@
 import StargazingMap from './components/StargazingMap'
+import { ExploreIn3D } from './explore'
 import './App.css'
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
         <span className="region-label">Western New York</span>
       </header>
       <StargazingMap />
+      <ExploreIn3D />
     </main>
   )
 }

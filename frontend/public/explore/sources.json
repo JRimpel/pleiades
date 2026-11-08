@@ -1,0 +1,39 @@
+{
+  "sources": [
+    {
+      "asset": "saturn",
+      "page": "https://science.nasa.gov/resource/saturn-3d-model/",
+      "model_url": "https://assets.science.nasa.gov/content/dam/science/psd/solar/2023/09/s/Saturn_1_120536.glb",
+      "image_url": "https://science.nasa.gov/wp-content/uploads/2023/05/saturn-farewell-pia21345-sse-banner-1920x640-1.jpg",
+      "reference_page": "https://science.nasa.gov/saturn/",
+      "credit": "NASA VTAD",
+      "bytes": 5476584,
+      "sha256": "8dbfde533b13e938408d8aded1d1ce48a084806233f67775371d83013dba7d38"
+    },
+    {
+      "asset": "jupiter",
+      "page": "https://science.nasa.gov/resource/jupiter-3d-model/",
+      "model_url": "https://assets.science.nasa.gov/content/dam/science/psd/solar/2023/09/j/Jupiter_1_142984.glb",
+      "image_url": "https://assets.science.nasa.gov/content/dam/science/psd/solar/internal_resources/4204/Jupiter_against_black_background_of_space.jpeg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg",
+      "reference_page": "https://science.nasa.gov/jupiter/",
+      "credit": "NASA VTAD",
+      "bytes": 11479456,
+      "sha256": "8edc4e9b88b73ca1b125a258f0ecaef7fc6494a7cadda37704af459a119f4870"
+    },
+    {
+      "asset": "pleiades",
+      "page": "https://science.nasa.gov/photojournal/seven-sisters-get-wise/",
+      "image_url": "https://assets.science.nasa.gov/content/dam/science/psd/photojournal/pia/pia13/pia13121/PIA13121.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg",
+      "credit": "NASA/JPL-Caltech/UCLA; infrared WISE image"
+    },
+    {
+      "asset": "andromeda",
+      "page": "https://science.nasa.gov/photojournal/andromeda/",
+      "image_url": "https://assets.science.nasa.gov/content/dam/science/psd/photojournal/pia/pia15/pia15416/PIA15416.jpg/jcr:content/renditions/cq5dam.web.1280.1280.jpeg",
+      "credit": "NASA/JPL-Caltech; ultraviolet GALEX image"
+    }
+  ],
+  "catalog_url": "https://raw.githubusercontent.com/astronexus/HYG-Database/main/hyg/CURRENT/hygdata_v40.csv.gz",
+  "catalog_credit": "David Nash / Astronexus, HYG v4.0, CC BY-SA 4.0",
+  "generated_models": "Pleiades: angular layout from HYG, schematic depth/enlarged stars, CC BY-SA 4.0. Vega and galaxy: original educational illustrations, CC BY 4.0."
+}

@@ -1,6 +1,9 @@
 import type {
   ApiErrorBody,
   BestResponse,
+  ChatContext,
+  ChatMessage,
+  ChatResponse,
   CreatePhotoRequest,
   CreatePhotoResponse,
   CreateUserResponse,
@@ -133,6 +136,11 @@ export function fetchSkyEvents(signal?: AbortSignal, at?: { lat: number; lon: nu
   return getJson<SkyEventsResponse>(withQuery('/api/sky-events', { lat: at?.lat, lon: at?.lon, date }), signal)
 }
 
+/** Ask the stargazing assistant. `messages` is the conversation so far, ending with the user's question. */
+export function postChat(messages: ChatMessage[], context: ChatContext, signal?: AbortSignal) {
+  return requestJson<ChatResponse>('/api/chat', { method: 'POST', body: { messages, context }, signal })
+}
+
 // ---- Community photos ----
 
 /** Every visible photo in the navigable region, newest first. The region is small enough to load once. */
@@ -165,6 +173,11 @@ export function presignPhoto(token: string, contentType: string, size: number) {
 /** Register an uploaded object; the backend then queues thumbnail + AI analysis. */
 export function createPhoto(token: string, body: CreatePhotoRequest) {
   return requestJson<CreatePhotoResponse>('/api/photos', { method: 'POST', token, body })
+}
+
+/** Demo reset: deletes every photo, its votes and its stored files. */
+export function wipePhotos() {
+  return requestJson<{ deleted: number }>('/api/photos/wipe', { method: 'POST' })
 }
 
 /** 1 = up, -1 = down, 0 = remove my vote. */

@@ -50,6 +50,24 @@
   box-shadow: 0 0 6px #b8caff;
 }
 
+/* Demo-only: deletes every photo. */
+.photo-wipe-button {
+  background: transparent;
+  color: #f0a3a3;
+  border-color: rgba(240, 120, 120, 0.55);
+}
+
+.photo-wipe-button:hover:not(:disabled) {
+  background: #c24040;
+  color: #fff;
+  border-color: #c24040;
+}
+
+.photo-wipe-button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
 .photo-signed-in {
   color: #8d98ae;
   font-size: 12px;
@@ -69,14 +87,14 @@
 
 .photo-marker {
   display: block;
-  width: 44px;
-  height: 44px;
+  width: 34px;
+  height: 34px;
   padding: 0;
   overflow: hidden;
   background: #1d2a44;
-  border: 3px solid #b8caff;
+  border: 2px solid #b8caff;
   border-radius: 50%;
-  box-shadow: 0 0 0 3px rgba(184, 202, 255, 0.25), 0 0 14px 2px rgba(143, 176, 255, 0.55);
+  box-shadow: 0 0 0 2px rgba(184, 202, 255, 0.25), 0 0 12px 2px rgba(143, 176, 255, 0.55);
   cursor: pointer;
   transition: transform 120ms ease;
   animation: photo-glow 3.2s ease-in-out infinite;
@@ -107,12 +125,12 @@
   place-items: center;
   height: 100%;
   color: #dce5ff;
-  font-size: 18px;
+  font-size: 14px;
 }
 
 @keyframes photo-glow {
   50% {
-    box-shadow: 0 0 0 3px rgba(184, 202, 255, 0.35), 0 0 20px 4px rgba(143, 176, 255, 0.75);
+    box-shadow: 0 0 0 2px rgba(184, 202, 255, 0.35), 0 0 16px 3px rgba(143, 176, 255, 0.75);
   }
 }
 

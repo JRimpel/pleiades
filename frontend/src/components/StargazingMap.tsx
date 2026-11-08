@@ -295,8 +295,27 @@ interface StargazingMapProps {
   onPickLocation?: ((lat: number, lon: number) => void) | null
   /** Location chosen for a photo being uploaded. */
   draftPin?: { lat: number; lon: number } | null
+  /** Places to pulse briefly (e.g. spots the assistant recommended). Pass a new object to pulse again. */
+  highlights?: MapHighlights
+  /** Called with the visible area after every pan or zoom, and once when the map loads. */
+  onViewportChange?: (viewport: MapViewport) => void
   children?: React.ReactNode
 }
+
+export interface MapHighlights {
+  points: { lat: number; lon: number }[]
+  key: number
+}
+
+export interface MapViewport {
+  west: number
+  south: number
+  east: number
+  north: number
+}
+
+/** How long highlighted places pulse. */
+const HIGHLIGHT_MS = 8000
 
 /**
  * Add the score sources and layers. The smooth surface sits under basemap labels so town
@@ -391,6 +410,8 @@ function StargazingMap({
   onOpenPhotoGroup,
   onPickLocation,
   draftPin,
+  highlights,
+  onViewportChange,
   children,
 }: StargazingMapProps) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -422,6 +443,10 @@ function StargazingMap({
   useEffect(() => {
     onSelectRef.current = onSelectCell
   }, [onSelectCell])
+  const onViewportRef = useRef(onViewportChange)
+  useEffect(() => {
+    onViewportRef.current = onViewportChange
+  }, [onViewportChange])
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -596,6 +621,17 @@ function StargazingMap({
       map.on('sourcedata', (event) => {
         if (event.sourceId === PHOTO_SOURCE && event.isSourceLoaded) syncPhotoMarkers()
       })
+      const reportViewport = () => {
+        const bounds = map.getBounds()
+        onViewportRef.current?.({
+          west: bounds.getWest(),
+          south: bounds.getSouth(),
+          east: bounds.getEast(),
+          north: bounds.getNorth(),
+        })
+      }
+      map.on('moveend', reportViewport)
+      reportViewport()
       setMapReady(true)
     })
     map.on('error', () => {
@@ -688,6 +724,26 @@ function StargazingMap({
       marker.remove()
     }
   }, [mapReady, draftPin])
+
+  // Pulse highlighted places for a few seconds.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!mapReady || !map || !highlights?.points.length) return
+    const markers = highlights.points.map(({ lat, lon }, index) => {
+      // MapLibre positions the marker element with `transform`, so the animated ring is a child.
+      const element = document.createElement('div')
+      element.setAttribute('aria-hidden', 'true')
+      const ring = document.createElement('div')
+      ring.className = index === 0 ? 'map-highlight primary' : 'map-highlight'
+      element.append(ring)
+      return new Marker({ element }).setLngLat([lon, lat]).addTo(map)
+    })
+    const timer = window.setTimeout(() => markers.forEach((marker) => marker.remove()), HIGHLIGHT_MS)
+    return () => {
+      window.clearTimeout(timer)
+      markers.forEach((marker) => marker.remove())
+    }
+  }, [mapReady, highlights])
 
   // Crosshair while picking an upload location.
   useEffect(() => {

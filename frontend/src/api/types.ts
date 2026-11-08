@@ -282,3 +282,48 @@ export interface VoteResponse {
   vote_count: number
   my_vote: VoteValue
 }
+
+// ---------- Chat assistant (mirrors schemas/chat.py) ----------
+
+export interface ChatMessage {
+  role: 'user' | 'assistant'
+  content: string
+}
+
+/** What the user is looking at, so "here", "this spot" and "at this time" make sense to the assistant. */
+export interface ChatContext {
+  location?: { lat: number; lon: number }
+  /** The hour on the time slider (ISO UTC). */
+  time?: string
+  selected_cell_id?: number
+  viewport?: { west: number; south: number; east: number; north: number }
+}
+
+export interface ChatSpot {
+  cell_id: number
+  name: string | null
+  lat: number
+  lon: number
+  score: number | null
+  label: ScoreLabel | null
+  /** The hour the score is for, when the assistant looked one up. */
+  valid_time: string | null
+}
+
+export interface ChatPhoto {
+  id: string
+  lat: number
+  lon: number
+  thumb_url: string | null
+  taken_at: string | null
+  description: string | null
+  objects: string[]
+}
+
+export interface ChatResponse {
+  reply: string
+  /** The data look-ups behind the reply. */
+  tool_calls: { name: string; args: Record<string, unknown> }[]
+  spots: ChatSpot[]
+  photos: ChatPhoto[]
+}

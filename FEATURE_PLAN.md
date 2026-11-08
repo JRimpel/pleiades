@@ -1,6 +1,6 @@
 # Pleiades: feature feasibility and build plan
 
-Written November 7, 2026. This is a future-work plan. *Update, Nov 8:* C (Tonight's best and the dusk/dawn ticks) and F (the forecast-drift chart) are built, and the Gemini blocker below is resolved. The rest is not implemented yet.
+Written November 7, 2026. This is a future-work plan. *Update, Nov 8:* the chatbot (Idea 2), C (Tonight's best and the dusk/dawn ticks) and F (the forecast-drift chart) are built, and the Gemini blocker below is resolved. The rest is not implemented yet.
 
 ## Context
 The team wants to add two features to the UB Hacking 2026 submission:
@@ -49,6 +49,8 @@ Both ideas depend on Gemini. Every live call failed with **HTTP 400 and an HTML 
 ---
 
 ## Idea 2: Chatbot. Feasibility: HIGH, if built as an agent that calls tools
+
+*Built (Nov 8).* `POST /api/chat` (`api/chat.py`, `ai/chat.py`, `ai/chat_tools.py`) and `ChatPanel.tsx` ("Ask the sky" in the header). Differences from the sketch below: the tools are `find_place` (curated spots, then `app/data/wny_towns.json`, then Open-Meteo geocoding), `best_spots`, `spot_conditions`, `when_visible`, `sky_tonight`, and `search_photos` (community photos with their AI analysis, shown as cards that open the photo viewer). Each request carries the app context: user location, slider hour, open spot, and map viewport. A reply that names spots flies the map to the first one, pulses all of them, and moves the slider to the hour they were scored for. Rate limit: `CHAT_PER_MINUTE` per client IP, taken from the nginx X-Forwarded-For hop. Tests: `backend/tests/test_api_chat.py`.
 
 The project already has the data the bot needs. A Gemini function-calling loop over existing repo and ephemeris functions gives grounded answers, so the bot doesn't invent numbers. This is also a strong Best AI/ML story: an agent that answers with real time-series data.
 

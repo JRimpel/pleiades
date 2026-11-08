@@ -5,7 +5,7 @@ from flask import Flask
 
 
 def register_blueprints(app: Flask) -> None:
-    from . import health, photos, scores, sky, spots, users
+    from . import chat, health, photos, scores, sky, spots, users
 
-    for module in (users, scores, spots, photos, sky, health):
+    for module in (users, scores, spots, photos, sky, chat, health):
         app.register_blueprint(module.bp, url_prefix="/api")

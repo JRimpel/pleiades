@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import re
 import uuid
 from datetime import timedelta
@@ -21,6 +22,8 @@ from ..storage import s3
 from ..timeutil import floor_hour, utcnow
 from ..workers import photo_analysis
 from .params import body, int_arg
+
+log = logging.getLogger(__name__)
 
 bp = Blueprint("photos", __name__)
 
@@ -120,6 +123,19 @@ def list_photos():
         for r in photos_repo.list_markers(bbox, sort, limit)
     ]
     return PhotoListResponse(photos=markers).model_dump(mode="json")
+
+
+@bp.post("/photos/wipe")
+def wipe_photos():
+    """Demo reset: delete every photo, its votes, and its stored files. Deliberately unauthenticated."""
+    rows = photos_repo.delete_all()
+    keys = [k for r in rows for k in (r.get("s3_key"), r.get("thumb_key")) if k]
+    if keys and current_settings().s3_configured:
+        try:
+            s3.delete_objects(keys)
+        except Exception as e:  # noqa: BLE001 - rows are already gone; leftover files are harmless
+            log.warning("wipe: could not delete %d stored objects: %s", len(keys), e)
+    return {"deleted": len(rows)}
 
 
 @bp.get("/photos/<uuid:photo_id>")

@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useId, useMemo, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { PHOTOS_KEY, usePhotos, useScoreRange, useScores, useSkyEvents, useSpot } from './api/hooks'
-import type { BestSpot } from './api/types'
-import { ApiError } from './api/client'
+import type { BestSpot, ChatContext, ChatSpot } from './api/types'
+import { ApiError, wipePhotos } from './api/client'
 import BestSpots from './components/BestSpots'
+import ChatPanel from './components/ChatPanel'
 import PhotoUploadDialog from './components/PhotoUploadDialog'
 import type { UploadLocation } from './components/PhotoUploadDialog'
 import PhotoViewer from './components/PhotoViewer'
@@ -15,7 +16,7 @@ import SkyPanel from './components/SkyPanel'
 import SpotPanel from './components/SpotPanel'
 import StargazingMap from './components/StargazingMap'
 import { ExploreIn3D } from './explore'
-import type { MapFocus } from './components/StargazingMap'
+import type { MapFocus, MapHighlights, MapViewport } from './components/StargazingMap'
 import TimeSlider from './components/TimeSlider'
 import { nearestCell } from './lib/nearestCell'
 import { isWithinBounds } from './lib/region'
@@ -26,6 +27,7 @@ import { resolveObservingContext } from './lib/observingContext'
 import { nightDate } from './explore/astronomy'
 import './App.css'
 import './photos.css'
+import './chat.css'
 
 /** How long the "outside Western New York" notice stays up. */
 const OUTSIDE_NOTICE_MS = 8000
@@ -120,17 +122,67 @@ function App() {
     setSelectedMs(ms)
   }, [])
 
-  const pickBest = useCallback(
-    (spot: BestSpot) => {
-      let ms = Math.floor(Date.parse(spot.valid_time) / HOUR_MS) * HOUR_MS
-      setPanelTime(toIsoHour(ms))
-      if (minMs !== undefined && maxMs !== undefined) ms = Math.min(Math.max(ms, minMs), maxMs)
-      setSelectedMs(ms)
-      setRequestedMs(ms)
+  /** Open a spot's details and fly to it; with `validTime`, also move the slider to that hour. */
+  const showSpot = useCallback(
+    (spot: { cell_id: number; lat: number; lon: number; valid_time?: string | null }) => {
+      if (spot.valid_time) {
+        let ms = Math.floor(Date.parse(spot.valid_time) / HOUR_MS) * HOUR_MS
+        setPanelTime(toIsoHour(ms))
+        if (minMs !== undefined && maxMs !== undefined) ms = Math.min(Math.max(ms, minMs), maxMs)
+        setSelectedMs(ms)
+        setRequestedMs(ms)
+      } else {
+        setPanelTime(undefined)
+      }
       setSelectedCellId(spot.cell_id)
       setFocus({ lat: spot.lat, lon: spot.lon, key: Date.now() })
     },
     [minMs, maxMs],
+  )
+  const pickBest = useCallback((spot: BestSpot) => showSpot(spot), [showSpot])
+
+  // ---- "Ask the sky" assistant ----
+  const [chatOpen, setChatOpen] = useState(false)
+  const [highlights, setHighlights] = useState<MapHighlights>()
+  const viewportRef = useRef<MapViewport | undefined>(undefined)
+  const onViewportChange = useCallback((viewport: MapViewport) => {
+    viewportRef.current = viewport
+  }, [])
+  const contextTime = panelTime ?? (sliderMs === undefined ? undefined : toIsoHour(sliderMs))
+  const getChatContext = useCallback(
+    (): ChatContext => ({
+      location: regionLocation ? { lat: regionLocation.lat, lon: regionLocation.lon } : undefined,
+      time: contextTime,
+      selected_cell_id: selectedCellId ?? undefined,
+      viewport: viewportRef.current,
+    }),
+    [regionLocation, contextTime, selectedCellId],
+  )
+  // A reply that names spots flies to the first one and pulses them all. When the reply is about a
+  // particular hour, the slider moves there too, so the map's colors match the scores in the reply.
+  const onChatSpots = useCallback(
+    (spots: ChatSpot[]) => {
+      const [first] = spots
+      setFocus({ lat: first.lat, lon: first.lon, key: Date.now() })
+      setHighlights({ points: spots.map(({ lat, lon }) => ({ lat, lon })), key: Date.now() })
+      if (first.valid_time && minMs !== undefined && maxMs !== undefined) {
+        const ms = Math.floor(Date.parse(first.valid_time) / HOUR_MS) * HOUR_MS
+        if (ms >= minMs && ms <= maxMs) {
+          setPanelTime(undefined)
+          setSelectedMs(ms)
+          setRequestedMs(ms)
+        }
+      }
+    },
+    [minMs, maxMs],
+  )
+  const onChatPickSpot = useCallback(
+    (spot: ChatSpot) => {
+      // On phones both panels are bottom sheets; make room for the spot's details.
+      if (window.matchMedia('(max-width: 640px)').matches) setChatOpen(false)
+      showSpot(spot)
+    },
+    [showSpot],
   )
 
   // ---- Community photos ----
@@ -214,6 +266,25 @@ function App() {
     [closeUpload, queryClient],
   )
 
+  // Demo-only: wipe every photo.
+  const [wiping, setWiping] = useState(false)
+  const [wipeError, setWipeError] = useState(false)
+  const wipeAllPhotos = useCallback(async () => {
+    if (!window.confirm('Delete ALL photos? This cannot be undone.')) return
+    setWiping(true)
+    setWipeError(false)
+    try {
+      await wipePhotos()
+      setViewer(null)
+      setJustUploadedId(null)
+    } catch {
+      setWipeError(true)
+    } finally {
+      setWiping(false)
+      void queryClient.invalidateQueries({ queryKey: PHOTOS_KEY })
+    }
+  }, [queryClient])
+
   // Escape cancels picking a location on the map.
   useEffect(() => {
     if (!picking) return
@@ -250,7 +321,11 @@ function App() {
   }
 
   return (
-    <main className={selectedCellId === null ? 'app' : 'app has-spot-panel'}>
+    <main
+      className={['app', selectedCellId !== null && 'has-spot-panel', chatOpen && 'has-chat-panel']
+        .filter(Boolean)
+        .join(' ')}
+    >
       <div className="app-map-shell">
       <header className="app-header">
         <div className="app-header-row">
@@ -259,6 +334,14 @@ function App() {
             <p>Find your next constellation lookout in Western New York</p>
           </div>
           <div className="app-header-buttons">
+            <button
+              type="button"
+              className="pill-button chat-launch-button"
+              aria-expanded={chatOpen}
+              onClick={() => setChatOpen((open) => !open)}
+            >
+              <span aria-hidden="true">✦ </span>Ask the sky
+            </button>
             <button type="button" className="pill-button" onClick={() => document.getElementById('explore-title')?.scrollIntoView()}>
               Explore in 3D
             </button>
@@ -307,10 +390,22 @@ function App() {
             <span className="photo-toggle-dot" aria-hidden="true" />
             Photos{showPhotos && photoList ? ` · ${photoList.length}` : ''}
           </button>
+          <button
+            type="button"
+            className="pill-button photo-wipe-button"
+            onClick={() => void wipeAllPhotos()}
+            disabled={wiping}
+            title="Demo only: delete every photo"
+          >
+            {wiping ? 'Wiping…' : 'Wipe photos (demo)'}
+          </button>
           {session && <span className="photo-signed-in" title="Your username on this browser">@{session.username}</span>}
         </div>
         {showPhotos && photos.isError && (
           <p className="photo-header-note" role="status">Community photos couldn’t be loaded.</p>
+        )}
+        {wipeError && (
+          <p className="photo-header-note" role="status">Couldn’t wipe photos. Check that the backend is running.</p>
         )}
         {skyOpen && <SkyPanel id={skyPanelId} at={observing.observation} date={observingNight} />}
       </header>
@@ -326,6 +421,8 @@ function App() {
         onOpenPhotoGroup={openPhotoGroup}
         onPickLocation={picking ? pickLocation : null}
         draftPin={uploadOpen ? uploadLocation : null}
+        highlights={highlights}
+        onViewportChange={onViewportChange}
       >
         {picking && (
           <div className="map-notice pick-notice" role="status">
@@ -367,6 +464,16 @@ function App() {
           userLocation={location}
         />
       )}
+      {/* Stays mounted while closed so the conversation survives. */}
+      <ChatPanel
+        open={chatOpen}
+        onClose={() => setChatOpen(false)}
+        getContext={getChatContext}
+        onSpots={onChatSpots}
+        onPickSpot={onChatPickSpot}
+        onOpenPhotos={(ids, index) => setViewer({ ids, index, key: Date.now() })}
+        hasSelectedSpot={selectedCellId !== null}
+      />
       </div>
       <ExploreIn3D observation={observing.observation} conditions={observing.conditions} contextLabel={observing.label} hideControls />
       {uploadOpen && (

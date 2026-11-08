@@ -108,6 +108,16 @@ def put_object(key: str, data: bytes, content_type: str) -> None:
     client().put_object(Bucket=_settings().s3_bucket, Key=key, Body=data, ContentType=content_type)
 
 
+def delete_objects(keys: list[str]) -> None:
+    """Delete objects by key, 1000 per request (the S3 limit). Missing keys are ignored."""
+    bucket = _settings().s3_bucket
+    for start in range(0, len(keys), 1000):
+        batch = keys[start:start + 1000]
+        client().delete_objects(
+            Bucket=bucket, Delete={"Objects": [{"Key": k} for k in batch], "Quiet": True}
+        )
+
+
 def bucket_reachable() -> bool:
     """True if the bucket answers a HEAD request. Never raises."""
     try:

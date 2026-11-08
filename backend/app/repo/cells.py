@@ -17,6 +17,18 @@ def get(cell_id: int) -> dict[str, Any] | None:
     return dict(row) if row else None
 
 
+def find_by_name(query: str, limit: int = 3) -> list[dict[str, Any]]:
+    """Named cells (curated spots first) whose name contains `query`, case-insensitively."""
+    pattern = "%" + query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
+    with get_conn() as conn:
+        rows = conn.execute(
+            f"SELECT {CELL_COLS} FROM grid_cells g WHERE g.name ILIKE %s "
+            "ORDER BY g.is_curated DESC, length(g.name), g.id LIMIT %s",
+            (pattern, limit),
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
 def nearest_cell(lat: float, lon: float) -> int | None:
     """Id of the grid cell or curated spot nearest to (lat, lon), via the GiST KNN operator."""
     with get_conn() as conn:

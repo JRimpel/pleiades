@@ -75,6 +75,48 @@ def list_markers(bbox: BBox, sort: str, limit: int) -> list[dict[str, Any]]:
     return [dict(r) for r in rows]
 
 
+def search(*, bbox: BBox | None = None, near: tuple[float, float] | None = None, radius_km: float | None = None,
+           object_name: str | None = None, since: datetime | None = None, limit: int = 6) -> list[dict[str, Any]]:
+    """Analyzed photos for the chat assistant, best-voted first. Every filter is optional."""
+    where = ["p.ai_status = 'done'"]
+    params: dict[str, Any] = {"limit": limit}
+    if bbox is not None:
+        params.update(zip(("w", "s", "e", "n"), bbox.as_tuple()))
+        where.append("p.geom && ST_MakeEnvelope(%(w)s, %(s)s, %(e)s, %(n)s, 4326)::geography")
+    if near is not None and radius_km is not None:
+        params["lat"], params["lon"] = near
+        params["radius_m"] = radius_km * 1000.0
+        where.append("ST_DWithin(p.geom, ST_SetSRID(ST_MakePoint(%(lon)s, %(lat)s), 4326)::geography, %(radius_m)s)")
+    if object_name:
+        params["object"] = "%" + object_name.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
+        where.append("EXISTS (SELECT 1 FROM jsonb_array_elements(coalesce(p.ai_objects, '[]'::jsonb)) o "
+                     "WHERE o->>'name' ILIKE %(object)s)")
+    if since is not None:
+        params["since"] = since
+        where.append("coalesce(p.taken_at, p.uploaded_at) >= %(since)s")
+    with get_conn() as conn:
+        rows = conn.execute(
+            f"""
+            SELECT p.id, ST_Y(p.geom::geometry) AS lat, ST_X(p.geom::geometry) AS lon, p.cell_id, p.thumb_key,
+                   p.taken_at, p.uploaded_at, p.caption, p.score_at_capture, p.ai_description, p.ai_objects,
+                   p.ai_sky_quality, p.ai_milky_way_visible, p.vote_count
+            FROM photos p
+            WHERE {' AND '.join(where)}
+            ORDER BY p.vote_count DESC, coalesce(p.taken_at, p.uploaded_at) DESC
+            LIMIT %(limit)s
+            """,
+            params,
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def delete_all() -> list[dict[str, Any]]:
+    """Delete every photo (votes cascade). Returns the deleted rows' storage keys."""
+    with get_conn() as conn:
+        rows = conn.execute("DELETE FROM photos RETURNING s3_key, thumb_key").fetchall()
+    return [dict(r) for r in rows]
+
+
 def count_recent_uploads(user_id: UUID, since: datetime) -> int:
     with get_conn() as conn:
         row = conn.execute(

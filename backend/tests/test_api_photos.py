@@ -248,3 +248,30 @@ def test_failed_analysis_stays_on_map_but_rejected_is_hidden():
     # A failed AI run (provider outage, no key) shouldn't hide the photo; a non-sky image should.
     assert "failed" in photos_repo.VISIBLE_STATUSES
     assert "rejected" not in photos_repo.VISIBLE_STATUSES
+
+
+# ---- demo wipe -----------------------------------------------------------------------
+
+def test_wipe_deletes_rows_and_objects(client, monkeypatch):
+    monkeypatch.setattr(photos_repo, "delete_all", lambda: [
+        {"s3_key": KEY, "thumb_key": f"thumbs/{PID}.jpg"},
+        {"s3_key": "photos/other.png", "thumb_key": None},
+    ])
+    seen = []
+    monkeypatch.setattr(s3, "delete_objects", lambda keys: seen.extend(keys))
+    resp = client.post("/api/photos/wipe")
+    assert resp.status_code == 200
+    assert resp.get_json() == {"deleted": 2}
+    assert seen == [KEY, f"thumbs/{PID}.jpg", "photos/other.png"]
+
+
+def test_wipe_survives_storage_errors(client, monkeypatch):
+    monkeypatch.setattr(photos_repo, "delete_all", lambda: [{"s3_key": KEY, "thumb_key": None}])
+
+    def boom(keys):
+        raise RuntimeError("bucket down")
+
+    monkeypatch.setattr(s3, "delete_objects", boom)
+    resp = client.post("/api/photos/wipe")
+    assert resp.status_code == 200
+    assert resp.get_json() == {"deleted": 1}

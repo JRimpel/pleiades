@@ -1,9 +1,16 @@
 import { useCallback, useEffect, useId, useMemo, useState } from 'react'
-import { useScoreRange, useScores, useSkyEvents, useSpot } from './api/hooks'
+import { useQueryClient } from '@tanstack/react-query'
+import { PHOTOS_KEY, usePhotos, useScoreRange, useScores, useSkyEvents, useSpot } from './api/hooks'
 import type { BestSpot } from './api/types'
 import { ApiError } from './api/client'
 import BestSpots from './components/BestSpots'
+import PhotoUploadDialog from './components/PhotoUploadDialog'
+import type { UploadLocation } from './components/PhotoUploadDialog'
+import PhotoViewer from './components/PhotoViewer'
 import ScoreLegend from './components/ScoreLegend'
+import UsernamePrompt from './components/UsernamePrompt'
+import { getSession, useSession } from './lib/session'
+import type { Session } from './lib/session'
 import SkyPanel from './components/SkyPanel'
 import SpotPanel from './components/SpotPanel'
 import StargazingMap from './components/StargazingMap'
@@ -18,9 +25,27 @@ import { useUserLocation } from './lib/useUserLocation'
 import { resolveObservingContext } from './lib/observingContext'
 import { nightDate } from './explore/astronomy'
 import './App.css'
+import './photos.css'
 
 /** How long the "outside Western New York" notice stays up. */
 const OUTSIDE_NOTICE_MS = 8000
+
+const SHOW_PHOTOS_KEY = 'pleiades.showPhotos'
+
+function readShowPhotos() {
+  try {
+    return window.localStorage.getItem(SHOW_PHOTOS_KEY) !== 'false'
+  } catch {
+    return true
+  }
+}
+
+interface ViewerState {
+  ids: string[]
+  index: number
+  /** Remounts the viewer for each new opening. */
+  key: number
+}
 
 function rgbCss(score: number) {
   const [r, g, b] = scoreToRgb(score)
@@ -108,6 +133,97 @@ function App() {
     [minMs, maxMs],
   )
 
+  // ---- Community photos ----
+  const queryClient = useQueryClient()
+  const session = useSession()
+  const [showPhotos, setShowPhotos] = useState(readShowPhotos)
+  const photos = usePhotos(showPhotos)
+  const photoList = photos.data?.photos
+  const [viewer, setViewer] = useState<ViewerState | null>(null)
+  const [uploadOpen, setUploadOpen] = useState(false)
+  const [uploadLocation, setUploadLocation] = useState<UploadLocation | null>(null)
+  const [picking, setPicking] = useState(false)
+  const [justUploadedId, setJustUploadedId] = useState<string | null>(null)
+  const [accountRequest, setAccountRequest] = useState<{
+    reason: string
+    resolve: (session: Session | null) => void
+  } | null>(null)
+
+  const toggleShowPhotos = useCallback(() => {
+    setShowPhotos((shown) => {
+      try {
+        window.localStorage.setItem(SHOW_PHOTOS_KEY, String(!shown))
+      } catch {
+        // Not remembered when storage is blocked.
+      }
+      return !shown
+    })
+  }, [])
+
+  /** The current session, or ask for a username first. Resolves null if the user cancels. */
+  const ensureSession = useCallback((reason: string) => {
+    const existing = getSession()
+    if (existing) return Promise.resolve(existing)
+    return new Promise<Session | null>((resolve) => setAccountRequest({ reason, resolve }))
+  }, [])
+  const finishAccountRequest = useCallback(
+    (result: Session | null) => {
+      accountRequest?.resolve(result)
+      setAccountRequest(null)
+    },
+    [accountRequest],
+  )
+
+  // A single pin opens the viewer at that photo within all loaded photos (newest first).
+  const openPhoto = useCallback(
+    (id: string) => {
+      const ids = photoList?.map((photo) => photo.id) ?? []
+      const index = ids.indexOf(id)
+      setViewer(index >= 0 ? { ids, index, key: Date.now() } : { ids: [id], index: 0, key: Date.now() })
+    },
+    [photoList],
+  )
+  // A cluster that can't be split further opens just its photos, newest capture first.
+  const openPhotoGroup = useCallback(
+    (ids: string[]) => {
+      const takenMs = (id: string) => {
+        const photo = photoList?.find((candidate) => candidate.id === id)
+        return photo?.taken_at ? Date.parse(photo.taken_at) : 0
+      }
+      setViewer({ ids: [...ids].sort((a, b) => takenMs(b) - takenMs(a)), index: 0, key: Date.now() })
+    },
+    [photoList],
+  )
+
+  const pickLocation = useCallback((lat: number, lon: number) => {
+    setUploadLocation({ lat, lon, source: 'map' })
+    setPicking(false)
+  }, [])
+  const closeUpload = useCallback(() => {
+    setUploadOpen(false)
+    setUploadLocation(null)
+    setPicking(false)
+  }, [])
+  const onUploaded = useCallback(
+    (id: string) => {
+      closeUpload()
+      setJustUploadedId(id)
+      void queryClient.invalidateQueries({ queryKey: PHOTOS_KEY })
+      setViewer({ ids: [id], index: 0, key: Date.now() })
+    },
+    [closeUpload, queryClient],
+  )
+
+  // Escape cancels picking a location on the map.
+  useEffect(() => {
+    if (!picking) return
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setPicking(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [picking])
+
   // Mark when real darkness starts and ends on the slider.
   const ticks: { ms: number; label: string }[] = []
   if (sky.data?.twilight.astronomical_dusk) {
@@ -177,6 +293,25 @@ function App() {
             )}
           </div>
         </div>
+        <div className="app-header-photo-row">
+          <button type="button" className="pill-button photo-upload-button" onClick={() => setUploadOpen(true)}>
+            Upload photo
+          </button>
+          <button
+            type="button"
+            className="pill-button photo-toggle"
+            aria-pressed={showPhotos}
+            onClick={toggleShowPhotos}
+            title="Show community sky photos on the map"
+          >
+            <span className="photo-toggle-dot" aria-hidden="true" />
+            Photos{showPhotos && photoList ? ` · ${photoList.length}` : ''}
+          </button>
+          {session && <span className="photo-signed-in" title="Your username on this browser">@{session.username}</span>}
+        </div>
+        {showPhotos && photos.isError && (
+          <p className="photo-header-note" role="status">Community photos couldn’t be loaded.</p>
+        )}
         {skyOpen && <SkyPanel id={skyPanelId} at={observing.observation} date={observingNight} />}
       </header>
       <StargazingMap
@@ -185,7 +320,21 @@ function App() {
         selectedCellId={selectedCellId}
         focus={focus}
         userLocation={location}
+        photos={photoList}
+        showPhotos={showPhotos}
+        onOpenPhoto={openPhoto}
+        onOpenPhotoGroup={openPhotoGroup}
+        onPickLocation={picking ? pickLocation : null}
+        draftPin={uploadOpen ? uploadLocation : null}
       >
+        {picking && (
+          <div className="map-notice pick-notice" role="status">
+            <span>Click the map where you took this photo.</span>
+            <button type="button" className="photo-button secondary small" onClick={() => setPicking(false)}>
+              Cancel
+            </button>
+          </div>
+        )}
         {showOutsideNotice && (
           <p className="map-notice location-notice" role="status">
             You're outside Western New York, so your location isn't shown on the map.
@@ -220,6 +369,30 @@ function App() {
       )}
       </div>
       <ExploreIn3D observation={observing.observation} conditions={observing.conditions} contextLabel={observing.label} hideControls />
+      {uploadOpen && (
+        <PhotoUploadDialog
+          location={uploadLocation}
+          onLocationChange={setUploadLocation}
+          picking={picking}
+          onStartPick={() => setPicking(true)}
+          userLocation={regionLocation}
+          ensureSession={ensureSession}
+          onUploaded={onUploaded}
+          onClose={closeUpload}
+        />
+      )}
+      {viewer && (
+        <PhotoViewer
+          key={viewer.key}
+          ids={viewer.ids}
+          startIndex={viewer.index}
+          justUploadedId={justUploadedId}
+          ensureSession={ensureSession}
+          onClose={() => setViewer(null)}
+        />
+      )}
+      {/* Last, so it stacks above whichever dialog asked for it. */}
+      {accountRequest && <UsernamePrompt reason={accountRequest.reason} onDone={finishAccountRequest} />}
     </main>
   )
 }

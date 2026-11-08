@@ -235,11 +235,9 @@ Important rules from the backend guide:
 - Errors use an `error` object with a `code`, `message`, and sometimes `details`.
 - Spot explanations may take several seconds, so the details panel will need a loading state.
 
-### Later photo integration
+### Photo integration
 
-The frontend will select a photo, read available EXIF metadata, and let the user confirm location and time. It will then request an upload URL from Flask, upload the file directly to Vultr with the supplied headers, register the photo with Flask, and poll for analysis results.
-
-Role C's vision implementation analyzes the image through the backend worker. The frontend handles `pending`, `done`, `failed`, and `rejected` display states. Uploads and votes require the bearer token issued by `POST /api/users`. These features are still pending.
+Implemented. See §14, Community photos.
 
 ## 7. How teammates run the current frontend
 
@@ -463,3 +461,36 @@ GPS updates arrive every few seconds. To avoid refetching on each one, query key
 `App` calls the same hook to place the slider's Dark/Dawn ticks.
 
 **Caching.** Spot, history, drift, and best queries are fresh for 5 minutes, and sky events for 30 minutes. That matters most for the spot explanation, which can take several seconds to generate the first time.
+
+## 14. Community photos
+
+Users upload their own night-sky photos, which appear for everyone as round thumbnails on the score map. Clicking one opens a story-style viewer with the AI analysis and voting. The backend routes (`/api/photos*`, `/api/users`) and the analysis worker existed already; this adds the frontend and local storage.
+
+**Accounts** ([session.ts](frontend/src/lib/session.ts), [UsernamePrompt.tsx](frontend/src/components/UsernamePrompt.tsx)). An account is a username plus the bearer token `POST /api/users` returns once. There is no password: the token is kept in `localStorage` under `pleiades.session`, so this browser *is* the account. The prompt says so plainly.
+- It only appears when an action needs an account (uploading, voting). `App.ensureSession(reason)` returns the current session or opens the prompt and resolves with the new one, or null if cancelled.
+- Any authenticated request that gets a 401 clears the session (in `requestJson`), so the next action asks again.
+
+**Map layer** ([StargazingMap.tsx](frontend/src/components/StargazingMap.tsx)). `usePhotos` loads `GET /api/photos` once for the whole navigable region (`PAN_BOUNDS`, newest first, up to 500). The pins go into a clustered GeoJSON source.
+- Clusters are canvas circles with a count. Clicking one zooms in; at full zoom it opens all of its photos in the viewer.
+- Single photos are HTML `Marker`s (`<button>` with an `<img>`), so presigned image URLs need no CORS. A photo whose thumbnail isn't ready yet shows a ✦ placeholder.
+- The **Photos** toggle in the title card hides the whole layer, and the choice is remembered. With photos off, the score map behaves exactly as before.
+
+**Upload** ([PhotoUploadDialog.tsx](frontend/src/components/PhotoUploadDialog.tsx)), opened from **Upload photo** in the title card:
+1. Choose a JPEG, PNG or WebP of up to 15 MB. HEIC gets a "export as JPEG" message.
+2. `readPhotoMetadata` ([photoMetadata.ts](frontend/src/lib/photoMetadata.ts), lazy-loading `exifr`) reads GPS and capture time.
+   - EXIF times without an offset are read as Eastern time ([photoTime.ts](frontend/src/lib/photoTime.ts)).
+   - GPS inside the region is used automatically. Otherwise, and often on phones, which strip GPS, the user picks **Pick on map** or **Use my location**.
+   - Pick mode hides the dialog, shows a banner, and the next map click sets a draft pin instead of selecting a cell. Esc cancels.
+3. The capture time can be corrected in a `datetime-local` field (Eastern time). An empty field means the server uses the upload time. The caption is optional, up to 500 characters.
+4. **Share photo** runs presign → XHR `PUT` straight to storage (with a progress bar and exactly the presigned headers) → `POST /api/photos`. Errors such as storage unavailable, rate limited, too large or expired account are shown in plain language.
+5. On success the map refreshes and the viewer opens on the new photo. It polls while the analysis is pending.
+
+**Viewer** ([PhotoViewer.tsx](frontend/src/components/PhotoViewer.tsx)) is a native modal `<dialog>`: full-screen on phones, side panel on desktop.
+- Arrow keys, ‹ › buttons or a swipe step through the photos, with a segmented progress bar. Esc closes it and returns focus to the pin.
+- It shows the photographer, capture time and its source, the caption, coordinates, and the predicted **score at capture**.
+- The AI panel: description, identified objects with the model's confidence, sky quality 1–10, Milky Way, and light-pollution notes. `pending` shows "Analyzing the sky…". `failed` (for example, Gemini unavailable) shows "AI analysis unavailable", and the photo stays on the map. `rejected` (not a night sky) is hidden from the map; only its uploader sees why.
+- ▲/▼ votes are optimistic. Clicking your current vote again removes it. When an analysis finishes, the map pins refresh so the thumbnail appears.
+
+**Dialogs** share [useModalDialog.ts](frontend/src/lib/useModalDialog.ts): `showModal()` while mounted, `data-autofocus` for the initial focus, and focus returned to the opener. `SpotPanel` already ignores Esc while any dialog is open.
+
+**Tests.** `tests/browser/photos.spec.ts` covers pins and the toggle, the viewer, the voting and username flow, GPS-EXIF upload with polling, and the no-GPS pick-on-map path with a storage outage. It uses an in-memory API and the fixture JPEGs in `tests/browser/fixtures/`. `tests/photoTime.test.ts` covers EXIF and Eastern-time conversion, including DST.

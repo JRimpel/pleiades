@@ -11,7 +11,7 @@ from psycopg.types.json import Jsonb
 from ..db import get_conn
 from ..geo import BBox
 
-VISIBLE_STATUSES = ("pending", "done")  # rejected/failed are hidden from the map
+VISIBLE_STATUSES = ("pending", "done", "failed")  # only rejected (not a night-sky photo) is hidden; failed = AI unavailable
 
 
 class PhotoExists(Exception):

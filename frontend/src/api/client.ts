@@ -1,13 +1,24 @@
 import type {
   ApiErrorBody,
   BestResponse,
+  CreatePhotoRequest,
+  CreatePhotoResponse,
+  CreateUserResponse,
+  Explanation,
+  PhotoDetail,
+  PhotoListResponse,
+  PresignResponse,
   ScoreRangeResponse,
   ScoresResponse,
   SkyEventsResponse,
   SpotDetail,
   SpotDrift,
   SpotHistory,
+  VoteResponse,
+  VoteValue,
 } from './types'
+import { PAN_BOUNDS } from '../lib/region'
+import { clearSession } from '../lib/session'
 
 export class ApiError extends Error {
   readonly status: number
@@ -32,11 +43,29 @@ function isApiErrorBody(body: unknown): body is ApiErrorBody {
   )
 }
 
-async function getJson<T>(path: string, signal?: AbortSignal): Promise<T> {
-  const response = await fetch(path, { signal, headers: { Accept: 'application/json' } })
+interface RequestOptions {
+  method?: 'GET' | 'POST'
+  /** Sent as JSON. */
+  body?: unknown
+  /** Bearer token for routes that need an account. A 401 signs this browser out. */
+  token?: string
+  signal?: AbortSignal
+}
+
+async function requestJson<T>(path: string, { method = 'GET', body: payload, token, signal }: RequestOptions = {}): Promise<T> {
+  const headers: Record<string, string> = { Accept: 'application/json' }
+  if (payload !== undefined) headers['Content-Type'] = 'application/json'
+  if (token) headers.Authorization = `Bearer ${token}`
+  const response = await fetch(path, {
+    method,
+    signal,
+    headers,
+    body: payload === undefined ? undefined : JSON.stringify(payload),
+  })
   const body: unknown = await response.json().catch(() => null)
 
   if (!response.ok) {
+    if (token && response.status === 401) clearSession()
     if (isApiErrorBody(body)) {
       throw new ApiError(response.status, body.error.code, body.error.message, body.error.details)
     }
@@ -46,6 +75,10 @@ async function getJson<T>(path: string, signal?: AbortSignal): Promise<T> {
     throw new ApiError(response.status, 'invalid_json', 'The server returned an unreadable response')
   }
   return body as T
+}
+
+function getJson<T>(path: string, signal?: AbortSignal): Promise<T> {
+  return requestJson<T>(path, { signal })
 }
 
 export function fetchScoreRange(signal?: AbortSignal) {
@@ -72,6 +105,11 @@ export function fetchSpot(cellId: number, time?: string, signal?: AbortSignal) {
   return getJson<SpotDetail>(withQuery(`/api/spots/${cellId}`, { time }), signal)
 }
 
+/** Plain-language explanation of the score. Can take a few seconds when it isn't cached yet. */
+export function fetchSpotExplanation(cellId: number, time?: string, signal?: AbortSignal) {
+  return getJson<Explanation>(withQuery(`/api/spots/${cellId}/explanation`, { time }), signal)
+}
+
 /** Hourly scores (past week through the forecast) and nightly bests. */
 export function fetchSpotHistory(cellId: number, signal?: AbortSignal) {
   return getJson<SpotHistory>(`/api/spots/${cellId}/history`, signal)
@@ -93,4 +131,84 @@ export function fetchBest(
 /** Moon, twilight, planets, and events for a local night (defaults to tonight). */
 export function fetchSkyEvents(signal?: AbortSignal, at?: { lat: number; lon: number }, date?: string) {
   return getJson<SkyEventsResponse>(withQuery('/api/sky-events', { lat: at?.lat, lon: at?.lon, date }), signal)
+}
+
+// ---- Community photos ----
+
+/** Every visible photo in the navigable region, newest first. The region is small enough to load once. */
+export function fetchPhotos(signal?: AbortSignal) {
+  const [[west, south], [east, north]] = PAN_BOUNDS
+  return getJson<PhotoListResponse>(
+    withQuery('/api/photos', { bbox: `${west},${south},${east},${north}`, sort: 'recent', limit: 500 }),
+    signal,
+  )
+}
+
+/** One photo with its AI analysis. With a token, `my_vote` is filled in. */
+export function fetchPhoto(id: string, token?: string, signal?: AbortSignal) {
+  return requestJson<PhotoDetail>(`/api/photos/${encodeURIComponent(id)}`, { token, signal })
+}
+
+export function createUser(username: string) {
+  return requestJson<CreateUserResponse>('/api/users', { method: 'POST', body: { username } })
+}
+
+/** A presigned PUT URL for one upload; the browser sends the file straight to storage. */
+export function presignPhoto(token: string, contentType: string, size: number) {
+  return requestJson<PresignResponse>('/api/photos/presign', {
+    method: 'POST',
+    token,
+    body: { content_type: contentType, size },
+  })
+}
+
+/** Register an uploaded object; the backend then queues thumbnail + AI analysis. */
+export function createPhoto(token: string, body: CreatePhotoRequest) {
+  return requestJson<CreatePhotoResponse>('/api/photos', { method: 'POST', token, body })
+}
+
+/** 1 = up, -1 = down, 0 = remove my vote. */
+export function votePhoto(token: string, id: string, value: VoteValue) {
+  return requestJson<VoteResponse>(`/api/photos/${encodeURIComponent(id)}/vote`, {
+    method: 'POST',
+    token,
+    body: { value },
+  })
+}
+
+/**
+ * PUT the file to a presigned storage URL. XHR (not fetch) so upload progress can be shown.
+ * `headers` must be exactly the presign response's headers: they are part of the signature.
+ */
+export function uploadToStorage(
+  url: string,
+  headers: Record<string, string>,
+  file: Blob,
+  onProgress?: (fraction: number) => void,
+  signal?: AbortSignal,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(new DOMException('Upload cancelled', 'AbortError'))
+      return
+    }
+    const xhr = new XMLHttpRequest()
+    xhr.open('PUT', url)
+    for (const [name, value] of Object.entries(headers)) xhr.setRequestHeader(name, value)
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) onProgress?.(event.loaded / event.total)
+    }
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        onProgress?.(1)
+        resolve()
+      } else {
+        reject(new ApiError(xhr.status, 'storage_upload_failed', `Photo storage rejected the upload (HTTP ${xhr.status})`))
+      }
+    }
+    xhr.onerror = () => reject(new ApiError(0, 'storage_unreachable', 'Photo storage could not be reached'))
+    xhr.onabort = () => reject(new DOMException('Upload cancelled', 'AbortError'))
+    signal?.addEventListener('abort', () => xhr.abort(), { once: true })
+    xhr.send(file)
+  })
 }

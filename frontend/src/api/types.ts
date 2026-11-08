@@ -83,6 +83,8 @@ export interface SpotDetail {
   conditions: Conditions | null
   astro: AstroSnapshot | null
   explanation: Explanation | null
+  /** True when there is a score but its explanation must be fetched separately (it may call Gemini). */
+  explanation_pending: boolean
 }
 
 export interface HistoryPoint {
@@ -186,4 +188,97 @@ export interface SkyEventsResponse {
   twilight: Twilight
   planets: PlanetVisibility[]
   events: SkyEvent[]
+}
+
+// ---- Community photos (backend/app/schemas/photos.py, users.py) ----
+
+/** pending: analysis queued · done: analyzed · failed: AI unavailable · rejected: not a night-sky photo */
+export type AiStatus = 'pending' | 'done' | 'failed' | 'rejected'
+export type TakenAtSource = 'exif' | 'user' | 'upload_time'
+export type VoteValue = -1 | 0 | 1
+
+/** One map pin. Newest first from `GET /api/photos?sort=recent`. */
+export interface PhotoMarker {
+  id: string
+  lat: number
+  lon: number
+  /** Null until the background worker writes the thumbnail. */
+  thumb_url: string | null
+  vote_count: number
+  taken_at: string | null
+  ai_status: AiStatus
+  ai_sky_quality: number | null
+}
+
+export interface PhotoListResponse {
+  photos: PhotoMarker[]
+}
+
+export interface AiObject {
+  name: string
+  type: string
+  /** The model's own assessment (0–1), not a calibrated probability. */
+  confidence: number
+}
+
+export interface PhotoDetail {
+  id: string
+  username: string
+  url: string | null
+  thumb_url: string | null
+  lat: number
+  lon: number
+  cell_id: number | null
+  taken_at: string | null
+  taken_at_source: TakenAtSource | null
+  uploaded_at: string
+  caption: string | null
+  /** The model score for the photo's cell at the hour it was taken, when known. */
+  score_at_capture: number | null
+  ai_status: AiStatus
+  ai_description: string | null
+  ai_objects: AiObject[] | null
+  /** Subjective 1–10 photographic sky quality from the vision model. */
+  ai_sky_quality: number | null
+  ai_milky_way_visible: boolean | null
+  ai_light_pollution_notes: string | null
+  /** Net votes (up minus down). */
+  vote_count: number
+  /** Only set when the request carried a valid token. */
+  my_vote: VoteValue | null
+}
+
+export interface CreateUserResponse {
+  user_id: string
+  username: string
+  token: string
+}
+
+export interface PresignResponse {
+  upload_url: string
+  s3_key: string
+  method: 'PUT'
+  /** Headers the browser must send with the PUT; they are part of the signature. */
+  headers: Record<string, string>
+  expires_in: number
+}
+
+export interface CreatePhotoRequest {
+  s3_key: string
+  lat: number
+  lon: number
+  taken_at?: string
+  taken_at_source?: 'exif' | 'user'
+  caption?: string
+}
+
+export interface CreatePhotoResponse {
+  id: string
+  ai_status: AiStatus
+}
+
+export interface VoteResponse {
+  photo_id: string
+  vote_count: number
+  my_vote: VoteValue
 }

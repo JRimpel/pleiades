@@ -53,6 +53,8 @@ class SpotDetail(ApiModel):
     conditions: Conditions | None
     astro: AstroSnapshot | None
     explanation: ExplanationOut | None
+    # True when a score exists but its explanation must be fetched from /spots/<id>/explanation.
+    explanation_pending: bool = False
 
 
 class HistoryPoint(ApiModel):

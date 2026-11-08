@@ -1,0 +1,9 @@
+{
+  "identities": [
+    {
+      "name": "pleiades-dev",
+      "credentials": [{ "accessKey": "pleiades-dev", "secretKey": "pleiades-dev-secret" }],
+      "actions": ["Admin", "Read", "Write", "List", "Tagging"]
+    }
+  ]
+}

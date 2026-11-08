@@ -1,5 +1,19 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { fetchBest, fetchScoreRange, fetchScores, fetchSkyEvents, fetchSpot, fetchSpotDrift, fetchSpotHistory } from './client'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  fetchBest,
+  fetchPhoto,
+  fetchPhotos,
+  fetchScoreRange,
+  fetchScores,
+  fetchSkyEvents,
+  fetchSpot,
+  fetchSpotDrift,
+  fetchSpotExplanation,
+  fetchSpotHistory,
+  votePhoto,
+} from './client'
+import type { PhotoDetail, VoteValue } from './types'
+import type { Session } from '../lib/session'
 
 export function useScoreRange() {
   return useQuery({
@@ -19,7 +33,7 @@ export function useScores(time: string | undefined) {
 
 const FIVE_MINUTES = 5 * 60 * 1000
 
-/** One spot at one hour. Cached for a while because the Gemini explanation is slow to generate. */
+/** One spot at one hour: score, factors and conditions. Fast; the explanation loads separately. */
 export function useSpot(cellId: number | null, time: string | undefined) {
   return useQuery({
     queryKey: ['spot', cellId, time ?? 'now'],
@@ -27,6 +41,20 @@ export function useSpot(cellId: number | null, time: string | undefined) {
     enabled: cellId !== null,
     staleTime: FIVE_MINUTES,
     placeholderData: (previous) => (previous?.cell_id === cellId ? previous : undefined),
+  })
+}
+
+/**
+ * The score explanation for one spot-hour, when the spot detail didn't already include it.
+ * `time` must be the spot's resolved `valid_time` so the key matches the hour being explained.
+ */
+export function useSpotExplanation(cellId: number | null, time: string | undefined, enabled: boolean) {
+  return useQuery({
+    queryKey: ['spot', cellId, time ?? 'now', 'explanation'],
+    queryFn: ({ signal }) => fetchSpotExplanation(cellId as number, time, signal),
+    enabled: enabled && cellId !== null,
+    staleTime: 30 * 60 * 1000,
+    retry: 1,
   })
 }
 
@@ -80,5 +108,87 @@ export function useSkyEvents(enabled = true, at?: { lat: number; lon: number }, 
     // Reuse nearby-location data only within the same night; never carry old-night ticks forward.
     placeholderData: previous => previous?.date === date ? previous : undefined,
     staleTime: 30 * 60 * 1000,
+  })
+}
+
+// ---- Community photos ----
+
+export const PHOTOS_KEY = ['photos', 'region'] as const
+
+/** Map pins for every visible photo in the region. */
+export function usePhotos(enabled: boolean) {
+  return useQuery({
+    queryKey: PHOTOS_KEY,
+    queryFn: ({ signal }) => fetchPhotos(signal),
+    enabled,
+    staleTime: 60 * 1000,
+  })
+}
+
+const PENDING_POLL_MS = 2000
+/** Stop polling a stuck analysis after ~5 minutes; reopening the photo checks again. */
+const MAX_PENDING_POLLS = 150
+
+function photoKey(id: string | null, session: Session | null) {
+  // The signed-in username is part of the key because `my_vote` depends on it.
+  return ['photo', id, session?.username ?? 'anon'] as const
+}
+
+/** One photo. Polls while its AI analysis is still pending. */
+export function usePhoto(id: string | null, session: Session | null) {
+  return useQuery({
+    queryKey: photoKey(id, session),
+    queryFn: ({ signal }) => fetchPhoto(id as string, session?.token, signal),
+    enabled: id !== null,
+    staleTime: 30 * 1000,
+    // Signing in changes the key; keep showing the same photo while it refetches with the token.
+    placeholderData: (previous) => (previous?.id === id ? previous : undefined),
+    refetchInterval: (query) =>
+      query.state.data?.ai_status === 'pending' && query.state.dataUpdateCount < MAX_PENDING_POLLS
+        ? PENDING_POLL_MS
+        : false,
+  })
+}
+
+interface VoteVariables {
+  id: string
+  value: VoteValue
+  session: Session
+}
+
+/** Up/down/clear a vote, updating the open photo immediately and rolling back on failure. */
+export function useVote() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, value, session }: VoteVariables) => votePhoto(session.token, id, value),
+    onMutate: async ({ id, value, session }) => {
+      const key = photoKey(id, session)
+      const previous = queryClient.getQueryData<PhotoDetail>(key)
+      // Only cancel a refetch of data we're about to overwrite. Cancelling the first fetch
+      // (e.g. right after signing in) would leave the query empty and never retried.
+      if (previous) {
+        await queryClient.cancelQueries({ queryKey: key })
+        queryClient.setQueryData<PhotoDetail>(key, {
+          ...previous,
+          my_vote: value,
+          vote_count: previous.vote_count - (previous.my_vote ?? 0) + value,
+        })
+      }
+      return { key, previous }
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previous) queryClient.setQueryData(context.key, context.previous)
+    },
+    onSuccess: (result, { session }) => {
+      const key = photoKey(result.photo_id, session)
+      if (queryClient.getQueryData<PhotoDetail>(key)) {
+        queryClient.setQueryData<PhotoDetail>(key, (photo) =>
+          photo ? { ...photo, vote_count: result.vote_count, my_vote: result.my_vote } : photo,
+        )
+      } else {
+        void queryClient.invalidateQueries({ queryKey: key })
+      }
+      void queryClient.invalidateQueries({ queryKey: PHOTOS_KEY })
+    },
   })
 }

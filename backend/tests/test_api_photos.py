@@ -242,3 +242,9 @@ def test_vote_flow(client, auth_headers, monkeypatch):
     assert client.post(url, json={"value": 2}, headers=auth_headers).status_code == 400
     assert client.post(url, json={"value": 1}).status_code == 401
     assert client.post(f"/api/photos/{uuid.UUID(int=9)}/vote", json={"value": 1}, headers=auth_headers).status_code == 404
+
+
+def test_failed_analysis_stays_on_map_but_rejected_is_hidden():
+    # A failed AI run (provider outage, no key) shouldn't hide the photo; a non-sky image should.
+    assert "failed" in photos_repo.VISIBLE_STATUSES
+    assert "rejected" not in photos_repo.VISIBLE_STATUSES

@@ -10,3 +10,5 @@ Group=pleiades
 WorkingDirectory=/opt/pleiades/backend
 EnvironmentFile=/opt/pleiades/.env
 ExecStart=/opt/pleiades/backend/.venv/bin/python -m app.ingest score
+# Best-effort (leading '-'): warm explanations for tonight's top spots; never fails the unit.
+ExecStartPost=-/opt/pleiades/backend/.venv/bin/python -m app.ingest explain

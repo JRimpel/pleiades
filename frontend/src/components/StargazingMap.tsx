@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Map, NavigationControl, ScaleControl, setWorkerUrl } from 'maplibre-gl'
+import { Map, Marker, NavigationControl, ScaleControl, setWorkerUrl } from 'maplibre-gl'
 import type {
   ExpressionSpecification,
   GeoJSONSource,
@@ -10,7 +10,7 @@ import type {
 } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
-import type { ScoresResponse } from '../api/types'
+import type { PhotoMarker, ScoresResponse } from '../api/types'
 import { DATA_BOUNDS, PAN_BOUNDS, isWithinBounds } from '../lib/region'
 import type { Bounds } from '../lib/region'
 import { scoreColorExpression } from '../lib/scoreColors'
@@ -164,6 +164,111 @@ function addUserLocationLayers(map: Map) {
   })
 }
 
+// ---- Community photos: clustered bubbles on the canvas, single photos as HTML thumbnails ----
+
+const PHOTO_SOURCE = 'photos'
+const PHOTO_CLUSTER_GLOW_LAYER = 'photo-cluster-glow'
+const PHOTO_CLUSTER_LAYER = 'photo-clusters'
+const PHOTO_CLUSTER_COUNT_LAYER = 'photo-cluster-count'
+const PHOTO_LAYERS = [PHOTO_CLUSTER_GLOW_LAYER, PHOTO_CLUSTER_LAYER, PHOTO_CLUSTER_COUNT_LAYER]
+const PHOTO_RING = '#b8caff'
+const IS_CLUSTER: ExpressionSpecification = ['has', 'point_count']
+
+const photoDateFormat = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'America/New_York',
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+})
+
+function photoCollection(photos: PhotoMarker[] | undefined): GeoJSON.FeatureCollection {
+  return {
+    type: 'FeatureCollection',
+    features: (photos ?? []).map((photo) => ({
+      type: 'Feature',
+      // Empty strings rather than null: null properties don't survive the GeoJSON worker.
+      properties: { id: photo.id, thumb_url: photo.thumb_url ?? '', taken_at: photo.taken_at ?? '' },
+      geometry: { type: 'Point', coordinates: [photo.lon, photo.lat] },
+    })),
+  }
+}
+
+function addPhotoLayers(map: Map) {
+  map.addSource(PHOTO_SOURCE, {
+    type: 'geojson',
+    data: EMPTY_COLLECTION,
+    cluster: true,
+    clusterRadius: 48,
+    clusterMaxZoom: 14,
+  })
+  const radius: ExpressionSpecification = ['step', ['get', 'point_count'], 18, 10, 22, 50, 27]
+  map.addLayer({
+    id: PHOTO_CLUSTER_GLOW_LAYER,
+    type: 'circle',
+    source: PHOTO_SOURCE,
+    filter: IS_CLUSTER,
+    paint: { 'circle-color': PHOTO_RING, 'circle-opacity': 0.35, 'circle-blur': 0.9, 'circle-radius': ['+', radius, 8] },
+  })
+  map.addLayer({
+    id: PHOTO_CLUSTER_LAYER,
+    type: 'circle',
+    source: PHOTO_SOURCE,
+    filter: IS_CLUSTER,
+    paint: {
+      'circle-color': '#1d2a44',
+      'circle-radius': radius,
+      'circle-stroke-color': PHOTO_RING,
+      'circle-stroke-width': 3,
+    },
+  })
+  map.addLayer({
+    id: PHOTO_CLUSTER_COUNT_LAYER,
+    type: 'symbol',
+    source: PHOTO_SOURCE,
+    filter: IS_CLUSTER,
+    layout: {
+      'text-field': ['get', 'point_count_abbreviated'],
+      'text-font': ['Noto Sans Bold'],
+      'text-size': 13,
+      'text-allow-overlap': true,
+    },
+    paint: { 'text-color': '#f1f5ff' },
+  })
+}
+
+/** A round thumbnail button for one photo (an `<img>`, so presigned URLs need no CORS). */
+function photoMarkerElement(id: string, thumbUrl: string, takenAt: string, onOpen: (id: string) => void) {
+  const button = document.createElement('button')
+  button.type = 'button'
+  button.className = 'photo-marker'
+  const when = takenAt ? `taken ${photoDateFormat.format(new Date(takenAt))}` : 'capture time unknown'
+  button.setAttribute('aria-label', `Open sky photo, ${when}`)
+  button.title = 'Sky photo'
+  if (thumbUrl) {
+    const img = document.createElement('img')
+    img.src = thumbUrl
+    img.alt = ''
+    img.loading = 'lazy'
+    img.decoding = 'async'
+    // A broken or expired thumbnail falls back to the placeholder star.
+    img.addEventListener('error', () => {
+      img.remove()
+      button.classList.add('placeholder')
+    })
+    button.append(img)
+  } else {
+    button.classList.add('placeholder')
+  }
+  button.addEventListener('click', (event) => {
+    event.stopPropagation()
+    // MapLibre markers swallow mousedown, so a click never focuses the button. Focus it so
+    // the viewer can hand focus back here when it closes.
+    button.focus({ preventScroll: true })
+    onOpen(id)
+  })
+  return button
+}
+
 /** Where to fly the camera. Change `key` to fly again to the same place. */
 export interface MapFocus {
   lat: number
@@ -179,6 +284,17 @@ interface StargazingMapProps {
   focus?: MapFocus
   /** Drawn as a blue dot with an accuracy ring when inside the region. */
   userLocation?: UserLocation | null
+  /** Community photo pins. */
+  photos?: PhotoMarker[]
+  showPhotos?: boolean
+  /** A single photo pin was clicked. */
+  onOpenPhoto?: (id: string) => void
+  /** A cluster of photos at (nearly) the same spot was clicked at full zoom. */
+  onOpenPhotoGroup?: (ids: string[]) => void
+  /** While set, a map click reports its position here instead of selecting a cell. */
+  onPickLocation?: ((lat: number, lon: number) => void) | null
+  /** Location chosen for a photo being uploaded. */
+  draftPin?: { lat: number; lon: number } | null
   children?: React.ReactNode
 }
 
@@ -248,8 +364,11 @@ function addScoreLayers(map: Map) {
       'text-field': ['coalesce', ['get', 'name'], ''],
       'text-font': ['Noto Sans Bold'],
       'text-size': 12,
-      'text-offset': [0, 1.2],
-      'text-anchor': 'top',
+      // Prefer below the dot; fall back to other sides so nearby spots (e.g. Hunters Creek
+      // next to Chestnut Ridge) don't hide each other's labels at the default zoom.
+      'text-variable-anchor': ['top', 'bottom', 'right', 'left'],
+      'text-radial-offset': 1.2,
+      'text-justify': 'auto',
       'text-optional': true,
     },
     paint: {
@@ -260,10 +379,36 @@ function addScoreLayers(map: Map) {
   })
 }
 
-function StargazingMap({ scores, onSelectCell, selectedCellId, focus, userLocation, children }: StargazingMapProps) {
+function StargazingMap({
+  scores,
+  onSelectCell,
+  selectedCellId,
+  focus,
+  userLocation,
+  photos,
+  showPhotos = true,
+  onOpenPhoto,
+  onOpenPhotoGroup,
+  onPickLocation,
+  draftPin,
+  children,
+}: StargazingMapProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<Map | null>(null)
   const locateRef = useRef<LocateControl | null>(null)
+  // Handlers registered once on the map read the latest props through refs.
+  const showPhotosRef = useRef(showPhotos)
+  const onOpenPhotoRef = useRef(onOpenPhoto)
+  const onOpenPhotoGroupRef = useRef(onOpenPhotoGroup)
+  const onPickRef = useRef(onPickLocation)
+  useEffect(() => {
+    showPhotosRef.current = showPhotos
+    onOpenPhotoRef.current = onOpenPhoto
+    onOpenPhotoGroupRef.current = onOpenPhotoGroup
+    onPickRef.current = onPickLocation
+  }, [showPhotos, onOpenPhoto, onOpenPhotoGroup, onPickLocation])
+  /** Re-syncs the HTML photo thumbnails with the clustered source; set once the map loads. */
+  const syncPhotoMarkersRef = useRef<() => void>(() => {})
   // The locate button is created once, so it reads the latest position through a ref.
   const userLocationRef = useRef(userLocation)
   useEffect(() => {
@@ -348,6 +493,10 @@ function StargazingMap({ scores, onSelectCell, selectedCellId, focus, userLocati
       map.getCanvas().style.cursor = ''
     }
     const onHover = (event: MapLayerMouseEvent) => {
+      if (onPickRef.current) {
+        map.getCanvas().style.cursor = 'crosshair'
+        return
+      }
       // Only spots get a highlight; the smooth surface just shows a pointer so it stays seamless.
       const [spot] = map.queryRenderedFeatures(event.point, { layers: [SPOT_LAYER] })
       if (spot?.id !== hoveredId) {
@@ -360,23 +509,93 @@ function StargazingMap({ scores, onSelectCell, selectedCellId, focus, userLocati
       const overScores = spot ?? map.queryRenderedFeatures(event.point, { layers: [FILL_LAYER] })[0]
       map.getCanvas().style.cursor = overScores ? 'pointer' : ''
     }
+    const onPhotoClusterHover = () => {
+      if (!onPickRef.current) map.getCanvas().style.cursor = 'pointer'
+    }
+
+    /** Zoom into a photo cluster, or open all its photos when they can't be separated further. */
+    const openCluster = async (clusterId: number, center: [number, number]) => {
+      const source = map.getSource<GeoJSONSource>(PHOTO_SOURCE)
+      if (!source) return
+      const zoom = await source.getClusterExpansionZoom(clusterId)
+      if (zoom > map.getZoom() + 0.01 && zoom <= map.getMaxZoom()) {
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        map.easeTo({ center, zoom, duration: reduceMotion ? 0 : 500 })
+        return
+      }
+      const leaves = await source.getClusterLeaves(clusterId, 200, 0)
+      const ids = leaves.map((leaf) => String(leaf.properties?.id)).filter(Boolean)
+      if (ids.length) onOpenPhotoGroupRef.current?.(ids)
+    }
 
     const onClick = (event: MapMouseEvent) => {
+      if (onPickRef.current) {
+        onPickRef.current(event.lngLat.lat, event.lngLat.lng)
+        return
+      }
+      if (showPhotosRef.current) {
+        const [cluster] = map.queryRenderedFeatures(event.point, { layers: [PHOTO_CLUSTER_LAYER] })
+        if (cluster && cluster.geometry.type === 'Point') {
+          void openCluster(Number(cluster.properties.cluster_id), cluster.geometry.coordinates as [number, number])
+          return
+        }
+      }
       const [feature] = map.queryRenderedFeatures(event.point, { layers: [SPOT_LAYER, FILL_LAYER] })
       const cellId = Number(feature?.properties.cell_id)
       if (feature && Number.isFinite(cellId)) onSelectRef.current?.(cellId)
     }
 
+    // Unclustered photos are HTML markers, kept in step with what the clustered source renders.
+    let photoMarkers: Record<string, Marker> = {}
+    const syncPhotoMarkers = () => {
+      const next: Record<string, Marker> = {}
+      if (showPhotosRef.current && map.getSource(PHOTO_SOURCE)) {
+        const features = map.querySourceFeatures(PHOTO_SOURCE, { filter: ['!', IS_CLUSTER] })
+        for (const feature of features) {
+          if (feature.geometry.type !== 'Point') continue
+          const id = String(feature.properties.id)
+          const thumb = String(feature.properties.thumb_url ?? '')
+          // Recreate a marker when its thumbnail appears (pending → analyzed).
+          const key = `${id}|${thumb}`
+          if (next[key]) continue
+          const [lon, lat] = feature.geometry.coordinates
+          next[key] =
+            photoMarkers[key] ??
+            new Marker({
+              element: photoMarkerElement(id, thumb, String(feature.properties.taken_at ?? ''), (photoId) => {
+                // While picking an upload location, a thumbnail counts as a click on its spot.
+                if (onPickRef.current) onPickRef.current(lat, lon)
+                else onOpenPhotoRef.current?.(photoId)
+              }),
+            })
+              .setLngLat([lon, lat])
+              .addTo(map)
+        }
+      }
+      for (const [key, marker] of Object.entries(photoMarkers)) {
+        if (!next[key]) marker.remove()
+      }
+      photoMarkers = next
+    }
+    syncPhotoMarkersRef.current = syncPhotoMarkers
+
     map.on('load', () => {
       setStatus('')
       addScoreLayers(map)
+      addPhotoLayers(map)
       addUserLocationLayers(map)
       for (const layer of [FILL_LAYER, SPOT_LAYER]) {
         map.on('mousemove', layer, onHover)
         map.on('mouseleave', layer, clearHover)
       }
-      // One click handler for both layers, so a spot over a square only selects once.
+      map.on('mousemove', PHOTO_CLUSTER_LAYER, onPhotoClusterHover)
+      map.on('mouseleave', PHOTO_CLUSTER_LAYER, clearHover)
+      // One click handler for every layer, so overlapping features only act once.
       map.on('click', onClick)
+      map.on('moveend', syncPhotoMarkers)
+      map.on('sourcedata', (event) => {
+        if (event.sourceId === PHOTO_SOURCE && event.isSourceLoaded) syncPhotoMarkers()
+      })
       setMapReady(true)
     })
     map.on('error', () => {
@@ -400,6 +619,9 @@ function StargazingMap({ scores, onSelectCell, selectedCellId, focus, userLocati
     // React development mode mounts twice; remove the old map each time.
     return () => {
       resizeObserver.disconnect()
+      for (const marker of Object.values(photoMarkers)) marker.remove()
+      photoMarkers = {}
+      syncPhotoMarkersRef.current = () => {}
       map.remove()
       mapRef.current = null
       locateRef.current = null
@@ -438,6 +660,42 @@ function StargazingMap({ scores, onSelectCell, selectedCellId, focus, userLocati
     }
   }, [mapReady, selectedCellId])
 
+  // Push new photo pins into the clustered source; markers re-sync once it's processed.
+  useEffect(() => {
+    if (!mapReady) return
+    mapRef.current?.getSource<GeoJSONSource>(PHOTO_SOURCE)?.setData(photoCollection(photos))
+  }, [mapReady, photos])
+
+  // Show or hide the whole photo layer.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!mapReady || !map) return
+    for (const layer of PHOTO_LAYERS) {
+      if (map.getLayer(layer)) map.setLayoutProperty(layer, 'visibility', showPhotos ? 'visible' : 'none')
+    }
+    syncPhotoMarkersRef.current()
+  }, [mapReady, showPhotos])
+
+  // Pin the location chosen for an upload.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!mapReady || !map || !draftPin) return
+    const element = document.createElement('div')
+    element.className = 'draft-pin'
+    element.setAttribute('aria-hidden', 'true')
+    const marker = new Marker({ element, anchor: 'bottom' }).setLngLat([draftPin.lon, draftPin.lat]).addTo(map)
+    return () => {
+      marker.remove()
+    }
+  }, [mapReady, draftPin])
+
+  // Crosshair while picking an upload location.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!mapReady || !map) return
+    map.getCanvas().style.cursor = onPickLocation ? 'crosshair' : ''
+  }, [mapReady, onPickLocation])
+
   // Fly to a requested place (e.g. a "Tonight's best" pick).
   useEffect(() => {
     const map = mapRef.current
@@ -455,8 +713,9 @@ function StargazingMap({ scores, onSelectCell, selectedCellId, focus, userLocati
     <section className="map-section" aria-label="Explore Western New York">
       {/* Read by screen readers via the canvas's aria-describedby; not shown visually. */}
       <p id="map-instructions" className="visually-hidden">
-        Drag to explore. Scroll or use plus and minus to zoom. Click a square or spot to open its details panel. You can
-        also focus the map and use the arrow keys.
+        Drag to explore. Scroll or use plus and minus to zoom. Click a square or spot to open its details panel. Round
+        photo thumbnails are community sky photos; numbered circles group several photos. You can also focus the map
+        and use the arrow keys.
       </p>
       <div className="map-frame">
         <div ref={containerRef} className="map-container" />

@@ -1,6 +1,20 @@
-# Local development database: PostgreSQL + TimescaleDB + PostGIS (same stack as Tiger Cloud).
+# Local development services.
+#
+# Database: PostgreSQL + TimescaleDB + PostGIS (same stack as Tiger Cloud).
 #   docker compose up -d db
 #   DATABASE_URL=postgres://postgres:password@localhost:5432/pleiades
+#
+# Photo storage: SeaweedFS, an S3-compatible stand-in for Vultr Object Storage.
+# (MinIO's prebuilt images are no longer published, so it can't be pinned here.)
+#   docker compose up -d storage
+#   VULTR_S3_ENDPOINT=http://localhost:8333
+#   VULTR_S3_REGION=us-east-1
+#   VULTR_S3_ACCESS_KEY=pleiades-dev
+#   VULTR_S3_SECRET_KEY=pleiades-dev-secret
+#   VULTR_S3_BUCKET=pleiades-photos
+# The bucket is created on startup. CORS allows any origin by default, so the
+# browser can PUT presigned uploads from the Vite dev server.
+# These credentials are for local development only.
 services:
   db:
     image: timescale/timescaledb-ha:pg17
@@ -17,5 +31,25 @@ services:
       timeout: 5s
       retries: 20
 
+  storage:
+    image: chrislusf/seaweedfs:4.48
+    command:
+      - mini
+      - -dir=/data
+      - -bucket=pleiades-photos
+      - -s3.config=/etc/seaweedfs/s3.json
+      - -master.telemetry=false
+    ports:
+      - "127.0.0.1:8333:8333"
+    volumes:
+      - pleiades-photos:/data
+      - ./infra/dev-storage/s3.json:/etc/seaweedfs/s3.json:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:9333/cluster/status || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
 volumes:
   pleiades-db:
+  pleiades-photos:

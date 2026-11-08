@@ -66,6 +66,9 @@ class Settings:
     uploads_per_hour: int = 20
     photo_workers: int = 4
     explain_timeout_s: float = 12.0
+    # Seconds between Gemini calls in `ingest explain`. 30 s keeps the free tier (5 requests/min)
+    # mostly free for on-demand clicks; set 0 on a paid tier.
+    explain_warm_interval_s: float = 30.0
 
     allowed_mime_types: dict[str, str] = field(default_factory=lambda: dict(ALLOWED_MIME_TYPES))
 
@@ -98,6 +101,7 @@ class Settings:
             uploads_per_hour=_int("UPLOADS_PER_HOUR", 20),
             photo_workers=_int("PHOTO_WORKERS", 4),
             explain_timeout_s=_float("EXPLAIN_TIMEOUT_S", 12.0),
+            explain_warm_interval_s=_float("EXPLAIN_WARM_INTERVAL_S", 30.0),
         )
 
 

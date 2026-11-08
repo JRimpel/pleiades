@@ -4,7 +4,7 @@ Pleiades finds the best places to stargaze in Western New York. It combines ligh
 
 Built for UB Hacking 2026. See [Architecture.md](Architecture.md) for the full design.
 
-Current integration status and verification: [INTEGRATION_HANDOFF.md](INTEGRATION_HANDOFF.md). The score map, spot details/charts, sky summary, location services and Explore in 3D now share selected observing context. Photo upload/voting UI remains planned.
+Current integration status and verification: [INTEGRATION_HANDOFF.md](INTEGRATION_HANDOFF.md). The score map, spot details/charts, sky summary, location services and Explore in 3D now share selected observing context. Community photos are live on the map: upload, a story-style viewer with the AI analysis, and voting.
 
 - `backend/`: Flask API, ingest and scoring jobs (Python 3.11+)
 - `db/migrations/`: Tiger Data (TimescaleDB + PostGIS) schema
@@ -16,8 +16,9 @@ Current integration status and verification: [INTEGRATION_HANDOFF.md](INTEGRATIO
 Prerequisites: Docker running Linux containers, Python 3.12+, and Node.js for the frontend. On Windows, install Docker Desktop and its WSL 2 prerequisite before `docker compose`; a Windows restart may be required. Keep an existing `.env` rather than copying over its credentials.
 
 ```bash
-# 1. Database (local TimescaleDB + PostGIS; Tiger Cloud in prod)
-docker compose up -d db
+# 1. Database (local TimescaleDB + PostGIS; Tiger Cloud in prod) and photo storage
+#    (local S3-compatible SeaweedFS; Vultr Object Storage in prod). See "Photo storage" below.
+docker compose up -d db storage
 
 # 2. Python env
 cd backend
@@ -52,6 +53,32 @@ Set-Location backend
 ```
 
 Keep Flask running, then start the frontend in another terminal. `GET /api/scores/range` should return a forecast range, and `GET /api/scores` should contain scored cells. Photo storage can be unavailable while scores still work; `/api/health` may therefore report `degraded` for storage only.
+
+### Photo storage
+
+Browsers upload photos straight to object storage with presigned URLs. The API, thumbnail worker and map read them back through the same `VULTR_S3_*` settings.
+
+**Local development.** `docker compose up -d storage` runs [SeaweedFS](https://github.com/seaweedfs/seaweedfs) on `localhost:8333`. It creates the `pleiades-photos` bucket on startup and allows browser uploads from any origin. MinIO's prebuilt images are no longer published, which is why SeaweedFS is used. Point the API at it in `.env`, then restart Flask:
+
+```bash
+VULTR_S3_ENDPOINT=http://localhost:8333
+VULTR_S3_REGION=us-east-1
+VULTR_S3_ACCESS_KEY=pleiades-dev          # dev-only, from infra/dev-storage/s3.json
+VULTR_S3_SECRET_KEY=pleiades-dev-secret
+VULTR_S3_BUCKET=pleiades-photos
+VULTR_S3_PUBLIC_BASE=                     # empty: photos are served with 1 h presigned URLs
+```
+
+`/api/health` should then report `"storage": true`. Photos persist in the `pleiades-photos` Docker volume.
+
+**Production (Vultr Object Storage).** Set the real endpoint (for example `https://ewr1.vultrobjects.com`), region `ewr1`, keys and bucket in the VM's `.env`. Then allow uploads from the site's origin once per bucket:
+
+```bash
+backend/.venv/bin/python data/configure_bucket_cors.py https://<your-host>
+backend/.venv/bin/python data/configure_bucket_cors.py --check   # show the current rules
+```
+
+Photo analysis needs a working `GEMINI_API_KEY`. Without one, or when the quota is used up, photos still appear on the map, marked "AI analysis unavailable". Only photos Gemini judges not to be night-sky pictures are hidden.
 
 ### Tests
 

@@ -1,19 +1,13 @@
 from __future__ import annotations
 
-import logging
-from concurrent.futures import ThreadPoolExecutor
-from concurrent.futures import TimeoutError as FutureTimeout
-from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
+from datetime import timedelta
 
 from flask import Blueprint, request
 
-from ..ai import explain
-from ..ai.types import ExplainContext, Explanation
+from .. import spot_explanations
 from ..config import current_settings
 from ..errors import bad_request, not_found
 from ..repo import cells as cells_repo
-from ..repo import explanations as explanations_repo
 from ..repo import forecasts as forecasts_repo
 from ..repo import scores as scores_repo
 from ..schemas.common import score_label
@@ -22,12 +16,7 @@ from ..schemas.spots import (AstroSnapshot, Conditions, DriftPoint, DriftRevisio
 from ..timeutil import current_night, night_window, parse_date, parse_iso, utcnow
 from .params import hour_arg
 
-log = logging.getLogger(__name__)
-
 bp = Blueprint("spots", __name__)
-
-# Shared pool for explanation calls so a slow LLM can be abandoned after a timeout.
-_explain_pool = ThreadPoolExecutor(max_workers=4, thread_name_prefix="explain")
 
 MAX_HISTORY_DAYS = 31
 
@@ -39,51 +28,16 @@ def _require_cell(cell_id: int) -> dict:
     return cell
 
 
-def _local_time_label(t: datetime, tz: str) -> str:
-    local = t.astimezone(ZoneInfo(tz))
-    hour12 = local.hour % 12 or 12
-    return f"{local:%a %b} {local.day}, {hour12}:{local:%M} {'AM' if local.hour < 12 else 'PM'}"
-
-
-def _explanation(cell: dict, hour: datetime, score: dict, conditions: dict | None, astro: dict | None) -> Explanation:
-    settings = current_settings()
-    model_version = int(score["model_version"])
-    cached = explanations_repo.get(cell["id"], hour, model_version)
-    if cached:
-        return Explanation(**cached)
-
-    ctx = ExplainContext(
-        cell_id=cell["id"], spot_name=cell["name"], valid_time=hour,
-        local_time=_local_time_label(hour, settings.region_tz), score=float(score["score"]),
-        nelm=score.get("nelm"), factors=score.get("factors") or {}, bortle=cell.get("bortle"),
-        sun_alt=(astro or {}).get("sun_alt"), moon_alt=(astro or {}).get("moon_alt"),
-        moon_illum=(astro or {}).get("moon_illum"),
-        conditions={k: v for k, v in (conditions or {}).items() if k != "fetched_at"},
-    )
-    try:
-        result = _explain_pool.submit(explain.explain_score, ctx).result(timeout=settings.explain_timeout_s)
-    except FutureTimeout:
-        log.warning("explain_score timed out for cell %s", cell["id"])
-        return explain.fallback_explanation(ctx)
-    except Exception as e:  # noqa: BLE001 - fall back to the template
-        log.warning("explain_score failed for cell %s: %s", cell["id"], e)
-        return explain.fallback_explanation(ctx)
-
-    try:
-        explanations_repo.put(cell["id"], hour, model_version, result.summary, result.tips)
-    except Exception as e:  # noqa: BLE001 - caching is best-effort
-        log.warning("Could not cache explanation: %s", e)
-    return result
-
-
 @bp.get("/spots/<int:cell_id>")
 def get_spot(cell_id: int):
+    """Spot detail from the database only. A not-yet-generated explanation is left to
+    `/spots/<id>/explanation` (`explanation_pending`), so this never waits on Gemini."""
     cell = _require_cell(cell_id)
     hour = hour_arg()
     score = scores_repo.score_for(cell_id, hour)
     conditions = forecasts_repo.latest_for(cell_id, hour)
     astro = forecasts_repo.astro_at(hour)
-    explanation = _explanation(cell, hour, score, conditions, astro) if score else None
+    explanation = spot_explanations.ready(cell, hour, score, conditions, astro) if score else None
 
     detail = SpotDetail(
         cell_id=cell["id"], name=cell["name"], is_curated=cell["is_curated"], lat=cell["lat"], lon=cell["lon"],
@@ -98,8 +52,23 @@ def get_spot(cell_id: int):
         conditions=Conditions(**conditions) if conditions else None,
         astro=AstroSnapshot(**astro) if astro else None,
         explanation=ExplanationOut(summary=explanation.summary, tips=explanation.tips) if explanation else None,
+        explanation_pending=score is not None and explanation is None,
     )
     return detail.model_dump(mode="json")
+
+
+@bp.get("/spots/<int:cell_id>/explanation")
+def get_spot_explanation(cell_id: int):
+    """Plain-language explanation of one cell-hour's score (Gemini, bounded by EXPLAIN_TIMEOUT_S)."""
+    cell = _require_cell(cell_id)
+    hour = hour_arg()
+    score = scores_repo.score_for(cell_id, hour)
+    if score is None:
+        raise not_found(f"Spot {cell_id} has no score at {hour.isoformat()}")
+    conditions = forecasts_repo.latest_for(cell_id, hour)
+    astro = forecasts_repo.astro_at(hour)
+    result = spot_explanations.get_or_generate(cell, hour, score, conditions, astro)
+    return ExplanationOut(summary=result.summary, tips=result.tips).model_dump(mode="json")
 
 
 @bp.get("/spots/<int:cell_id>/history")

@@ -11,8 +11,9 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { useSpot, useSpotDrift, useSpotHistory } from '../api/hooks'
-import type { Conditions, AstroSnapshot, SpotDetail, SpotDrift, SpotHistory } from '../api/types'
+import type { UseQueryResult } from '@tanstack/react-query'
+import { useSpot, useSpotDrift, useSpotExplanation, useSpotHistory } from '../api/hooks'
+import type { Conditions, AstroSnapshot, Explanation, SpotDetail, SpotDrift, SpotHistory } from '../api/types'
 import { factorLabel, scoreToRgb } from '../lib/scoreColors'
 import { formatCoords, formatMiles, haversineMiles, spotTitle } from '../lib/placeName'
 import { formatLocalDayTime, formatLocalHour } from '../lib/time'
@@ -248,17 +249,47 @@ function DriftChart({ drift }: { drift: SpotDrift }) {
   )
 }
 
+/** The "why this score" text: included with the spot when cached, otherwise loaded on its own. */
+function ExplanationSection({ spot, query }: { spot: SpotDetail; query: UseQueryResult<Explanation> }) {
+  const explanation = spot.explanation ?? query.data
+  if (explanation) {
+    return (
+      <section className="spot-section" aria-label="Why this score">
+        <p className="spot-explanation">{explanation.summary}</p>
+        {explanation.tips.length > 0 && (
+          <ul className="spot-tips">
+            {explanation.tips.map((tip) => (
+              <li key={tip}>{tip}</li>
+            ))}
+          </ul>
+        )}
+      </section>
+    )
+  }
+  if (!spot.explanation_pending || query.isError) return null
+  return (
+    <section className="spot-section" role="status" aria-label="Loading why this score">
+      <div className="skeleton skeleton-line" />
+      <div className="skeleton skeleton-line short" />
+    </section>
+  )
+}
+
 function SpotBody({
   spot,
+  explanation,
+  history,
+  drift,
   selectedMs,
   userLocation,
 }: {
   spot: SpotDetail
+  explanation: UseQueryResult<Explanation>
+  history: UseQueryResult<SpotHistory>
+  drift: UseQueryResult<SpotDrift>
   selectedMs?: number
   userLocation?: UserLocation | null
 }) {
-  const history = useSpotHistory(spot.cell_id)
-  const drift = useSpotDrift(spot.cell_id)
   const directionsParams = new URLSearchParams({ api: '1', destination: `${spot.lat},${spot.lon}` })
   if (userLocation) directionsParams.set('origin', `${userLocation.lat},${userLocation.lon}`)
   const directions = `https://www.google.com/maps/dir/?${directionsParams}`
@@ -288,18 +319,7 @@ function SpotBody({
         </div>
       </div>
 
-      {spot.explanation && (
-        <section className="spot-section" aria-label="Why this score">
-          <p className="spot-explanation">{spot.explanation.summary}</p>
-          {spot.explanation.tips.length > 0 && (
-            <ul className="spot-tips">
-              {spot.explanation.tips.map((tip) => (
-                <li key={tip}>{tip}</li>
-              ))}
-            </ul>
-          )}
-        </section>
-      )}
+      <ExplanationSection spot={spot} query={explanation} />
 
       {spot.factors && (
         <section className="spot-section">
@@ -347,6 +367,10 @@ function SpotPanel({ cellId, time, onClose, userLocation }: SpotPanelProps) {
   const headingRef = useRef<HTMLHeadingElement>(null)
   const spot = useSpot(cellId, time)
   const data = spot.data?.cell_id === cellId ? spot.data : undefined
+  // Start the charts alongside the spot request instead of after it.
+  const history = useSpotHistory(cellId)
+  const drift = useSpotDrift(cellId)
+  const explanation = useSpotExplanation(cellId, data?.valid_time, Boolean(data?.explanation_pending))
   const selectedMs = time ? Date.parse(time) : data ? Date.parse(data.valid_time) : undefined
 
   // Move focus to the panel when it opens or switches spot, for keyboard and screen-reader users.
@@ -390,7 +414,14 @@ function SpotPanel({ cellId, time, onClose, userLocation }: SpotPanelProps) {
                 Updating…
               </p>
             )}
-            <SpotBody spot={data} selectedMs={selectedMs} userLocation={userLocation} />
+            <SpotBody
+              spot={data}
+              explanation={explanation}
+              history={history}
+              drift={drift}
+              selectedMs={selectedMs}
+              userLocation={userLocation}
+            />
           </>
         ) : spot.isError ? (
           <p className="spot-muted" role="alert">

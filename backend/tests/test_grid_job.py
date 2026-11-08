@@ -147,8 +147,8 @@ def test_cli_bootstrap_order():
     assert _names(["bootstrap"]) == ["grid", "astro", "weather", "score"]
 
 
-def test_cli_all_unchanged():
-    assert _names(["all"]) == ["astro", "weather", "score"]
+def test_cli_all_order():
+    assert _names(["all"]) == ["astro", "weather", "score", "explain"]
 
 
 @pytest.mark.parametrize("argv, reset", [

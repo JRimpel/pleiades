@@ -9,7 +9,15 @@ Updated November 8, 2026 (America/New_York). Start with the current guidance bel
 - Models rotate automatically at 12 degrees/second, including reduced-motion mode, per the user's explicit choice. Pause/Resume is always available. Left/right camera buttons and Reset pause rotation; pointer dragging does not explicitly pause it.
 - Default **Visibility** sorting uses the selected location/time: above horizon, unknown, below horizon. Fixed objects have approximate catalog-based altitude estimates, including during API outages. Planets/Moon use matched nightly rise/set estimates. Search/filter/sort operate on the full collection before 24-card pagination; Name (A–Z) is also available.
 - An optional **Visible tonight** switch now filters objects estimated above the horizon sometime during the selected local night. It defaults off, combines with category/search, and runs before sorting/pagination. The matched night window prefers astronomical dusk/dawn, falling back to sunset/sunrise; unknown estimates are excluded. Missing night data are explained and users can turn the switch off to browse all objects. Current-hour card statuses/sorting remain distinct from whole-night inclusion. No endpoint or asset regeneration is needed for this filter; the detailed helper contracts are in the explorer guide.
-- No atlas change introduced a backend endpoint/schema, changed the scoring seam, or added a Gemini dependency. Photo upload/voting and storage-to-vision UI integration remain separate work.
+- No atlas change introduced a backend endpoint/schema, changed the scoring seam, or added a Gemini dependency.
+- **Community photos (November 8).** Users upload night-sky photos, which everyone sees as round thumbnails on the score map. A story-style viewer shows the AI analysis and score at capture, with ▲/▼ voting.
+  - Accounts are username-only: the bearer token lives in `localStorage`, so the browser is the account.
+  - Uploads read GPS and time from EXIF, fall back to picking on the map or the device location, and PUT straight to storage with a presigned URL.
+  - Pins are exact coordinates, clustered, and can be hidden with the **Photos** toggle in the title card.
+  - Existing backend routes, schema and worker are reused. One backend change: `failed` analyses (Gemini outage or quota) now stay on the map; only `rejected` (not a night sky) is hidden.
+  - Local storage is a SeaweedFS container (`docker compose up -d storage`); see the README's "Photo storage". MinIO was planned but its images are no longer published.
+  - Production needs Vultr credentials plus `data/configure_bucket_cors.py <origin>`.
+  - Details: [frontend-documentation.md §14](frontend-documentation.md#14-community-photos).
 - For exact props, data types, stable IDs, generated-file ownership, regeneration order, scientific limits and extension steps, use [the current explorer integration guide](frontend/EXPLORE_3D_HANDOFF.md). [Frontend setup](frontend/README.md), [frontend overview](frontend-documentation.md) and [AI/ML handoff](AI_ML_HANDOFF.md) cover adjacent ownership.
 - Implementation/docs are working-tree changes; no commit or deployment is claimed. Include the untracked generated assets, metadata, thumbnail set/manifests, new scripts/components/tests and relevant tracked changes when preparing the integration commit. `git diff` alone omits untracked files; inspect `git status --short --untracked-files=normal`.
 
@@ -23,7 +31,8 @@ From repository root, for the existing local database configuration:
 
 ```powershell
 # Start Docker Desktop first. Preserve the existing .env and database volume.
-docker compose up -d db
+# `storage` is local S3-compatible photo storage; set VULTR_S3_* as in the README's "Photo storage".
+docker compose up -d db storage
 backend/.venv/Scripts/python.exe data/diagnose_backend.py
 Set-Location backend
 .venv/Scripts/python.exe -m app.migrate
@@ -51,7 +60,15 @@ When scores fail, distinguish: proxy `ECONNREFUSED` means no reachable Flask lis
 
 ## Current verification and integration directions
 
-The most recent application pass completed `npm run build`, **10 unit tests**, and **17 browser tests** (7 explorer, 3 map/API integration, 2 thumbnail, 2 sorting, 3 Visible tonight). All generated assets and all 263 thumbnails passed structural/coverage validation; the grid and updated lunar/nebula renders were visually reviewed. Browser tests use API fixtures with real local assets, so their results do not establish live DB/Gemini/storage availability. Lint passed earlier, but was not rerun for the final atlas/sorting changes. The Visible tonight implementation passed the current checks; earlier documentation-only notes do not override these results.
+**Photo pass (November 8):**
+- Backend offline suite: **167 passed, 1 skipped**.
+- Frontend: build and lint pass, **15 unit tests**, and **22 browser tests** (the 17 earlier tests plus 5 in `photos.spec.ts`).
+- Live check against the local DB and SeaweedFS (Flask with the storage settings, Vite proxied to it):
+  - Account creation, presign, browser PUT, registration, worker thumbnail and presigned display all worked, and the new pin appeared with its thumbnail.
+  - Gemini returned `429 RESOURCE_EXHAUSTED` (key quota), so that photo ended `failed` and stayed visible. A successful `done` analysis is covered only by fixtures, not a live call.
+- That live check created one test account (`e2e-check-…`) and one synthetic starfield photo near 42.85, −78.75 in the local database and bucket.
+
+The atlas pass before it completed `npm run build`, **10 unit tests**, and **17 browser tests** (7 explorer, 3 map/API integration, 2 thumbnail, 2 sorting, 3 Visible tonight). All generated assets and all 263 thumbnails passed structural/coverage validation; the grid and updated lunar/nebula renders were visually reviewed. Browser tests use API fixtures with real local assets, so their results do not establish live DB/Gemini/storage availability. Lint passed earlier, but was not rerun for the final atlas/sorting changes. The Visible tonight implementation passed the current checks; earlier documentation-only notes do not override these results.
 
 From `frontend/`:
 

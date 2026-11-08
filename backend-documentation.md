@@ -160,7 +160,7 @@ def explain_score(ctx: ExplainContext) -> Explanation          # replace the bod
 def fallback_explanation(ctx: ExplainContext) -> Explanation   # keep: used on timeout or error
 ```
 
-- **Called by:** `GET /api/spots/:id`, **synchronously** during the request. The call runs in a helper thread with an `EXPLAIN_TIMEOUT_S` timeout (default 12 s; Gemini requires a deadline of at least 10 s).
+- **Called by:** `GET /api/spots/:id/explanation` (never by `GET /api/spots/:id`, which only reads the cache) and the `ingest explain` pre-warm job. The API call runs in a helper thread with an `EXPLAIN_TIMEOUT_S` timeout (default 12 s; Gemini requires a deadline of at least 10 s). The request uses minimal thinking and at most 512 output tokens (about 1.5–2 s). Shared logic lives in `backend/app/spot_explanations.py`.
 - **Input: `ExplainContext`**
   - Cell and spot name, `valid_time` plus a readable `local_time`.
   - `score`, `nelm`, `factors`, `bortle`.
@@ -168,8 +168,10 @@ def fallback_explanation(ctx: ExplainContext) -> Explanation   # keep: used on t
   - A `conditions` dict with the raw weather, and `visible_planets`.
 - **Output:** `Explanation{summary: str, tips: list[str]}`.
 - **Caching and fallback:**
-  - On timeout or exception, the backend serves `fallback_explanation` and **does not cache it**.
-  - Successful answers are cached in `score_explanations` per (cell, hour, `MODEL_VERSION`).
+  - On timeout or exception, the backend serves `fallback_explanation`. It **does not store it in the database**, but remembers it in-process for 10 minutes so repeat requests are instant.
+  - Successful answers are stored in `score_explanations` per (cell, hour, `MODEL_VERSION`) together with `explained_score`. A stored explanation is reused only while the rounded score is unchanged, so an hourly re-score with the same score keeps it, and a changed score regenerates it.
+  - With no Gemini key configured, the template is served directly and not stored.
+  - `python -m app.ingest explain` (part of `all`, and run after each score job via `ExecStartPost` in `pleiades-score.service`) pre-generates explanations for tonight's top 10 spots and every curated spot at their best hour. It waits `EXPLAIN_WARM_INTERVAL_S` (default 30 s) between calls and stops at the first 429.
 
 ### 3.5 Grid preprocessing: `data/build_grid.py` → `grid_cells`
 
@@ -304,11 +306,11 @@ Flask runs on port **5001** (set in `backend/.flaskenv`; see §5).
  "conditions": {"fetched_at": "...", "cloud_low": 10, "cloud_mid": 5, "cloud_high": 40, "cloud_total": 45,
                 "visibility_m": 24000, "rh": 72, "dew_point_c": -1, "temp_c": 4, "wind_kmh": 9, "precip_prob": 5},
  "astro": {"time": "...", "sun_alt": -48.2, "moon_alt": 22.0, "moon_illum": 0.78, "moon_phase_deg": 125.0},
- "explanation": {"summary": "...", "tips": ["..."]}}
+ "explanation": {"summary": "...", "tips": ["..."]}, "explanation_pending": false}
 ```
 - `factors` are points lost (negative) or gained (positive). Draw them as bars.
 - `score`, `factors` and `explanation` are `null` when that hour has no score.
-- This route can take a few seconds when the explanation isn't cached yet, so show a skeleton loader.
+- This route reads only the database and never waits on Gemini. When the explanation isn't cached yet, `explanation` is `null` and `explanation_pending` is `true`. Fetch `GET /api/spots/:id/explanation?time=` (`{summary, tips}`, which can take a few seconds) and show a skeleton until it arrives. It returns 404 when that hour has no score.
 
 `GET /api/spots/:id/history` returns `{cell_id, from_time, to_time, hourly: [{time, score, nelm}], nightly: [{night: "YYYY-MM-DD", best_score, best_time}]}`.
 
@@ -454,7 +456,7 @@ Policies:
 4. **`ingest grid --reset` is destructive.** It runs `TRUNCATE grid_cells … CASCADE`, which also deletes forecasts, scores, explanations, **photos and votes**. Don't run it once real uploads exist. Use `data/build_grid.py --load` (merges and keeps IDs, still untested) or write a migration instead.
 5. **Sky data is thin.** The only meteor shower is the hard-coded 2026 Leonids, there are no ISS passes, and the spot route leaves `ExplainContext.visible_planets` empty. Sun/Moon are computed at the region centroid (≤ ~1.25° error at the corners).
 6. **Gemini HTTP 400 is resolved** *(Nov 8)*: the cause was a request deadline under 10 s, which Gemini rejects with 400 INVALID_ARGUMENT. `explain_score` now sends at least 10 s and `EXPLAIN_TIMEOUT_S` defaults to 12 s. A live explanation with `gemini-3.5-flash` was verified (about 6 s). Photo analysis has not been verified end to end.
-7. **Explanation cache staleness:** `score_explanations` is keyed on cell, hour and model version only. A new forecast can leave old text in place. Template explanations cached while no Gemini key was loaded keep being served for those cells and hours; run `DELETE FROM score_explanations;` after configuring the key. *(Nov 8: all 85 rows in the local DB were template text.)*
+7. **Explanation cache staleness is resolved** *(Nov 8, migration 004)*: each cached explanation records `explained_score` and is regenerated when the rounded score changes. Rows written before migration 004 have no `explained_score`, so they never match and get replaced. Templates are no longer stored. The Gemini free tier allows 5 requests/min and 20/day per model, which on-demand clicks can easily exceed. Once the daily cap is hit, users see the template text. Use a paid key for real use.
 8. **Frontend integration** *(updated by Role A, Nov 8)*.
    - **Wired up:** the map calls `GET /api/scores?time=` and `GET /api/scores/range` through the Vite proxy (default `localhost:5001`). It shows real v2 scores with an hour slider.
    - **Also wired up:** `/spots/:id` with `/history` and `/drift` (spot panel), `/best` with `near`/`radius_km` (Tonight's best), and `/sky-events` with `lat`/`lon` (Sky tonight and the slider's Dark/Dawn ticks).

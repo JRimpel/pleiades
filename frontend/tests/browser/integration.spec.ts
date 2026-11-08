@@ -4,7 +4,8 @@ import type { Page } from '@playwright/test'
 const start = '2026-11-08T04:00:00Z'
 const bestTime = '2026-11-09T06:00:00Z'
 
-async function projectApi(page: Page) {
+/** `explanationGate` holds back /api/spots/42/explanation until it resolves. */
+async function projectApi(page: Page, explanationGate: Promise<void> = Promise.resolve()) {
   await page.route('http://127.0.0.1:4173/api/**', async route => {
     const url = new URL(route.request().url())
     const path = url.pathname
@@ -28,7 +29,10 @@ async function projectApi(page: Page) {
         conditions: { fetched_at: start, cloud_total: 12, cloud_low: 3, cloud_mid: 4, cloud_high: 5, visibility_m: 20000,
           rh: 50, dew_point_c: 0, temp_c: 5, wind_kmh: 10, precip_prob: 0 },
         astro: { time: bestTime, sun_alt: -30, moon_alt: -10, moon_illum: .1, moon_phase_deg: 30 },
-        explanation: { summary: 'Integration fixture explanation.', tips: ['Compare clearer hours.'] } }
+        explanation: null, explanation_pending: true }
+    } else if (path === '/api/spots/42/explanation') {
+      await explanationGate
+      body = { summary: 'Integration fixture explanation.', tips: ['Compare clearer hours.'] }
     } else if (path.endsWith('/history')) {
       body = { cell_id: 42, from_time: start, to_time: bestTime, hourly: [{ time: bestTime, score: 78, nelm: 6 }], nightly: [] }
     } else if (path.endsWith('/drift')) {
@@ -40,6 +44,8 @@ async function projectApi(page: Page) {
         moon: { phase_deg: 30, phase_name: 'Waxing crescent', illumination: .1, rise: null, set: null },
         twilight: { sunset: `${date}T22:00:00Z`, astronomical_dusk: `${date}T23:30:00Z`, astronomical_dawn: `${next.toISOString().slice(0, 10)}T10:00:00Z`, sunrise: null },
         planets: [{ name: 'Saturn', rise: `${date}T20:00:00Z`, set: `${next.toISOString().slice(0, 10)}T07:00:00Z`, max_alt_deg: 40, magnitude: 1 }], events: [] }
+    } else if (path === '/api/photos') {
+      body = { photos: [] }
     } else {
       await route.fulfill({ status: 404, json: { error: { code: 'not_found', message: path } } }); return
     }
@@ -58,7 +64,8 @@ test('a database outage is distinguished from an unreachable API', async ({ page
 
 test('best spot, forecast slider, sky summary, ML factors and 3D context stay connected', async ({ page }) => {
   await page.clock.setFixedTime(new Date(start))
-  await projectApi(page)
+  let releaseExplanation = () => {}
+  await projectApi(page, new Promise<void>(resolve => { releaseExplanation = resolve }))
   const errors: string[] = []
   page.on('pageerror', error => errors.push(error.message))
   await page.goto('/')
@@ -67,8 +74,15 @@ test('best spot, forecast slider, sky summary, ML factors and 3D context stay co
   await page.getByRole('button', { name: /Tonight's best/ }).click()
   const panel = page.getByRole('complementary', { name: 'Integration Lookout' })
   await expect(panel).toBeVisible()
-  await expect(panel.getByText('Integration fixture explanation.')).toBeVisible()
+  // The score, factors and charts render while the (slow) explanation is still loading.
   await expect(panel.getByText('Observational calibration', { exact: true })).toBeVisible()
+  await expect(panel.getByRole('status', { name: 'Loading why this score' })).toBeVisible()
+  await expect(panel.getByText('Not enough history yet.')).toBeVisible()
+  await expect(panel.getByText('No forecasts for tonight yet.')).toBeVisible()
+  await expect(panel.getByText('Integration fixture explanation.')).not.toBeVisible()
+  releaseExplanation()
+  await expect(panel.getByText('Integration fixture explanation.')).toBeVisible()
+  await expect(panel.getByRole('status', { name: 'Loading why this score' })).toHaveCount(0)
   await expect(panel.getByText('Relative observing index · model v3', { exact: true })).toBeVisible()
   await expect(slider).toHaveValue('26')
   await expect(page.getByText('Loading the map…', { exact: true })).not.toBeVisible({ timeout: 20000 })

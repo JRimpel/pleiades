@@ -40,9 +40,11 @@ Browser ──HTTPS──> nginx ──/api──> Flask (gunicorn) ──SQL─
    └──presigned PUT/GET──> Vultr Object Storage <──┘
 
 systemd timers ──> python -m app.ingest {astro | weather | score} ──> Tiger Cloud
+deploy / setup ──> python -m app.ingest bootstrap  (grid → astro → weather → score)
 ```
 
 **Data pipeline** (each job writes to the DB and logs itself in `ingest_runs`):
+0. **`ingest grid`** (one-off) loads the static `grid_cells` (light pollution, elevation, curated spots) from the committed `data/wny_grid.geojson`. It does nothing once loaded (§3.5). `ingest bootstrap` runs steps 0–3 in order on a fresh database.
 1. **`ingest astro`** (daily) calls `ephemeris.hourly_conditions` and writes `astro_conditions`, then calls `ephemeris.sky_events` and writes `sky_events`.
 2. **`ingest weather`** (every 3 h) fetches Open-Meteo for every `grid_cells` row and writes `weather_forecast`. Every revision is kept; nothing is overwritten.
 3. **`score`** (hourly, and after each weather run):
@@ -62,7 +64,7 @@ systemd timers ──> python -m app.ingest {astro | weather | score} ──> Ti
 
 ## 3. AI/ML integration guide (role C)
 
-The placeholders are deterministic and use no extra libraries, so the whole pipeline already runs. Replace them one at a time; everything else keeps working.
+All four seams now have real implementations from role C: physics scoring v2 (calibrated v3 opt-in), Skyfield astronomy, and Gemini vision/explanations. See [AI_ML_HANDOFF.md](AI_ML_HANDOFF.md) for their status. The contracts below still apply: any change to a seam must keep its inputs and outputs the same.
 
 `backend/requirements.txt` already lists `skyfield` and `google-genai`. Add any other dependency you need there.
 
@@ -185,17 +187,20 @@ The backend never computes static cell data; it reads whatever is in `grid_cells
 
 - Grid squares are drawn as `±GRID_STEP_DEG/2` around each centre. The default is 0.1°; if you change the spacing, set `GRID_STEP_DEG` to match.
 - Load the grid **before** the first `ingest weather` run.
-- For local development, `python scripts/seed_dev_grid.py --no-elevation` builds a fake 356-cell grid plus 8 curated spots. Use it as a template.
-- To replace a dev grid, use `--reset`. Add `--force` to also truncate the data that depends on it.
+- **Loading:** `python -m app.ingest grid` loads the committed `data/wny_grid.geojson` (path overridable with `GRID_GEOJSON_PATH`). It validates every feature first. If `grid_cells` already has rows it is a no-op, so it is safe on every deploy. `--reset` runs `TRUNCATE grid_cells RESTART IDENTITY CASCADE`, which also deletes forecasts, scores, explanations, photos and votes. Then re-run astro/weather/score, or use `bootstrap --reset-grid`, which does all of it.
+- The 3 GB atlas TIF is only needed to *regenerate* the GeoJSON (`data/build_grid.py`, role C). Commit the new GeoJSON, then `ingest grid --reset` (before any real photos exist).
+- `scripts/seed_dev_grid.py` is a **synthetic** fallback (fake city-glow brightness) for offline work only.
 
 ### 3.6 How to check your changes
 
 ```bash
 cd backend && .venv/bin/python -m pytest -q        # offline; must pass
-python -m app.ingest astro && python -m app.ingest score   # against a seeded DB
-curl 'localhost:5000/api/spots/1'                  # see score, factors, explanation
-curl 'localhost:5000/api/sky-events'               # see night_summary + events
+python -m app.ingest bootstrap                     # grid (if empty) -> astro -> weather -> score
+curl 'localhost:5001/api/spots/1'                  # see score, factors, explanation
+curl 'localhost:5001/api/sky-events'               # see night_summary + events
 ```
+
+Flask runs on port **5001** (set in `backend/.flaskenv`; see §5).
 
 ---
 
@@ -203,7 +208,7 @@ curl 'localhost:5000/api/sky-events'               # see night_summary + events
 
 ### 4.1 Basics
 - **Base path:** `/api`.
-  - In development, Vite proxies `/api` to `http://localhost:5000`.
+  - In development, Vite proxies `/api` to `http://localhost:5001` by default. *(Role A, Nov 7: on macOS, AirPlay Receiver holds port 5000, so `backend/.flaskenv` runs Flask on 5001. For a Flask on another computer, set `API_PROXY_TARGET`, e.g. `API_PROXY_TARGET=http://<other-computer>:5001 npm run dev`.)*
   - In production, nginx serves the build and proxies `/api` on the same origin, so **no CORS is needed**.
 - **JSON everywhere.** All timestamps are **ISO-8601 UTC**. Send `time` values the same way; naive timestamps are treated as UTC.
 - **Auth:**
@@ -271,6 +276,10 @@ curl 'localhost:5000/api/sky-events'               # see night_summary + events
 ```
 - **Grid cells are Polygons, curated spots are Points.** Style them as two layers.
 - `score` and `label` are `null` when a cell has no score for that hour (for example, beyond the forecast window).
+- *Role A (frontend), Nov 7: how the frontend draws this response.*
+  - The grid Polygons are not drawn as squares. The frontend blends the cell scores into one smooth image (Gaussian-weighted between cell centres). The Polygons stay on the map invisibly, only so clicks can find the cell.
+  - The frontend assumes `GRID_STEP_DEG = 0.1` and the current grid extent (centres −79.8 to −77.0, 42.0 to 43.3), and its map bounds are hard-coded to that extent.
+  - **Tell Role A if the grid spacing or extent changes.**
 
 `GET /api/scores/range` returns `{"min_time": "...", "max_time": "...", "now": "..."}`. Use it to set the bounds of the time slider.
 
@@ -315,7 +324,7 @@ curl 'localhost:5000/api/sky-events'               # see night_summary + events
  "planets": [{"name": "Jupiter", "rise": "...", "set": "...", "max_alt_deg": 55.0, "magnitude": -2.5}],
  "events": [{"time": "...", "type": "meteor_shower", "name": "Leonids", "details": {"zhr": 15, "peak": true}}]}
 ```
-Moon rise/set and the planet list are empty until role C replaces the placeholder astro module.
+Moon rise/set, twilight and planets are computed with Skyfield. Planet `magnitude` is currently `null`. The only meteor shower in `events` is the 2026 Leonids; ISS passes are not implemented.
 
 `GET /api/photos` returns `{photos: [{id, lat, lon, thumb_url, vote_count, taken_at, ai_status, ai_sky_quality}]}`.
 - Rejected and failed photos are left out.
@@ -362,13 +371,14 @@ docker compose up -d db                    # TimescaleDB + PostGIS on :5432
 cd backend
 python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
 .venv/bin/python -m app.migrate            # applies db/migrations/*.sql (use --dry-run to preview)
-.venv/bin/python scripts/seed_dev_grid.py  # add --no-elevation to skip the network
-.venv/bin/python -m app.ingest all         # astro -> weather -> score
-.venv/bin/flask --app app run --debug      # http://localhost:5000/api/health
+.venv/bin/python -m app.ingest bootstrap   # real grid -> astro -> weather -> score
+# switching an existing DB from the synthetic seed: bootstrap --reset-grid (wipes forecasts/scores/photos)
+.venv/bin/flask --app app run --debug      # http://localhost:5001/api/health
 .venv/bin/python -m pytest -q              # offline tests
 TEST_DATABASE_URL=postgres://postgres:password@localhost:5432/pleiades_test .venv/bin/python -m pytest -m db
 ```
 - The app **boots without a database or storage**: `/api/health` then reports `degraded`, and DB-backed routes return 500. This lets the frontend start early.
+- **Port 5001** *(Role A, Nov 7)*: `backend/.flaskenv` sets `FLASK_RUN_PORT=5001` (macOS AirPlay occupies 5000), and `flask run` loads it through `python-dotenv`. **`.flaskenv` is not committed yet.** Until it is, add `--port 5001` to the `flask run` command.
 - Photo uploads need real Vultr credentials, or another S3-compatible service set through `VULTR_S3_*`.
 
 ---
@@ -406,12 +416,13 @@ Policies:
 | `pleiades-ingest-weather.timer` | Every 3 h at :05 (00:05, 03:05, ...) | `python -m app.ingest weather`, then starts a score run |
 | `pleiades-score.timer` | Hourly at :15 | `python -m app.ingest score` |
 | `pleiades-api.service` | Always on | gunicorn `gthread` on `127.0.0.1:8000` |
+| `infra/deploy.sh` | Every deploy | `python -m app.ingest bootstrap` (grid is a no-op once loaded; backfills astro/weather/score) |
 
-- **Deploy:** run `infra/deploy.sh` on the VM. It runs `git pull`, builds the frontend, installs the backend dependencies, runs `migrate`, installs the systemd units, and restarts the API.
+- **Deploy:** run `infra/deploy.sh` on the VM. It runs `git pull`, builds the frontend, installs the backend dependencies, runs `migrate` and `ingest bootstrap`, installs the systemd units, and restarts the API.
 - **Configuration:** see `.env.example` for the full list. The main variables:
   - Database and AI: `DATABASE_URL`, `GEMINI_API_KEY`, `GEMINI_MODEL`.
   - Storage: `VULTR_S3_ENDPOINT/ACCESS_KEY/SECRET_KEY/BUCKET`, plus optional `VULTR_S3_PUBLIC_BASE`.
-  - Region and grid: `REGION_TZ`, `GRID_STEP_DEG`, `REGION_CENTROID_LAT/LON`, `FORECAST_HOURS`.
+  - Region and grid: `REGION_TZ`, `GRID_STEP_DEG`, `REGION_CENTROID_LAT/LON`, `FORECAST_HOURS`, `GRID_GEOJSON_PATH`.
   - Limits: `MAX_UPLOAD_BYTES`, `UPLOADS_PER_HOUR`, `PHOTO_WORKERS`, `EXPLAIN_TIMEOUT_S`.
 
 ---
@@ -437,10 +448,16 @@ Policies:
 
 ## 9. Known gaps and risks
 
-1. **No SQL has run against a real database yet.** Docker was off during development, so the 112 offline tests mock the database. The first `docker compose up` followed by `pytest -m db` is the real check.
-2. **The `cell_nightly_best` aggregate** uses a time-zone-aware 1-day bucket with a 12 h offset. That needs a recent TimescaleDB (about 2.13+; Tiger Cloud should be fine). If creating it fails, switch to a UTC bucket with an `origin` at local noon.
+1. **The DB path is verified.** `pytest -m db` passes (6/6) against TimescaleDB 2.31 + PostGIS. A local `ingest bootstrap --reset-grid` loaded 364 cells (8 curated) and wrote 26,208 forecast and score rows. Offline: 149 passed, 1 skipped (`tests` + `data/tests`). Not yet verified: S3 upload → worker → result, and a production deploy.
+2. **Aggregate timezone fix (uncommitted).** TimescaleDB 2.2x+ requires a hierarchical aggregate to use the same timezone and offset as its parent. `002_aggregates.sql` therefore buckets `cell_hourly_score` with `'America/New_York'` and a 12 h offset, matching `cell_nightly_best`. It also starts with `DROP MATERIALIZED VIEW IF EXISTS`, so a half-applied run can be retried. A DB that recorded the old version of 002 as applied keeps the old views. Drop both views, delete the `002_aggregates.sql` row from `schema_migrations`, and re-run `app.migrate`.
 3. **Stale hourly scores between refreshes:** future buckets of `cell_hourly_score` are materialized, so a new score revision shows up only after a refresh. The score job refreshes straight after each run; this only matters if that refresh fails.
-4. **The placeholder astro is approximate.** The sun is within about 1°. The moon altitude is crude, and moonrise/set and planets are empty. Moon-related scores aren't realistic until role C replaces it.
-5. **The placeholder vision and explanation** return neutral or template text.
-6. **The integration test truncates its tables.** Always point `TEST_DATABASE_URL` at a throwaway database.
-7. **Nothing is committed to git yet.**
+4. **`ingest grid --reset` is destructive.** It runs `TRUNCATE grid_cells … CASCADE`, which also deletes forecasts, scores, explanations, **photos and votes**. Don't run it once real uploads exist. Use `data/build_grid.py --load` (merges and keeps IDs, still untested) or write a migration instead.
+5. **Sky data is thin.** The only meteor shower is the hard-coded 2026 Leonids, there are no ISS passes, and the spot route leaves `ExplainContext.visible_planets` empty. Sun/Moon are computed at the region centroid (≤ ~1.25° error at the corners).
+6. **Gemini live calls fail** with HTTP 400 (HTML body), and the cause is still unresolved (see AI_ML_HANDOFF.md). Without Gemini, explanations fall back to template text and photo analysis cannot finish.
+7. **Explanation cache staleness:** `score_explanations` is keyed on cell, hour and model version only. A new forecast can leave old text in place.
+8. **Frontend integration is partial** *(updated by Role A, Nov 7)*.
+   - **Wired up:** the map calls `GET /api/scores?time=` and `GET /api/scores/range` through the Vite proxy (default `localhost:5001`). It shows real v2 scores with an hour slider.
+   - **Not called yet:** `/spots/:id` (with history and drift), `/best`, `/sky-events`, `/photos`, and `/users`.
+   - **Not committed yet:** `backend/.flaskenv` (port 5001).
+9. **The integration test truncates its tables.** Always point `TEST_DATABASE_URL` at a throwaway database.
+10. **Git state:** the grid-ingestion work (`app/ingest/grid.py`, `bootstrap`, deploy step, tests, docs) and the aggregate fix are not committed yet.

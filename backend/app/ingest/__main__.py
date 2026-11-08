@@ -4,6 +4,8 @@
     python -m app.ingest astro              # ephemeris + sky events (daily)
     python -m app.ingest score [--no-refresh]  # scoring model -> score_snapshots (hourly)
     python -m app.ingest all                # astro, weather, score
+    python -m app.ingest grid [--reset]     # static grid from data/wny_grid.geojson (one-off)
+    python -m app.ingest bootstrap [--reset-grid]  # grid, astro, weather, score (fresh DB / deploy)
 """
 from __future__ import annotations
 
@@ -39,14 +41,19 @@ def run_job(name: str, fn: JobFn, settings: Settings) -> int:
 
 
 def _jobs(args: argparse.Namespace) -> list[tuple[str, JobFn]]:
-    from . import astro, score, weather
+    from . import astro, grid, score, weather
 
     def score_job(conn: psycopg.Connection, settings: Settings) -> int:
         return score.run(conn, settings, refresh=not getattr(args, "no_refresh", False))
 
-    table: dict[str, JobFn] = {"weather": weather.run, "astro": astro.run, "score": score_job}
+    def grid_job(conn: psycopg.Connection, settings: Settings) -> int:
+        return grid.run(conn, settings, reset=getattr(args, "reset", False) or getattr(args, "reset_grid", False))
+
+    table: dict[str, JobFn] = {"weather": weather.run, "astro": astro.run, "score": score_job, "grid": grid_job}
     if args.job == "all":
         return [(n, table[n]) for n in ("astro", "weather", "score")]
+    if args.job == "bootstrap":
+        return [(n, table[n]) for n in ("grid", "astro", "weather", "score")]
     return [(args.job, table[args.job])]
 
 
@@ -59,6 +66,12 @@ def main(argv: list[str] | None = None) -> int:
     p_score.add_argument("--no-refresh", action="store_true", help="skip continuous-aggregate refresh")
     p_all = sub.add_parser("all", help="astro, weather, then score")
     p_all.add_argument("--no-refresh", action="store_true", help="skip continuous-aggregate refresh")
+    p_grid = sub.add_parser("grid", help="load grid_cells from the committed grid GeoJSON (no-op if loaded)")
+    p_grid.add_argument("--reset", action="store_true",
+                        help="TRUNCATE grid_cells ... CASCADE first (also deletes forecasts, scores, explanations)")
+    p_boot = sub.add_parser("bootstrap", help="grid, astro, weather, score: populate a fresh database")
+    p_boot.add_argument("--reset-grid", action="store_true", help="replace the existing grid (see grid --reset)")
+    p_boot.add_argument("--no-refresh", action="store_true", help="skip continuous-aggregate refresh")
     args = parser.parse_args(argv)
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")

@@ -28,9 +28,9 @@ cp ../.env.example ../.env          # then edit; DATABASE_URL defaults to the do
 # 4. Data pipeline: astro, weather, then score
 .venv/bin/python -m app.ingest all
 
-# 5. API on http://localhost:5000/api
+# 5. API on http://localhost:5001/api (port set in backend/.flaskenv; add --port 5001 if that file is missing)
 .venv/bin/flask --app app run --debug
-curl localhost:5000/api/health
+curl localhost:5001/api/health
 ```
 
 ### Tests

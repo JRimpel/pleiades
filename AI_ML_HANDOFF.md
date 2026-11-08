@@ -1,15 +1,16 @@
 ﻿# Pleiades AI / ML / Astronomy Handoff
 
-Living Role C implementation and integration record. Last updated: November 7, 2026 (America/New_York).
+Living Role C implementation and integration record. Last updated: November 7, 2026 (America/New_York). The latest update is from Role B: grid ingestion and verification against a real DB.
 
 ## Current status
 
 - **Implemented:** physics scoring v2; opt-in trained calibration v3; Skyfield astronomy; grounded Gemini vision/explanation code; real WNY grid; training, evaluation, and smoke-test tools.
-- **Offline verification:** **124 passed, 1 skipped** in the combined backend/Role C suite. The skipped test requires a live database. One upstream Skyfield/NumPy deprecation warning remains.
+- **Offline verification:** **149 passed, 1 skipped** in the combined backend/Role C suite (`tests` + `data/tests`; 12 of those are Role C tests). The skipped module is the live-DB integration test; run it with `pytest -m db` (below). One upstream Skyfield/NumPy deprecation warning remains.
+- **Real DB verified (Role B):** the new `python -m app.ingest grid` job loads `data/wny_grid.geojson` into `grid_cells`. On local TimescaleDB 2.31 + PostGIS, `ingest bootstrap --reset-grid` loaded 364 cells (8 curated; Beaver Meadow 21.3995 mag/arcsec²) and wrote 26,208 live Open-Meteo forecast rows. It then scored all 26,208 cell-hours end to end with model v2. `pytest -m db`: 6 passed.
 - **Real data:** 364 WNY cells with atlas brightness and Open-Meteo elevation. Live weather-to-score smoke produced 72 hourly scores across three WNY spots.
 - **Training:** 7,845 training observations and 528 spatially/temporally withheld observations; learned NELM MAE 0.8603 versus physics 2.2869 and constant-mean 0.9846.
 - **Gemini live verification is unresolved:** SDK calls and authenticated model listing return HTTP 400 with HTML, including from the user's normal terminal. Key-format heuristics did not recognize the configured value; this is not definitive proof of an invalid key. No proxy environment was detected. A hidden-input configuration helper is available to replace the value from AI Studio without exposing it.
-- **Not verified:** live DB loading/ingestion/route persistence, S3 upload-to-result integration, deployment, real-photo recognition accuracy, and WNY-specific learned-model accuracy.
+- **Not verified:** S3 upload-to-result integration, deployment, real-photo recognition accuracy, and WNY-specific learned-model accuracy.
 - No routes, shared types, migrations, repository SQL modules, ingest jobs, or worker code were changed. Work is not committed or pushed. Existing user changes to `.env.example` were left intact.
 
 ## Scope and accepted plan
@@ -88,7 +89,7 @@ From repository root unless noted; Linux uses `.venv/bin/python` instead of `.ve
 ```powershell
 # From backend/:
 .venv/Scripts/python.exe -m pytest -q tests ../data/tests
-# 124 passed, 1 skipped; one upstream deprecation warning
+# 149 passed, 1 skipped; one upstream deprecation warning (skipped = live-DB test)
 ```
 
 ```powershell
@@ -106,6 +107,15 @@ backend/.venv/Scripts/python.exe data/live_weather_smoke.py
 - At the four bounding-box corners over the sampled 72 hourly timestamps, centroid Sun/Moon altitude differences reached ~1.25°. Twilight-gate difference reached **0.191** near a boundary. Retain this approximation as a hackathon limitation; exact per-cell twilight would require backend data/contract coordination. Photo grounding and live spot smoke use exact locations.
 - Live weather smoke: three WNY curated spots × 24 hours → **72 scored rows**; report `data/live_weather_report.json`. It uses local fixture ordinals, not database IDs.
 - Grid output has elevation for all 364 cells. Default generation makes no DB changes. Optional `--load` updates matching centres/inserts missing cells in one transaction and never deletes cells/renumbers IDs. Live SQL execution remains unverified.
+- **Supported DB load path (Role B):** `python -m app.ingest grid` (from `backend/`) reads the committed GeoJSON (override with `GRID_GEOJSON_PATH`). It needs no atlas raster and validates every feature before touching the DB. It does nothing if `grid_cells` is populated. `--reset` truncates the grid **and everything referencing it** (forecasts, scores, explanations, photos, votes). Use `build_grid.py --load` only when IDs must be preserved.
+
+```bash
+# From backend/ (Role B, verified):
+.venv/bin/python -m app.ingest bootstrap --reset-grid   # grid -> astro -> weather -> score
+# job grid: ok (364) · astro: ok (100) · weather: ok (26208) · score: ok (26208)
+TEST_DATABASE_URL=postgres://…/pleiades_test .venv/bin/python -m pytest -m db
+# 6 passed (throwaway DB; the test truncates tables)
+```
 
 ## Gemini configuration and current failure
 
@@ -129,14 +139,16 @@ Set-Location 'C:\Users\PC\Documents\Documents\TheWatchtower\pleiades'
 ## Integration actions for teammates
 
 1. Install updated `backend/requirements.txt`; keep `data/models/calibration.json` with the deployed repository if enabling v3.
-2. Coordinate loading `data/wny_grid.geojson` with Role B. `data/build_grid.py --load` preserves matching IDs, but its SQL path needs a real test DB check. Generate/load the grid before weather ingest; rerun astro/weather/score after updating static inputs.
+2. **Done (Role B):** `data/wny_grid.geojson` loads through `python -m app.ingest grid`, and `bootstrap` runs grid → astro → weather → score. `infra/deploy.sh` runs `bootstrap` on every deploy; the grid step does nothing once loaded. If you regenerate the GeoJSON, commit it and then run `ingest bootstrap --reset-grid`, but **only before real photos exist** (the reset cascades to photos/votes). After that, use `build_grid.py --load` (its SQL is still untested).
 3. Restart API and scoring jobs together after model/config changes. Default v2 is ready for integration; use v3 explicitly after local validation. Preserve model-version labels in comparisons/history.
 4. Frontend: support the additional `calibration` factor label. Grid artifact Points are centres; existing API makes noncurated squares at `GRID_STEP_DEG=0.1`. Curated locations remain Points.
+   - **Done (Role A, Nov 7):** `FACTOR_LABELS` in `frontend/src/lib/scoreColors.ts` maps `calibration` to "Calibration". Unknown keys fall back to a readable version of the key.
+   - **Note for Role C:** the frontend's smooth score surface assumes the 0.1° spacing and the current grid extent (centres −79.8 to −77.0, 42.0 to 43.3). So do its hard-coded map bounds (`DATA_BOUNDS` / `PAN_BOUNDS`). If you regenerate `data/wny_grid.geojson` with a different spacing or extent, tell Role A.
 5. **Fix forecast-sensitive explanation caching in Role B's route/repository layer:** current identity is cell/hour/model version, so forecast updates can leave stale text. Include score revision or input hash and test invalidation. Seam changes alone cannot fix this.
 6. **Extend photo context provenance with Role B before using capture metadata as strong evidence:** `VisionContext` lacks `taken_at_source` and camera orientation. Current worker substitutes upload time when capture time is absent. The prompt explicitly treats metadata as uncertain, but the API cannot yet distinguish that case.
 7. The spot route currently leaves `ExplainContext.visible_planets` empty. Populate it from verified astronomy if the UI needs planet-specific explanation text. Never infer moonset/event times absent from context.
 8. Helper threads lack Flask request context and use process settings. Production should keep environment settings consistent; backend tests now isolate that path from real keys. Coordinate explicit settings/context propagation if per-app settings are needed.
-9. Verify real DB migrations/aggregates, grid load, ingest jobs, API persistence, S3 upload and worker recovery with Role B. Existing worker already has retry/stale-pending startup recovery; it was not rebuilt here.
+9. **Partly done:** real-DB migrations, aggregates, grid load, ingest jobs and score persistence are verified (`pytest -m db` and the local bootstrap above). The hourly aggregate now uses the same `America/New_York` timezone and 12 h offset as the nightly one, which TimescaleDB 2.2x+ requires (`002_aggregates.sql`, uncommitted). Still open: S3 upload, worker recovery and a production deploy. The existing worker already has retry/stale-pending startup recovery; it was not rebuilt here.
 
 ## Evaluation and remaining work
 
@@ -158,5 +170,20 @@ Set-Location 'C:\Users\PC\Documents\Documents\TheWatchtower\pleiades'
 - **Latest verification:** combined suite 123 passed, 1 skipped; Gemini live and direct API checks failed with HTTP 400 HTML; user is running safe diagnosis. No DB/deployment success or real-photo accuracy is claimed.
 - **Gemini follow-up:** user confirmed the same failure outside the agent. Added safe configuration helper and an offline test for replacing duplicate assignments without altering model/other settings. Removed an overly narrow legacy-key assumption. Next action requires a complete AI Studio credential entered privately, followed by endpoint verification.
 - **Follow-up verification:** combined suite **124 passed, 1 skipped** after adding the configuration helper test.
+- **Role B grid ingestion (Nov 7):**
+  - Added the `ingest grid [--reset]` and `ingest bootstrap [--reset-grid]` jobs, the `GRID_GEOJSON_PATH` setting, and a bootstrap step in `deploy.sh`.
+  - Relabelled `seed_dev_grid.py` as a synthetic fallback.
+  - Fixed the hourly/nightly aggregate timezone mismatch for TimescaleDB 2.31.
+  - Replaced the synthetic grid in the local DB with the real one and verified live ingest and scoring. `pytest -m db` 6 passed; combined suite **149 passed, 1 skipped**.
+  - Not committed yet.
+
+- **Role A frontend integration (Nov 7):**
+  - The map now consumes model v2 scores through `GET /api/scores` and `/api/scores/range`, via the Vite proxy to Flask on :5001.
+  - Scores are drawn as a smooth red → yellow → green surface, with curated spots as circles. Click popups show the score, label, Bortle class, and top factor.
+  - Observed live ranges:
+    - 0.4–16 at 2026-11-08T02:00Z (all cells scored, none null).
+    - Up to 44 at 05:00Z on Nov 8.
+    - Up to 69 at 05:00Z on Nov 9.
+  - No seam, contract, or backend code was changed.
 
 See [data/README.md](data/README.md) for detailed run commands, manifest schema, data retrieval, scientific references, and attribution.

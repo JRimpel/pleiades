@@ -1,22 +1,199 @@
 import { useEffect, useRef, useState } from 'react'
-import { Map, NavigationControl, ScaleControl, setWorkerUrl } from 'maplibre-gl'
-import type { LngLatBoundsLike } from 'maplibre-gl'
+import { Map, NavigationControl, Popup, ScaleControl, setWorkerUrl } from 'maplibre-gl'
+import type {
+  ExpressionSpecification,
+  GeoJSONSource,
+  ImageSource,
+  MapGeoJSONFeature,
+  MapLayerMouseEvent,
+} from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
+import type { ScoreFeatureProperties, ScoresResponse } from '../api/types'
+import { factorLabel, scoreColorExpression } from '../lib/scoreColors'
+import { TRANSPARENT_PNG, buildScoreSurface } from '../lib/scoreSurface'
+import type { ImageCorners } from '../lib/scoreSurface'
 
 // Let Vite bundle the background worker that decodes the map tiles.
 setWorkerUrl(workerUrl)
 
-// MapLibre uses [longitude, latitude]. These bounds match Architecture.md.
-const WNY_BOUNDS: LngLatBoundsLike = [
-  [-79.8, 42.0],
-  [-77.0, 43.4],
+// MapLibre uses [longitude, latitude].
+// Extent of the drawn score data: grid centres (−79.8..−77.0, 42.0..43.3) plus the 1.5-step
+// fade margin that scoreSurface.ts draws around them. Used for the starting view.
+type Bounds = [[number, number], [number, number]]
+const DATA_BOUNDS: Bounds = [
+  [-79.95, 41.85],
+  [-76.85, 43.45],
 ]
+// Panning limit: DATA_BOUNDS plus ~2° on every side.
+const PAN_BOUNDS: Bounds = [
+  [-81.95, 39.85],
+  [-74.85, 45.45],
+]
+/** How many zoom levels closer than "fit" the map starts, and than "PAN_BOUNDS fills the screen" it stops zooming out. */
+const ZOOM_CLOSER = 0.5
+
+/** Zoom at which `bounds` exactly fill a `width` × `height` viewport in both directions (MapLibre uses 512 px tiles). */
+function zoomToFill([[west, south], [east, north]]: Bounds, width: number, height: number) {
+  const mercatorY = (lat: number) => (1 - Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360)) / Math.PI) / 2
+  const zoomForWidth = Math.log2((width * 360) / (512 * (east - west)))
+  const zoomForHeight = Math.log2(height / (512 * (mercatorY(south) - mercatorY(north))))
+  return Math.max(zoomForWidth, zoomForHeight)
+}
+
+/** Starting-view padding that keeps the data clear of the title card, slider card, and map controls. */
+function fitPadding() {
+  return window.innerWidth <= 640
+    ? { top: 100, bottom: 150, left: 8, right: 8 }
+    : { top: 96, bottom: 140, left: 24, right: 56 }
+}
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/dark'
 
-function StargazingMap() {
+const SCORE_SOURCE = 'scores'
+const SURFACE_SOURCE = 'score-surface'
+const SURFACE_LAYER = 'score-surface'
+/** Invisible grid squares: never drawn, but still clickable so the popup can find the cell. */
+const FILL_LAYER = 'score-fill'
+const SPOT_LAYER = 'spot-circle'
+const SPOT_LABEL_LAYER = 'spot-label'
+const EMPTY_COLLECTION: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] }
+const EMPTY_IMAGE_CORNERS: ImageCorners = [
+  [-79.8, 43.4],
+  [-77.0, 43.4],
+  [-77.0, 42.0],
+  [-79.8, 42.0],
+]
+
+interface StargazingMapProps {
+  scores?: ScoresResponse
+  children?: React.ReactNode
+}
+
+/**
+ * Add the score sources and layers. The smooth surface sits under basemap labels so town
+ * names stay readable; curated spots sit on top of everything.
+ */
+function addScoreLayers(map: Map) {
+  map.addSource(SCORE_SOURCE, {
+    type: 'geojson',
+    data: EMPTY_COLLECTION,
+    promoteId: 'cell_id',
+  })
+  map.addSource(SURFACE_SOURCE, {
+    type: 'image',
+    url: TRANSPARENT_PNG,
+    coordinates: EMPTY_IMAGE_CORNERS,
+  })
+
+  const firstSymbolLayer = map.getStyle().layers.find((layer) => layer.type === 'symbol')?.id
+  const hovered: ExpressionSpecification = ['boolean', ['feature-state', 'hover'], false]
+
+  map.addLayer(
+    {
+      id: SURFACE_LAYER,
+      type: 'raster',
+      source: SURFACE_SOURCE,
+      paint: {
+        'raster-opacity': 0.55,
+        'raster-resampling': 'linear',
+        'raster-fade-duration': 0,
+      },
+    },
+    firstSymbolLayer,
+  )
+  map.addLayer(
+    {
+      id: FILL_LAYER,
+      type: 'fill',
+      source: SCORE_SOURCE,
+      filter: ['==', ['geometry-type'], 'Polygon'],
+      paint: { 'fill-opacity': 0 },
+    },
+    firstSymbolLayer,
+  )
+  // Curated spots go on top of everything so they stay visible and clickable.
+  map.addLayer({
+    id: SPOT_LAYER,
+    type: 'circle',
+    source: SCORE_SOURCE,
+    filter: ['==', ['geometry-type'], 'Point'],
+    paint: {
+      'circle-color': scoreColorExpression,
+      'circle-radius': ['case', hovered, 10, 8],
+      'circle-stroke-color': '#ffffff',
+      'circle-stroke-width': ['case', hovered, 3, 2],
+    },
+  })
+  map.addLayer({
+    id: SPOT_LABEL_LAYER,
+    type: 'symbol',
+    source: SCORE_SOURCE,
+    filter: ['==', ['geometry-type'], 'Point'],
+    layout: {
+      'text-field': ['coalesce', ['get', 'name'], ''],
+      'text-font': ['Noto Sans Bold'],
+      'text-size': 12,
+      'text-offset': [0, 1.2],
+      'text-anchor': 'top',
+      'text-optional': true,
+    },
+    paint: {
+      'text-color': '#f1f5ff',
+      'text-halo-color': '#0b0f17',
+      'text-halo-width': 1.5,
+    },
+  })
+}
+
+function formatScore(props: ScoreFeatureProperties) {
+  if (props.score === null) return 'No score for this hour'
+  return `${Math.round(props.score)} / 100 · ${props.label ?? 'Unlabeled'}`
+}
+
+/** Build the popup with DOM nodes (not HTML strings) so names are never interpreted as markup. */
+function popupContent(props: ScoreFeatureProperties) {
+  const root = document.createElement('div')
+  root.className = 'score-popup'
+
+  const title = document.createElement('h2')
+  title.textContent = props.name ?? `Grid cell #${props.cell_id}`
+  root.append(title)
+
+  const rows: [string, string][] = [
+    ['Score', formatScore(props)],
+    ['Bortle class', props.bortle === null ? 'Unknown' : String(props.bortle)],
+    ['Biggest factor', props.score === null ? '—' : factorLabel(props.top_factor)],
+  ]
+  const list = document.createElement('dl')
+  for (const [term, value] of rows) {
+    const dt = document.createElement('dt')
+    dt.textContent = term
+    const dd = document.createElement('dd')
+    dd.textContent = value
+    list.append(dt, dd)
+  }
+  root.append(list)
+  return root
+}
+
+/** GeoJSON properties from MapLibre lose `null` values, so restore them explicitly. */
+function readProps(feature: MapGeoJSONFeature): ScoreFeatureProperties {
+  const p = feature.properties
+  return {
+    cell_id: Number(p.cell_id),
+    name: typeof p.name === 'string' ? p.name : null,
+    score: typeof p.score === 'number' ? p.score : null,
+    label: typeof p.label === 'string' ? (p.label as ScoreFeatureProperties['label']) : null,
+    bortle: typeof p.bortle === 'number' ? p.bortle : null,
+    top_factor: typeof p.top_factor === 'string' ? p.top_factor : null,
+    is_curated: p.is_curated === true,
+  }
+}
+
+function StargazingMap({ scores, children }: StargazingMapProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<Map | null>(null)
+  const [mapReady, setMapReady] = useState(false)
   const [status, setStatus] = useState('Loading the map…')
   const [error, setError] = useState<string | null>(null)
 
@@ -28,11 +205,8 @@ function StargazingMap() {
       map = new Map({
         container: containerRef.current,
         style: MAP_STYLE,
-        bounds: WNY_BOUNDS,
-        // Keep navigation inside our project's Western New York region.
-        maxBounds: WNY_BOUNDS,
-        fitBoundsOptions: { padding: 32 },
-        minZoom: 3,
+        // Keep navigation within ~2° of the data.
+        maxBounds: PAN_BOUNDS,
         maxZoom: 18,
       })
     } catch {
@@ -42,12 +216,68 @@ function StargazingMap() {
     }
 
     mapRef.current = map
+
+    // Zoom-out limit: a little closer than the point where PAN_BOUNDS fills the screen.
+    // It depends on the viewport size, so it is recomputed on resize.
+    const updateMinZoom = () => {
+      const { clientWidth, clientHeight } = map.getContainer()
+      if (clientWidth > 0 && clientHeight > 0) {
+        map.setMinZoom(zoomToFill(PAN_BOUNDS, clientWidth, clientHeight) + ZOOM_CLOSER)
+      }
+    }
+    updateMinZoom()
+
+    // Starting view: fit the data clear of the overlay cards, then move a little closer.
+    const camera = map.cameraForBounds(DATA_BOUNDS, { padding: fitPadding() })
+    if (camera?.center && camera.zoom !== undefined) {
+      map.jumpTo({ center: camera.center, zoom: Math.max(camera.zoom + ZOOM_CLOSER, map.getMinZoom()) })
+    }
+
     map.addControl(new NavigationControl(), 'top-right')
     map.addControl(new ScaleControl({ unit: 'imperial' }), 'bottom-left')
-    map.getCanvas().setAttribute('aria-label', 'Interactive map of Western New York')
+    map.getCanvas().setAttribute('aria-label', 'Interactive map of Western New York stargazing scores')
     map.getCanvas().setAttribute('aria-describedby', 'map-instructions')
 
-    map.on('load', () => setStatus(''))
+    // Hover: highlight one feature at a time using feature-state.
+    let hoveredId: string | number | undefined
+    const clearHover = () => {
+      if (hoveredId !== undefined) {
+        map.setFeatureState({ source: SCORE_SOURCE, id: hoveredId }, { hover: false })
+        hoveredId = undefined
+      }
+      map.getCanvas().style.cursor = ''
+    }
+    const onHover = (event: MapLayerMouseEvent) => {
+      // Only spots get a highlight; the smooth surface just shows a pointer so it stays seamless.
+      const [spot] = map.queryRenderedFeatures(event.point, { layers: [SPOT_LAYER] })
+      if (spot?.id !== hoveredId) {
+        clearHover()
+        if (spot?.id !== undefined) {
+          hoveredId = spot.id
+          map.setFeatureState({ source: SCORE_SOURCE, id: hoveredId }, { hover: true })
+        }
+      }
+      const overScores = spot ?? map.queryRenderedFeatures(event.point, { layers: [FILL_LAYER] })[0]
+      map.getCanvas().style.cursor = overScores ? 'pointer' : ''
+    }
+
+    const popup = new Popup({ closeButton: true, maxWidth: '280px', className: 'score-popup-container' })
+    const onClick = (event: MapLayerMouseEvent) => {
+      const [feature] = map.queryRenderedFeatures(event.point, { layers: [SPOT_LAYER, FILL_LAYER] })
+      if (!feature) return
+      popup.setLngLat(event.lngLat).setDOMContent(popupContent(readProps(feature))).addTo(map)
+    }
+
+    map.on('load', () => {
+      setStatus('')
+      addScoreLayers(map)
+      for (const layer of [FILL_LAYER, SPOT_LAYER]) {
+        map.on('mousemove', layer, onHover)
+        map.on('mouseleave', layer, clearHover)
+        map.on('click', layer, onClick)
+      }
+      setMapReady(true)
+    })
     map.on('error', () => {
       setStatus('')
       setError('Some map details could not load. Check your internet connection and reload the page.')
@@ -60,41 +290,45 @@ function StargazingMap() {
       }
     })
 
-    const resizeObserver = new ResizeObserver(() => map.resize())
+    const resizeObserver = new ResizeObserver(() => {
+      map.resize()
+      updateMinZoom()
+    })
     resizeObserver.observe(containerRef.current)
 
     // React development mode mounts twice; remove the old map each time.
     return () => {
       resizeObserver.disconnect()
+      popup.remove()
       map.remove()
       mapRef.current = null
+      setMapReady(false)
     }
   }, [])
 
-  function resetView() {
-    mapRef.current?.fitBounds(WNY_BOUNDS, {
-      padding: 32,
-      bearing: 0,
-      pitch: 0,
-      duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 800,
-    })
-  }
+  // Push new score data into the existing source whenever the selected hour changes.
+  useEffect(() => {
+    if (!mapReady) return
+    const map = mapRef.current
+    map?.getSource<GeoJSONSource>(SCORE_SOURCE)?.setData(scores ?? EMPTY_COLLECTION)
+    const surface = scores ? buildScoreSurface(scores) : null
+    map
+      ?.getSource<ImageSource>(SURFACE_SOURCE)
+      ?.updateImage(surface ?? { url: TRANSPARENT_PNG, coordinates: EMPTY_IMAGE_CORNERS })
+  }, [mapReady, scores])
 
   return (
     <section className="map-section" aria-label="Explore Western New York">
-      <div className="map-toolbar">
-        <p id="map-instructions">
-          Drag to explore. Scroll or use + / − to zoom.
-          <span className="keyboard-hint"> You can also focus the map and use the arrow keys.</span>
-        </p>
-        <button type="button" onClick={resetView}>
-          Back to Western New York
-        </button>
-      </div>
+      {/* Read by screen readers via the canvas's aria-describedby; not shown visually. */}
+      <p id="map-instructions" className="visually-hidden">
+        Drag to explore. Scroll or use plus and minus to zoom. Click a square or spot for details. You can
+        also focus the map and use the arrow keys.
+      </p>
       <div className="map-frame">
         <div ref={containerRef} className="map-container" />
         {status && <p className="map-notice" role="status">{status}</p>}
         {error && <p className="map-notice map-error" role="alert">{error}</p>}
+        {children}
       </div>
     </section>
   )

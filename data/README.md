@@ -67,6 +67,8 @@ backend/.venv/Scripts/python.exe data/build_grid.py
 backend/.venv/Scripts/python.exe data/build_grid.py --load
 ```
 
+**To load the committed artifact into the DB, use the backend job. No TIF is needed:** from `backend/`, run `python -m app.ingest grid` (or `bootstrap` for grid + astro + weather + score). Add `--reset` to replace an existing grid (wipes dependent forecasts/scores/photos). The `build_grid.py` steps below are only for regenerating the GeoJSON from the atlas.
+
 Default generation writes `wny_grid.geojson` and fetches Open-Meteo elevation. It does not modify the database. The artifact has 356 regular centres and eight curated spots, with source metadata and approximate Bortle classes. All artifact geometries are centre Points; the existing API constructs map squares for noncurated cells using `GRID_STEP_DEG=0.1`.
 
 The optional loader merges matching centres within 1 metre, preserving IDs and existing elevation when a new value is unavailable. It refuses ambiguous duplicate matches and never deletes old cells. Database execution remains unverified. The reused development lake polygons are coarse; shoreline cells require a better land/water mask for production accuracy.

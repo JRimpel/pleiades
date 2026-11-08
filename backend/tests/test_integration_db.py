@@ -8,11 +8,8 @@ with TRUNCATE ... CASCADE, which also clears forecasts, scores and photos.
 """
 from __future__ import annotations
 
-import importlib.util
 import os
-import sys
 from datetime import timedelta
-from pathlib import Path
 
 import pytest
 
@@ -25,21 +22,12 @@ if not TEST_DATABASE_URL:
 from app import create_app, db  # noqa: E402
 from app.config import Settings  # noqa: E402
 from app.ingest import astro as astro_job  # noqa: E402
+from app.ingest import grid as grid_job  # noqa: E402
 from app.ingest import openmeteo  # noqa: E402
 from app.ingest import score as score_job  # noqa: E402
 from app.ingest import weather as weather_job  # noqa: E402
 from app.migrate import run as run_migrations  # noqa: E402
 from app.timeutil import floor_hour, utcnow  # noqa: E402
-
-SEED_PATH = Path(__file__).resolve().parents[1] / "scripts" / "seed_dev_grid.py"
-
-
-def _load_seed_module():
-    spec = importlib.util.spec_from_file_location("seed_dev_grid", SEED_PATH)
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules["seed_dev_grid"] = mod
-    spec.loader.exec_module(mod)
-    return mod
 
 
 @pytest.fixture(scope="module")
@@ -49,13 +37,17 @@ def settings() -> Settings:
 
 @pytest.fixture(scope="module")
 def pipeline(settings):
-    """Migrate, seed, ingest astro, insert synthetic weather (no network), score."""
+    """Migrate, load the real grid, ingest astro, insert synthetic weather (no network), score."""
     run_migrations(database_url=TEST_DATABASE_URL)
-    seed = _load_seed_module()
-    n_cells = seed.seed(TEST_DATABASE_URL, do_reset=True, force=True, elevations=False)
-    assert n_cells > 300
 
     with db.connect_direct(settings) as conn:
+        n_cells = grid_job.run(conn, settings, reset=True)
+        assert n_cells == 364
+        counts = conn.execute(
+            "SELECT count(*) AS n, count(*) FILTER (WHERE is_curated) AS curated FROM grid_cells").fetchone()
+        assert (counts["n"], counts["curated"]) == (364, 8)
+        assert grid_job.run(conn, settings) == 0  # idempotent: already loaded
+
         assert astro_job.run(conn, settings) > 0
 
         cells = weather_job.load_cells(conn)

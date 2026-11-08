@@ -33,6 +33,10 @@ sudo -u "$APP_USER" .venv/bin/pip install --quiet -r requirements.txt
 echo "==> migrations"
 sudo -u "$APP_USER" bash -c "set -a; source '$APP_DIR/.env'; set +a; .venv/bin/python -m app.migrate"
 
+echo "==> data bootstrap (grid no-ops once loaded; backfills astro, weather, score)"
+sudo -u "$APP_USER" bash -c "set -a; source '$APP_DIR/.env'; set +a; .venv/bin/python -m app.ingest bootstrap" \
+  || echo "WARNING: ingest bootstrap failed; timers will retry. Check: journalctl -u pleiades-ingest-weather"
+
 echo "==> systemd units"
 for unit in "${UNITS[@]}"; do
   install -m 0644 "$APP_DIR/infra/$unit" "/etc/systemd/system/$unit"

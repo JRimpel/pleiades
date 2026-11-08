@@ -60,7 +60,7 @@ def test_real_migrations():
     assert names[:3] == ["001_init.sql", "002_aggregates.sql", "003_policies.sql"]
     counts = {f.name: len(split_sql(f.read_text())) for f in files}
     assert counts["001_init.sql"] == 25
-    assert counts["002_aggregates.sql"] == 2
+    assert counts["002_aggregates.sql"] == 4
     assert counts["003_policies.sql"] == 7
     for f in files:
         for stmt in split_sql(f.read_text()):

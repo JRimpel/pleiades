@@ -26,7 +26,7 @@ Built for **UB Hacking 2026** (theme: *Space*). Team of 3, ~24 hours.
 | **Frontend** | React 18 + Vite + TypeScript | Single-page web app that works in desktop and mobile browsers. |
 | Map | MapLibre GL JS | Open source, no API key. Dark basemap (OpenFreeMap or CARTO Dark Matter). |
 | Data fetching | TanStack Query | Caching and refetching for the score grid and photos. |
-| Styling | Tailwind CSS | Fast, consistent UI. |
+| Styling | Tailwind CSS | Fast, consistent UI. *(As built: plain CSS; see §10.1.)* |
 | Charts | Recharts | Score history sparkline and forecast charts. |
 | EXIF parsing | `exifr` | Reads GPS and capture time from photos in the browser. |
 | **Backend** | Python 3.11+ / Flask | App factory + blueprints. Served by gunicorn (`gthread` workers). |
@@ -373,6 +373,22 @@ Base path `/api`. JSON everywhere. Authenticated routes need `Authorization: Bea
 - "Locate me" via browser geolocation (requires HTTPS, see §12).
 - Skeleton loaders and helpful empty states.
 
+### 10.1 Frontend as built (Nov 7)
+
+The design above is the plan. This is what the frontend currently does, and where it differs. Details: [frontend-documentation.md](frontend-documentation.md).
+
+| Area | As built |
+|---|---|
+| Score layer | A **smooth surface**. Cell scores are blended (Gaussian-weighted) into one image drawn under the basemap labels, with a soft fade at the grid edge and over the lakes. The polygons stay only as invisible click targets. |
+| Palette | **Red (0) → yellow (50) → green (100)**, chosen by the team. Unlike the planned cividis/viridis palette, this is **not color-blind-safe**. Popups show the number and label, and the legend shows the label names. *Open UI/UX item.* |
+| Curated spots | Colored circles with names, not star-shaped pins. |
+| Time slider | Hourly steps across `/scores/range`, in a floating card at the bottom center. No sunset or dusk ticks and no "Tonight's best" button yet. |
+| Layout | Full-window map. The title and subtitle are a translucent card at the top left, and the legend is at the bottom right. |
+| Bounds and zoom | Opens fitted to the score data, 0.5 zoom level closer. Panning is limited to about 2° beyond the data, and zoom-out is limited too. |
+| Interaction | Click a cell or spot for a popup with score and label, Bortle class, and biggest factor. Hover highlights curated spots only. |
+| Styling and data | Plain CSS instead of Tailwind. TanStack Query, as planned. |
+| Not built yet | Spot panel, sky panel, photo layer and upload, voting, night mode, "Locate me". |
+
 ---
 
 ## 11. Repository Layout
@@ -386,7 +402,9 @@ pleiades/
 │   └── src/
 │       ├── api/               # typed client + TanStack Query hooks
 │       ├── components/        # Map, ScoreLayer, TimeSlider, SpotPanel, PhotoLightbox, UploadFlow, SkyPanel
+│       │                      #   (as built: StargazingMap, TimeSlider, ScoreLegend)
 │       ├── lib/               # color scales, formatters, exif helpers
+│       │                      #   (as built: scoreColors, scoreSurface, time)
 │       └── App.tsx
 ├── backend/
 │   ├── app/
@@ -428,7 +446,8 @@ pleiades/
 
 ### Local development
 - Backend: `flask --app app run --debug`, pointed at a shared Tiger Cloud dev service (or a local `timescale/timescaledb-ha` Docker image, which includes PostGIS).
-- Frontend: `npm run dev` with Vite proxying `/api` → `localhost:5000`.
+- Backend port: Flask runs on `localhost:5001`, set in `backend/.flaskenv` (macOS AirPlay occupies 5000).
+- Frontend: `npm run dev` with Vite proxying `/api` → `localhost:5001` (override with `API_PROXY_TARGET`).
 
 ### Configuration (`.env`, never committed)
 ```

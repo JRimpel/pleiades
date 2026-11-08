@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 MIGRATIONS_DIR = REPO_ROOT / "db" / "migrations"
+DEFAULT_GRID_GEOJSON = REPO_ROOT / "data" / "wny_grid.geojson"
 
 # Load repo-root .env first, then backend/.env (neither is required).
 load_dotenv(REPO_ROOT / ".env")
@@ -59,6 +60,7 @@ class Settings:
     centroid_lat: float = 42.7
     centroid_lon: float = -78.4
     forecast_hours: int = 72
+    grid_geojson_path: str = str(DEFAULT_GRID_GEOJSON)
 
     max_upload_bytes: int = 15 * 1024 * 1024
     uploads_per_hour: int = 20
@@ -91,6 +93,7 @@ class Settings:
             centroid_lat=_float("REGION_CENTROID_LAT", 42.7),
             centroid_lon=_float("REGION_CENTROID_LON", -78.4),
             forecast_hours=_int("FORECAST_HOURS", 72),
+            grid_geojson_path=_env("GRID_GEOJSON_PATH") or str(DEFAULT_GRID_GEOJSON),
             max_upload_bytes=_int("MAX_UPLOAD_BYTES", 15 * 1024 * 1024),
             uploads_per_hour=_int("UPLOADS_PER_HOUR", 20),
             photo_workers=_int("PHOTO_WORKERS", 4),

@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "model_version": 3,
+  "kind": "monotone_affine_dark_nelm",
+  "intercept": -0.7437984233507677,
+  "slope": 0.7885748087623122,
+  "input_nelm_range": [
+    3.0936510276155937,
+    6.625194365872518
+  ],
+  "enabled": true,
+  "source_doi": "10.5880/GFZ.1.4.2022.008",
+  "source_url": "https://datapub.gfz.de/download/10.5880.GFZ.1.4.2022.008-Mcvwue/2022-008_Kyba-et-al_GaN-code-and-data.zip",
+  "observations_license": "CC BY 4.0",
+  "atlas_doi": "10.5880/GFZ.1.4.2016.001",
+  "atlas_license": "CC BY-NC 4.0",
+  "archive_sha256": "a9c539adce27d68c756c1b8ce8616e5575300e8e5c377122b348cc88d9683712",
+  "atlas_sha256": "9725566ed4fcf1a8fa311654143bb024c4fe2a792b85356be99adce07e1e83c1",
+  "features": [
+    "physics_dark_nelm_from_atlas_mpsas"
+  ],
+  "target": "observer_NELM_1_to_7",
+  "selection": "2014-2017; clear; no SQM; computed sun<-18 deg and moon<-5 deg; unique location/time",
+  "split": "seed 2026; disjoint 2-degree spatial blocks; train 2014-2016; test 2017; cross-boundary rows embargoed",
+  "counts": {
+    "usable": 13007,
+    "train": 7845,
+    "test": 528,
+    "embargoed": 4634,
+    "spatial_blocks": 517
+  },
+  "rejected": {
+    "outside_2014_2017_atlas_window": 42487,
+    "sqm_pair_potential_automatic_label": 1778,
+    "duplicate_location_time": 875,
+    "invalid_label_location_or_clouds": 2,
+    "sun_or_moon_not_dark": 210
+  },
+  "test_physics": {
+    "mae_mag": 2.286853697750305,
+    "rmse_mag": 2.5523773431483043,
+    "bias_mag": 2.282097821970959,
+    "n": 528
+  },
+  "test_learned": {
+    "mae_mag": 0.8602809125745486,
+    "rmse_mag": 1.159744933785127,
+    "bias_mag": 0.29900034791560204,
+    "n": 528
+  },
+  "test_training_mean": {
+    "mae_mag": 0.9846268613477026,
+    "rmse_mag": 1.2241672605206875,
+    "bias_mag": -0.3656512544179849,
+    "n": 528
+  },
+  "block_bootstrap_delta_mae_95_ci": [
+    -1.278803877418052,
+    -0.6286730519349021
+  ],
+  "limitations": [
+    "Citizen-science labels are noisy and ordinal.",
+    "2015 atlas does not measure current weather or 2026 light pollution.",
+    "Global held-out evaluation is not validation in WNY.",
+    "Moon/cloud corrections remain physics based.",
+    "Two-degree blocks can still share regional bias; confidence interval is exploratory."
+  ]
+}

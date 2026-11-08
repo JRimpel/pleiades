@@ -1,0 +1,130 @@
+.app {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px 28px;
+  border-bottom: 1px solid #303745;
+}
+
+.app-header h1 {
+  margin: 0 0 4px;
+  color: #f1f5ff;
+  font-size: 30px;
+  letter-spacing: -1px;
+}
+
+.app-header p,
+.map-toolbar p {
+  margin: 0;
+  color: #bac4d7;
+  line-height: 1.5;
+}
+
+.region-label {
+  color: #c9d3ff;
+  border: 1px solid #47516b;
+  border-radius: 20px;
+  padding: 8px 14px;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.map-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 28px;
+  font-size: 14px;
+}
+
+.map-toolbar button {
+  flex-shrink: 0;
+  padding: 10px 14px;
+  border: 1px solid #56627c;
+  border-radius: 8px;
+  background: #212b40;
+  color: #f1f5ff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.map-toolbar button:hover {
+  background: #303e59;
+}
+
+button:focus-visible,
+.maplibregl-canvas:focus-visible,
+.maplibregl-ctrl a:focus-visible,
+.maplibregl-ctrl summary:focus-visible {
+  outline: 3px solid #b3cbff;
+  outline-offset: -3px;
+}
+
+.map-frame {
+  position: relative;
+  flex: 1;
+  min-height: 420px;
+  background: #171c26;
+}
+
+.map-container {
+  position: absolute;
+  inset: 0;
+}
+
+.map-notice {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 64px;
+  width: fit-content;
+  max-width: calc(100% - 80px);
+  margin: 0;
+  padding: 12px 16px;
+  background: #162136;
+  color: #f1f5ff;
+  border: 1px solid #56627c;
+  border-radius: 8px;
+  line-height: 1.5;
+}
+
+.map-error {
+  background: #34251e;
+  border-color: #c49774;
+}
+
+@media (max-width: 640px) {
+  .app-header {
+    padding: 18px;
+  }
+
+  .region-label,
+  .keyboard-hint {
+    display: none;
+  }
+
+  .map-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 12px 18px;
+    gap: 10px;
+  }
+
+  .map-frame {
+    min-height: 55svh;
+  }
+}

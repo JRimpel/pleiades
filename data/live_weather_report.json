@@ -1,0 +1,1387 @@
+{
+  "fetched_at": "2026-11-08T01:14:58.293918+00:00",
+  "weather_source": "Open-Meteo live Forecast API",
+  "static_source": {
+    "atlas_doi": "10.5880/GFZ.1.4.2016.001",
+    "paper_doi": "10.1126/sciadv.1600377",
+    "license": "CC BY-NC 4.0",
+    "raster_units": "artificial mcd/m2",
+    "natural_background_mcd_m2": 0.171,
+    "grid_step_deg": 0.1,
+    "elevation_source": "Open-Meteo",
+    "bortle": "approximate brightness-derived class",
+    "geometry_limitations": "Reuses rough development lake polygons; shoreline accuracy is limited."
+  },
+  "model_version": 2,
+  "note": "fixture ordinals are not database cell IDs; exact per-spot ephemeris used",
+  "points": [
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T01:00:00+00:00",
+      "score": 2.9,
+      "nelm": 6.45,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -77.48,
+        "haze": -1.34,
+        "twilight": 0.0,
+        "elevation": 0.16
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -33.356,
+      "moon_alt": -45.037,
+      "moon_illum": 0.01732
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T02:00:00+00:00",
+      "score": 2.8,
+      "nelm": 6.45,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -77.48,
+        "haze": -1.37,
+        "twilight": 0.0,
+        "elevation": 0.09
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -44.156,
+      "moon_alt": -54.519,
+      "moon_illum": 0.0163
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T03:00:00+00:00",
+      "score": 2.9,
+      "nelm": 6.45,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -77.48,
+        "haze": -1.33,
+        "twilight": 0.0,
+        "elevation": 0.15
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -53.988,
+      "moon_alt": -61.874,
+      "moon_illum": 0.01531
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T04:00:00+00:00",
+      "score": 2.6,
+      "nelm": 6.45,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -77.48,
+        "haze": -1.54,
+        "twilight": 0.0,
+        "elevation": 0.06
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -61.529,
+      "moon_alt": -65.032,
+      "moon_illum": 0.01436
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T05:00:00+00:00",
+      "score": 3.0,
+      "nelm": 6.45,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -77.48,
+        "haze": -1.2,
+        "twilight": 0.0,
+        "elevation": 0.12
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -64.468,
+      "moon_alt": -62.494,
+      "moon_illum": 0.01344
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T06:00:00+00:00",
+      "score": 3.0,
+      "nelm": 6.45,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -77.48,
+        "haze": -1.19,
+        "twilight": 0.0,
+        "elevation": 0.11
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -61.303,
+      "moon_alt": -55.545,
+      "moon_illum": 0.01256
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T07:00:00+00:00",
+      "score": 2.7,
+      "nelm": 6.45,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -77.48,
+        "haze": -1.5,
+        "twilight": 0.0,
+        "elevation": 0.12
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -53.636,
+      "moon_alt": -46.332,
+      "moon_illum": 0.01171
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T08:00:00+00:00",
+      "score": 1.9,
+      "nelm": 6.45,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -77.48,
+        "haze": -2.21,
+        "twilight": 0.0,
+        "elevation": 0.03
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -43.753,
+      "moon_alt": -36.134,
+      "moon_illum": 0.0109
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T09:00:00+00:00",
+      "score": 2.0,
+      "nelm": 6.45,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -77.48,
+        "haze": -2.14,
+        "twilight": 0.0,
+        "elevation": 0.06
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -32.942,
+      "moon_alt": -25.59,
+      "moon_illum": 0.01012
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T10:00:00+00:00",
+      "score": 2.6,
+      "nelm": 6.45,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -77.48,
+        "haze": -1.54,
+        "twilight": 0.0,
+        "elevation": 0.06
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -21.843,
+      "moon_alt": -15.076,
+      "moon_illum": 0.00938
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T11:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.45,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -77.48,
+        "haze": -1.54,
+        "twilight": -2.54,
+        "elevation": 0.0
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -10.84,
+      "moon_alt": -4.889,
+      "moon_illum": 0.00867
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T12:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.44,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": -0.09,
+        "clouds": -77.4,
+        "haze": -1.19,
+        "twilight": -2.89,
+        "elevation": 0.01
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -0.251,
+      "moon_alt": 4.666,
+      "moon_illum": 0.008
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T13:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.44,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": -0.14,
+        "clouds": -77.35,
+        "haze": -0.9,
+        "twilight": -3.18,
+        "elevation": 0.01
+      },
+      "cloud_total": 100.0,
+      "sun_alt": 9.585,
+      "moon_alt": 13.217,
+      "moon_illum": 0.00737
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T14:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.44,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": -0.17,
+        "clouds": -53.35,
+        "haze": -5.13,
+        "twilight": -22.91,
+        "elevation": 0.0
+      },
+      "cloud_total": 69.0,
+      "sun_alt": 18.236,
+      "moon_alt": 20.293,
+      "moon_illum": 0.00677
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T15:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.44,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": -0.18,
+        "clouds": -67.31,
+        "haze": -1.17,
+        "twilight": -12.91,
+        "elevation": 0.01
+      },
+      "cloud_total": 100.0,
+      "sun_alt": 25.144,
+      "moon_alt": 25.333,
+      "moon_illum": 0.0062
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T16:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.44,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": -0.17,
+        "clouds": -67.33,
+        "haze": -0.35,
+        "twilight": -13.71,
+        "elevation": 0.0
+      },
+      "cloud_total": 100.0,
+      "sun_alt": 29.654,
+      "moon_alt": 27.795,
+      "moon_illum": 0.00567
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T17:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.44,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": -0.16,
+        "clouds": -58.14,
+        "haze": 0.0,
+        "twilight": -23.26,
+        "elevation": 0.0
+      },
+      "cloud_total": 100.0,
+      "sun_alt": 31.184,
+      "moon_alt": 27.352,
+      "moon_illum": 0.00517
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T18:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.44,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": -0.14,
+        "clouds": -1.55,
+        "haze": 0.0,
+        "twilight": -79.88,
+        "elevation": 0.01
+      },
+      "cloud_total": 2.0,
+      "sun_alt": 29.498,
+      "moon_alt": 24.064,
+      "moon_illum": 0.00471
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T19:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.44,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": -0.12,
+        "clouds": 0.0,
+        "haze": 0.0,
+        "twilight": -81.45,
+        "elevation": 0.01
+      },
+      "cloud_total": 0.0,
+      "sun_alt": 24.853,
+      "moon_alt": 18.344,
+      "moon_illum": 0.00428
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T20:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.44,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": -0.09,
+        "clouds": 0.0,
+        "haze": 0.0,
+        "twilight": -81.48,
+        "elevation": 0.01
+      },
+      "cloud_total": 0.0,
+      "sun_alt": 17.843,
+      "moon_alt": 10.754,
+      "moon_illum": 0.00389
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T21:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.45,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": -0.02,
+        "clouds": 0.0,
+        "haze": 0.0,
+        "twilight": -81.54,
+        "elevation": 0.0
+      },
+      "cloud_total": 0.0,
+      "sun_alt": 9.12,
+      "moon_alt": 1.828,
+      "moon_illum": 0.00353
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T22:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.45,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -5.42,
+        "haze": 0.0,
+        "twilight": -76.14,
+        "elevation": 0.0
+      },
+      "cloud_total": 7.0,
+      "sun_alt": -0.766,
+      "moon_alt": -8.005,
+      "moon_illum": 0.00321
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-08T23:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.45,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -77.48,
+        "haze": 0.0,
+        "twilight": -4.08,
+        "elevation": 0.0
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -11.39,
+      "moon_alt": -18.412,
+      "moon_illum": 0.00292
+    },
+    {
+      "spot_name": "Allegany State Park",
+      "valid_time": "2026-11-09T00:00:00+00:00",
+      "score": 2.7,
+      "nelm": 6.45,
+      "factors": {
+        "light_pollution": -18.44,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -77.48,
+        "haze": -1.45,
+        "twilight": 0.0,
+        "elevation": 0.07
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -22.415,
+      "moon_alt": -29.123,
+      "moon_illum": 0.00267
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T01:00:00+00:00",
+      "score": 2.5,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -73.87,
+        "haze": -1.47,
+        "twilight": 0.0,
+        "elevation": 0.08
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -33.539,
+      "moon_alt": -45.075,
+      "moon_illum": 0.01732
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T02:00:00+00:00",
+      "score": 2.5,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -73.87,
+        "haze": -1.47,
+        "twilight": 0.0,
+        "elevation": 0.08
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -44.207,
+      "moon_alt": -54.389,
+      "moon_illum": 0.0163
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T03:00:00+00:00",
+      "score": 2.0,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -73.87,
+        "haze": -1.99,
+        "twilight": 0.0,
+        "elevation": 0.1
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -53.862,
+      "moon_alt": -61.524,
+      "moon_illum": 0.01531
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T04:00:00+00:00",
+      "score": 1.9,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -73.87,
+        "haze": -2.1,
+        "twilight": 0.0,
+        "elevation": 0.11
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -61.171,
+      "moon_alt": -64.474,
+      "moon_illum": 0.01436
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T05:00:00+00:00",
+      "score": 1.9,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -73.87,
+        "haze": -2.06,
+        "twilight": 0.0,
+        "elevation": 0.07
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -63.895,
+      "moon_alt": -61.878,
+      "moon_illum": 0.01344
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T06:00:00+00:00",
+      "score": 1.9,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -73.87,
+        "haze": -2.06,
+        "twilight": 0.0,
+        "elevation": 0.07
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -60.68,
+      "moon_alt": -54.998,
+      "moon_illum": 0.01256
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T07:00:00+00:00",
+      "score": 1.8,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -73.87,
+        "haze": -2.15,
+        "twilight": 0.0,
+        "elevation": 0.06
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -53.09,
+      "moon_alt": -45.888,
+      "moon_illum": 0.01171
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T08:00:00+00:00",
+      "score": 1.8,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -73.87,
+        "haze": -2.18,
+        "twilight": 0.0,
+        "elevation": 0.09
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -43.313,
+      "moon_alt": -35.791,
+      "moon_illum": 0.0109
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T09:00:00+00:00",
+      "score": 2.4,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -73.87,
+        "haze": -1.55,
+        "twilight": 0.0,
+        "elevation": 0.06
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -32.606,
+      "moon_alt": -25.345,
+      "moon_illum": 0.01012
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T10:00:00+00:00",
+      "score": 1.8,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -73.87,
+        "haze": -2.18,
+        "twilight": 0.0,
+        "elevation": 0.09
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -21.607,
+      "moon_alt": -14.93,
+      "moon_illum": 0.00938
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T11:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -73.87,
+        "haze": -2.14,
+        "twilight": -1.75,
+        "elevation": 0.0
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -10.706,
+      "moon_alt": -4.844,
+      "moon_illum": 0.00867
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T12:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": -0.08,
+        "clouds": -70.85,
+        "haze": -2.01,
+        "twilight": -4.82,
+        "elevation": -0.0
+      },
+      "cloud_total": 96.0,
+      "sun_alt": -0.223,
+      "moon_alt": 4.601,
+      "moon_illum": 0.008
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T13:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": -0.12,
+        "clouds": -50.89,
+        "haze": -6.38,
+        "twilight": -20.37,
+        "elevation": 0.0
+      },
+      "cloud_total": 69.0,
+      "sun_alt": 9.497,
+      "moon_alt": 13.033,
+      "moon_illum": 0.00737
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T14:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": -0.14,
+        "clouds": -11.06,
+        "haze": -8.53,
+        "twilight": -58.02,
+        "elevation": -0.01
+      },
+      "cloud_total": 15.0,
+      "sun_alt": 18.022,
+      "moon_alt": 19.983,
+      "moon_illum": 0.00677
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T15:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": -0.15,
+        "clouds": -35.88,
+        "haze": -2.85,
+        "twilight": -38.88,
+        "elevation": 0.0
+      },
+      "cloud_total": 44.0,
+      "sun_alt": 24.797,
+      "moon_alt": 24.899,
+      "moon_illum": 0.0062
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T16:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": -0.15,
+        "clouds": -73.98,
+        "haze": -0.12,
+        "twilight": -3.51,
+        "elevation": 0.0
+      },
+      "cloud_total": 100.0,
+      "sun_alt": 29.182,
+      "moon_alt": 27.255,
+      "moon_illum": 0.00567
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T17:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": -0.13,
+        "clouds": -46.64,
+        "haze": 0.0,
+        "twilight": -30.98,
+        "elevation": -0.01
+      },
+      "cloud_total": 69.0,
+      "sun_alt": 30.614,
+      "moon_alt": 26.744,
+      "moon_illum": 0.00517
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T18:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": -0.12,
+        "clouds": -2.21,
+        "haze": 0.0,
+        "twilight": -75.43,
+        "elevation": 0.0
+      },
+      "cloud_total": 3.0,
+      "sun_alt": 28.877,
+      "moon_alt": 23.433,
+      "moon_illum": 0.00471
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T19:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": -0.1,
+        "clouds": -0.74,
+        "haze": 0.0,
+        "twilight": -76.92,
+        "elevation": 0.0
+      },
+      "cloud_total": 1.0,
+      "sun_alt": 24.231,
+      "moon_alt": 17.729,
+      "moon_illum": 0.00428
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T20:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": -0.07,
+        "clouds": -2.95,
+        "haze": 0.0,
+        "twilight": -74.73,
+        "elevation": -0.01
+      },
+      "cloud_total": 4.0,
+      "sun_alt": 17.256,
+      "moon_alt": 10.181,
+      "moon_illum": 0.00389
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T21:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": -0.01,
+        "clouds": -73.86,
+        "haze": 0.0,
+        "twilight": -3.89,
+        "elevation": 0.0
+      },
+      "cloud_total": 100.0,
+      "sun_alt": 8.59,
+      "moon_alt": 1.312,
+      "moon_illum": 0.00353
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T22:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -73.87,
+        "haze": -1.66,
+        "twilight": -2.22,
+        "elevation": -0.01
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -1.226,
+      "moon_alt": -8.453,
+      "moon_illum": 0.00321
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-08T23:00:00+00:00",
+      "score": 0.0,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -73.87,
+        "haze": -1.2,
+        "twilight": -2.69,
+        "elevation": 0.0
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -11.771,
+      "moon_alt": -18.785,
+      "moon_illum": 0.00292
+    },
+    {
+      "spot_name": "Beaver Meadow Audubon Center",
+      "valid_time": "2026-11-09T00:00:00+00:00",
+      "score": 9.8,
+      "nelm": 6.33,
+      "factors": {
+        "light_pollution": -22.24,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -65.74,
+        "haze": -2.66,
+        "twilight": 0.0,
+        "elevation": 0.44
+      },
+      "cloud_total": 89.0,
+      "sun_alt": -22.707,
+      "moon_alt": -29.411,
+      "moon_illum": 0.00267
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T01:00:00+00:00",
+      "score": 2.0,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -54.59,
+        "haze": -0.98,
+        "twilight": 0.0,
+        "elevation": 0.11
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -33.266,
+      "moon_alt": -44.811,
+      "moon_illum": 0.01732
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T02:00:00+00:00",
+      "score": 2.0,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -54.59,
+        "haze": -0.98,
+        "twilight": 0.0,
+        "elevation": 0.11
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -43.938,
+      "moon_alt": -54.15,
+      "moon_illum": 0.0163
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T03:00:00+00:00",
+      "score": 1.9,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -54.59,
+        "haze": -0.99,
+        "twilight": 0.0,
+        "elevation": 0.02
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -53.619,
+      "moon_alt": -61.352,
+      "moon_illum": 0.01531
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T04:00:00+00:00",
+      "score": 2.0,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -54.59,
+        "haze": -0.94,
+        "twilight": 0.0,
+        "elevation": 0.07
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -60.998,
+      "moon_alt": -64.428,
+      "moon_illum": 0.01436
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T05:00:00+00:00",
+      "score": 1.9,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -54.59,
+        "haze": -0.99,
+        "twilight": 0.0,
+        "elevation": 0.02
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -63.855,
+      "moon_alt": -61.972,
+      "moon_illum": 0.01344
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T06:00:00+00:00",
+      "score": 2.0,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -54.59,
+        "haze": -0.94,
+        "twilight": 0.0,
+        "elevation": 0.07
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -60.783,
+      "moon_alt": -55.184,
+      "moon_illum": 0.01256
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T07:00:00+00:00",
+      "score": 1.8,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -54.59,
+        "haze": -1.09,
+        "twilight": 0.0,
+        "elevation": 0.02
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -53.283,
+      "moon_alt": -46.121,
+      "moon_illum": 0.01171
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T08:00:00+00:00",
+      "score": 2.0,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -54.59,
+        "haze": -0.97,
+        "twilight": 0.0,
+        "elevation": 0.1
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -43.552,
+      "moon_alt": -36.049,
+      "moon_illum": 0.0109
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T09:00:00+00:00",
+      "score": 1.9,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -54.59,
+        "haze": -1.06,
+        "twilight": 0.0,
+        "elevation": 0.09
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -32.868,
+      "moon_alt": -25.615,
+      "moon_illum": 0.01012
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T10:00:00+00:00",
+      "score": 1.8,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -54.59,
+        "haze": -1.09,
+        "twilight": 0.0,
+        "elevation": 0.02
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -21.879,
+      "moon_alt": -15.202,
+      "moon_illum": 0.00938
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T11:00:00+00:00",
+      "score": 0.0,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -54.59,
+        "haze": -0.9,
+        "twilight": -1.97,
+        "elevation": 0.0
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -10.98,
+      "moon_alt": -5.112,
+      "moon_illum": 0.00867
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T12:00:00+00:00",
+      "score": 0.0,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": -0.03,
+        "clouds": -19.64,
+        "haze": -6.4,
+        "twilight": -31.38,
+        "elevation": -0.01
+      },
+      "cloud_total": 36.0,
+      "sun_alt": -0.49,
+      "moon_alt": 4.346,
+      "moon_illum": 0.008
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T13:00:00+00:00",
+      "score": 0.0,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": -0.05,
+        "clouds": -52.9,
+        "haze": -0.94,
+        "twilight": -3.57,
+        "elevation": 0.0
+      },
+      "cloud_total": 97.0,
+      "sun_alt": 9.246,
+      "moon_alt": 12.802,
+      "moon_illum": 0.00737
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T14:00:00+00:00",
+      "score": 0.0,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": -0.06,
+        "clouds": -7.43,
+        "haze": -2.08,
+        "twilight": -47.89,
+        "elevation": 0.0
+      },
+      "cloud_total": 12.0,
+      "sun_alt": 17.799,
+      "moon_alt": 19.788,
+      "moon_illum": 0.00677
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T15:00:00+00:00",
+      "score": 0.0,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": -0.07,
+        "clouds": -55.24,
+        "haze": -0.11,
+        "twilight": -2.04,
+        "elevation": 0.0
+      },
+      "cloud_total": 100.0,
+      "sun_alt": 24.618,
+      "moon_alt": 24.757,
+      "moon_illum": 0.0062
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T16:00:00+00:00",
+      "score": 0.0,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": -0.07,
+        "clouds": -56.67,
+        "haze": -0.05,
+        "twilight": -0.67,
+        "elevation": 0.0
+      },
+      "cloud_total": 100.0,
+      "sun_alt": 29.064,
+      "moon_alt": 27.18,
+      "moon_illum": 0.00567
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T17:00:00+00:00",
+      "score": 0.0,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": -0.06,
+        "clouds": -9.27,
+        "haze": 0.0,
+        "twilight": -48.13,
+        "elevation": 0.0
+      },
+      "cloud_total": 17.0,
+      "sun_alt": 30.571,
+      "moon_alt": 26.743,
+      "moon_illum": 0.00517
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T18:00:00+00:00",
+      "score": 0.0,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": -0.05,
+        "clouds": -1.09,
+        "haze": 0.0,
+        "twilight": -56.32,
+        "elevation": 0.0
+      },
+      "cloud_total": 2.0,
+      "sun_alt": 28.913,
+      "moon_alt": 23.503,
+      "moon_illum": 0.00471
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T19:00:00+00:00",
+      "score": 0.0,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": -0.05,
+        "clouds": 0.0,
+        "haze": 0.0,
+        "twilight": -57.42,
+        "elevation": 0.01
+      },
+      "cloud_total": 0.0,
+      "sun_alt": 24.337,
+      "moon_alt": 17.858,
+      "moon_illum": 0.00428
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T20:00:00+00:00",
+      "score": 0.0,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": -0.03,
+        "clouds": -8.18,
+        "haze": 0.0,
+        "twilight": -49.25,
+        "elevation": 0.0
+      },
+      "cloud_total": 15.0,
+      "sun_alt": 17.418,
+      "moon_alt": 10.357,
+      "moon_illum": 0.00389
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T21:00:00+00:00",
+      "score": 0.0,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": -0.01,
+        "clouds": -54.58,
+        "haze": -0.07,
+        "twilight": -2.8,
+        "elevation": 0.0
+      },
+      "cloud_total": 100.0,
+      "sun_alt": 8.794,
+      "moon_alt": 1.523,
+      "moon_illum": 0.00353
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T22:00:00+00:00",
+      "score": 0.0,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -54.59,
+        "haze": -0.44,
+        "twilight": -2.44,
+        "elevation": 0.01
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -0.992,
+      "moon_alt": -8.217,
+      "moon_illum": 0.00321
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-08T23:00:00+00:00",
+      "score": 0.0,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -54.59,
+        "haze": -0.51,
+        "twilight": -2.36,
+        "elevation": 0.0
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -11.516,
+      "moon_alt": -18.53,
+      "moon_illum": 0.00292
+    },
+    {
+      "spot_name": "Chestnut Ridge Park",
+      "valid_time": "2026-11-09T00:00:00+00:00",
+      "score": 2.5,
+      "nelm": 5.72,
+      "factors": {
+        "light_pollution": -42.54,
+        "calibration": 0.0,
+        "moon": 0.0,
+        "clouds": -54.59,
+        "haze": -0.44,
+        "twilight": 0.0,
+        "elevation": 0.07
+      },
+      "cloud_total": 100.0,
+      "sun_alt": -22.439,
+      "moon_alt": -29.145,
+      "moon_illum": 0.00267
+    }
+  ]
+}

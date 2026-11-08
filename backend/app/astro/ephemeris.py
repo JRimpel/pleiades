@@ -1,130 +1,197 @@
-"""Ephemeris, sky events, and visible-object lists.
+﻿"""OWNER: AI/ML. Offline Skyfield ephemeris with bounded night-summary cache.
 
-OWNER: AI/ML (role C) — replace function bodies with skyfield, keep signatures.
-
-PLACEHOLDER: low-precision analytic approximations (sun within ~1°, moon very rough)
-so the backend runs without skyfield/de421.bsp.
+DE421 is installed by skyfield-data. No function downloads kernels or catalogs.
+Rise/set and twilight use interpolated five-minute samples (approximate times).
 """
 from __future__ import annotations
 
-import math
+import os
 from datetime import date, datetime, timedelta, timezone
+from functools import lru_cache
+from pathlib import Path
+from zoneinfo import ZoneInfo
 
-from .types import AstroHour, CandidateObject, MoonInfo, NightSummary, SkyEventRecord, Twilight
+import numpy as np
+from skyfield import almanac
+from skyfield.api import Star, load, load_file, wgs84
+from skyfield_data import __file__ as _data_init
+
+from .types import AstroHour, CandidateObject, MoonInfo, NightSummary, PlanetVisibility, SkyEventRecord, Twilight
 
 _UTC = timezone.utc
-_SYNODIC_DAYS = 29.530588853
-_KNOWN_NEW_MOON = datetime(2000, 1, 6, 18, 14, tzinfo=_UTC)
+_PLANETS = {'Mercury': 'mercury', 'Venus': 'venus', 'Mars': 'mars',
+            'Jupiter': 'jupiter barycenter', 'Saturn': 'saturn barycenter',
+            'Uranus': 'uranus barycenter', 'Neptune': 'neptune barycenter'}
+# Rounded J2000 positions (hours/degrees), for candidate generation, not astrometry.
+_STARS = [
+    ('Sirius', 6.7525, -16.7161, -1.46), ('Canopus', 6.3992, -52.6957, -.74),
+    ('Arcturus', 14.2610, 19.1824, -.05), ('Vega', 18.6156, 38.7837, .03),
+    ('Capella', 5.2782, 45.9980, .08), ('Rigel', 5.2423, -8.2016, .13),
+    ('Procyon', 7.6550, 5.2250, .34), ('Betelgeuse', 5.9195, 7.4071, .5),
+    ('Altair', 19.8464, 8.8683, .76), ('Aldebaran', 4.5987, 16.5093, .85),
+    ('Spica', 13.4199, -11.1613, .97), ('Antares', 16.4901, -26.4320, 1.06),
+    ('Pollux', 7.7553, 28.0262, 1.14), ('Fomalhaut', 22.9608, -29.6222, 1.16),
+    ('Deneb', 20.6905, 45.2803, 1.25), ('Regulus', 10.1395, 11.9672, 1.35),
+    ('Castor', 7.5767, 31.8883, 1.58), ('Bellatrix', 5.4189, 6.3497, 1.64),
+    ('Alnilam', 5.6036, -1.2019, 1.69), ('Alnitak', 5.6793, -1.9426, 1.74),
+    ('Alioth', 12.9005, 55.9598, 1.76), ('Dubhe', 11.0621, 61.7510, 1.79),
+    ('Mirfak', 3.4054, 49.8612, 1.79), ('Alkaid', 13.7923, 49.3133, 1.86),
+    ('Polaris', 2.5303, 89.2641, 1.98), ('Hamal', 2.1196, 23.4624, 2.0),
+    ('Denebola', 11.8177, 14.5721, 2.14), ('Mizar', 13.3987, 54.9254, 2.23),
+    ('Merak', 11.0307, 56.3824, 2.37), ('Phecda', 11.8972, 53.6948, 2.44),
+]
+_CLUSTERS = [('Pleiades', 3.79, 24.12, 1.6), ('Andromeda Galaxy', .712, 41.269, 3.44),
+             ('Orion Nebula', 5.588, -5.391, 4.0)]
+# Constellations are extended; these anchors only indicate a potentially visible region.
+_CONSTELLATIONS = [('Orion', 5.6, 2), ('Cassiopeia', 1, 60), ('Ursa Major', 11.5, 55),
+                   ('Cygnus', 20.5, 42), ('Lyra', 18.6, 36), ('Taurus', 4.6, 18),
+                   ('Gemini', 7.1, 24), ('Leo', 10.7, 15)]
 
 
-def _sun_alt(when: datetime, lat: float, lon: float) -> float:
-    when = when.astimezone(_UTC)
-    doy = when.timetuple().tm_yday
-    hour = when.hour + when.minute / 60 + when.second / 3600
-    g = 2 * math.pi / 365 * (doy - 1 + (hour - 12) / 24)
-    decl = (0.006918 - 0.399912 * math.cos(g) + 0.070257 * math.sin(g) - 0.006758 * math.cos(2 * g)
-            + 0.000907 * math.sin(2 * g) - 0.002697 * math.cos(3 * g) + 0.00148 * math.sin(3 * g))
-    eqtime = 229.18 * (0.000075 + 0.001868 * math.cos(g) - 0.032077 * math.sin(g)
-                       - 0.014615 * math.cos(2 * g) - 0.040849 * math.sin(2 * g))
-    tst = hour * 60 + eqtime + 4 * lon
-    ha = math.radians(tst / 4 - 180)
-    phi = math.radians(lat)
-    sin_alt = math.sin(phi) * math.sin(decl) + math.cos(phi) * math.cos(decl) * math.cos(ha)
-    return math.degrees(math.asin(max(-1.0, min(1.0, sin_alt))))
+def _utc(when):
+    if when.tzinfo is None or when.utcoffset() is None:
+        raise ValueError('Astronomy requires timezone-aware timestamps')
+    return when.astimezone(_UTC)
 
 
-def _moon_phase_deg(when: datetime) -> float:
-    days = (when - _KNOWN_NEW_MOON).total_seconds() / 86400.0
-    return (days % _SYNODIC_DAYS) / _SYNODIC_DAYS * 360.0
+def _location(lat, lon):
+    if not np.isfinite([lat, lon]).all() or not -90 <= lat <= 90 or not -180 <= lon <= 180:
+        raise ValueError('Invalid latitude/longitude')
+    return wgs84.latlon(lat, lon)
 
 
-def _moon_alt(when: datetime, lat: float, lon: float) -> float:
-    # The moon trails the sun by its phase angle in hour angle; declination ignored (placeholder).
-    lag_hours = _moon_phase_deg(when) / 15.0
-    utc = when.astimezone(_UTC)
-    hour = (utc.hour + utc.minute / 60) - lag_hours
-    ha = math.radians((hour * 15 + lon) - 180)
-    sin_alt = math.cos(math.radians(lat)) * math.cos(ha)
-    return math.degrees(math.asin(max(-1.0, min(1.0, sin_alt))))
+@lru_cache(maxsize=1)
+def _resources():
+    path = Path(os.environ.get('PLEIADES_EPHEMERIS_PATH') or Path(_data_init).parent / 'data' / 'de421.bsp')
+    if not path.is_file():
+        raise RuntimeError('Ephemeris missing: install skyfield-data or set PLEIADES_EPHEMERIS_PATH')
+    return load.timescale(builtin=True), load_file(str(path))
 
 
-def _illum(phase_deg: float) -> float:
-    return (1 - math.cos(math.radians(phase_deg))) / 2
-
-
-def _phase_name(phase_deg: float) -> str:
-    names = ["New Moon", "Waxing Crescent", "First Quarter", "Waxing Gibbous",
-             "Full Moon", "Waning Gibbous", "Last Quarter", "Waning Crescent"]
+def _phase_name(phase_deg):
+    names = ['New Moon', 'Waxing Crescent', 'First Quarter', 'Waxing Gibbous',
+             'Full Moon', 'Waning Gibbous', 'Last Quarter', 'Waning Crescent']
     return names[int(((phase_deg + 22.5) % 360) // 45)]
 
 
 def hourly_conditions(start: datetime, hours: int, lat: float, lon: float) -> list[AstroHour]:
-    """Sun/moon state for each hour in [start, start + hours) at (lat, lon). `start` is on the hour (UTC)."""
-    out: list[AstroHour] = []
-    for i in range(hours):
-        t = start + timedelta(hours=i)
-        phase = _moon_phase_deg(t)
-        out.append(AstroHour(
-            time=t,
-            sun_alt=round(_sun_alt(t, lat, lon), 2),
-            moon_alt=round(_moon_alt(t, lat, lon), 2),
-            moon_illum=round(_illum(phase), 3),
-            moon_phase_deg=round(phase, 1),
-        ))
-    return out
+    start = _utc(start)
+    site = _location(lat, lon)
+    if not isinstance(hours, int) or not 0 <= hours <= 24 * 366:
+        raise ValueError('hours must be an integer from 0 to 8784')
+    if not hours:
+        return []
+    ts, eph = _resources()
+    times = [start + timedelta(hours=i) for i in range(hours)]
+    t = ts.from_datetimes(times)
+    obs = (eph['earth'] + site).at(t)
+    sun = obs.observe(eph['sun']).apparent().altaz()[0].degrees
+    moon = obs.observe(eph['moon']).apparent().altaz()[0].degrees
+    phase = almanac.moon_phase(eph, t).degrees % 360
+    illumination = almanac.fraction_illuminated(eph, 'moon', t)
+    return [AstroHour(time=dt, sun_alt=round(float(s), 3), moon_alt=round(float(m), 3),
+                      moon_illum=round(float(i), 5), moon_phase_deg=round(float(p), 3))
+            for dt, s, m, i, p in zip(times, sun, moon, illumination, phase)]
 
 
-# Approximate peak dates (month, day) for major showers.
-_SHOWERS = [
-    ("Quadrantids", 1, 3, 120), ("Lyrids", 4, 22, 18), ("Eta Aquariids", 5, 6, 50),
-    ("Perseids", 8, 12, 100), ("Orionids", 10, 21, 20), ("Southern Taurids", 11, 5, 5),
-    ("Northern Taurids", 11, 12, 5), ("Leonids", 11, 17, 15), ("Geminids", 12, 14, 150),
-]
+def _crossings(times, values, threshold):
+    shifted = np.asarray(values) - threshold
+    result = []
+    for i in np.flatnonzero((shifted[:-1] > 0) != (shifted[1:] > 0)):
+        fraction = -shifted[i] / (shifted[i + 1] - shifted[i])
+        result.append((times[i] + (times[i + 1] - times[i]) * float(fraction), bool(shifted[i + 1] > 0)))
+    return result
 
 
 def sky_events(start: datetime, end: datetime, lat: float, lon: float) -> list[SkyEventRecord]:
-    """Events in [start, end): planet visibility, ISS passes, meteor-shower peaks, moonrise/set."""
-    out: list[SkyEventRecord] = []
-    for year in {start.year, end.year}:
-        for name, month, day, zhr in _SHOWERS:
-            peak = datetime(year, month, day, 6, 0, tzinfo=_UTC)
-            if start <= peak < end:
-                out.append(SkyEventRecord(time=peak, type="meteor_shower", name=name,
-                                          details={"zhr": zhr, "peak": True}))
-    return out
+    start, end = _utc(start), _utc(end)
+    site = _location(lat, lon)
+    if end <= start or end - start > timedelta(days=32):
+        raise ValueError('Event window must be positive and no longer than 32 days')
+    ts, eph = _resources()
+    # Skyfield finds physical Moon rise/set events.
+    times, rising = almanac.find_discrete(ts.from_datetime(start), ts.from_datetime(end),
+                                         almanac.risings_and_settings(eph, eph['moon'], site, radius_degrees=.25))
+    events = [SkyEventRecord(time=t.utc_datetime(), type='moonrise' if up else 'moonset',
+                           name='Moonrise' if up else 'Moonset',
+                           details={'lat': lat, 'lon': lon, 'source': 'Skyfield DE421'})
+            for t, up in zip(times, rising)]
+    # Verified 2026 prediction; never repeat a year's peak as an exact future date.
+    peak = datetime(2026, 11, 17, 23, 45, tzinfo=_UTC)
+    if start <= peak < end:
+        events.append(SkyEventRecord(time=peak, type='meteor_shower', name='Leonids',
+                                    details={'predicted_peak': True, 'source': 'https://www.imo.net/files/meteor-shower/cal2026.pdf',
+                                             'note': 'Predicted annual maximum; local observed rates vary.'}))
+    return sorted(events, key=lambda event: event.time)
+
+
+@lru_cache(maxsize=256)
+def _night_cached(lat, lon, night, tz, kernel_path):
+    zone = ZoneInfo(tz)
+    local_noon = datetime(night.year, night.month, night.day, 12, tzinfo=zone)
+    start = local_noon.astimezone(_UTC)
+    end = (local_noon + timedelta(days=1)).astimezone(_UTC)
+    times = [start + timedelta(minutes=5 * i) for i in range(int((end - start).total_seconds() / 300) + 1)]
+    ts, eph = _resources()
+    t = ts.from_datetimes(times)
+    observer = eph['earth'] + _location(lat, lon)
+    obs = observer.at(t)
+    solar_alt = obs.observe(eph['sun']).apparent().altaz()[0].degrees
+
+    def first(values, threshold, up):
+        return next((when for when, rising in _crossings(times, values, threshold) if rising == up), None)
+
+    twilight = Twilight(sunset=first(solar_alt, -.8333, False), sunrise=first(solar_alt, -.8333, True),
+                        civil_dusk=first(solar_alt, -6, False), nautical_dusk=first(solar_alt, -12, False),
+                        astronomical_dusk=first(solar_alt, -18, False), astronomical_dawn=first(solar_alt, -18, True))
+    midnight = datetime.combine(night + timedelta(days=1), datetime.min.time(), tzinfo=zone).astimezone(_UTC)
+    mt = ts.from_datetime(midnight)
+    phase = float(almanac.moon_phase(eph, mt).degrees % 360)
+    lunar = obs.observe(eph['moon']).apparent()
+    moon_alt, _, moon_distance = lunar.altaz()
+    # Refraction plus Moon semidiameter; no terrain horizon is modeled.
+    lunar_threshold = -.5667 - np.degrees(np.arcsin(1737.4 / moon_distance.km))
+    moon = MoonInfo(phase_deg=round(phase, 3), illumination=round(float(almanac.fraction_illuminated(eph, 'moon', mt)), 5),
+                    phase_name=_phase_name(phase), rise=first(moon_alt.degrees, lunar_threshold, True),
+                    set=first(moon_alt.degrees, lunar_threshold, False))
+    planets = []
+    dark = solar_alt < -6
+    for name, key in _PLANETS.items():
+        apparent = obs.observe(eph[key]).apparent()
+        alt = apparent.altaz()[0].degrees
+        visible = dark & (alt > 0)
+        if not visible.any():
+            continue
+        planets.append(PlanetVisibility(name=name, rise=first(alt, -.5667, True), set=first(alt, -.5667, False),
+                                         max_alt_deg=round(float(alt[visible].max()), 1)))
+    return NightSummary(moon=moon, twilight=twilight, planets=planets)
 
 
 def night_summary(lat: float, lon: float, night: date, tz: str) -> NightSummary:
-    """Moon, twilight times, and planet visibility for the night starting on local date `night`."""
-    from zoneinfo import ZoneInfo
-
-    local_noon = datetime(night.year, night.month, night.day, 12, tzinfo=ZoneInfo(tz)).astimezone(_UTC)
-    samples = [local_noon + timedelta(minutes=5 * i) for i in range(24 * 12 + 1)]
-    alts = [_sun_alt(t, lat, lon) for t in samples]
-
-    def crossing(threshold: float, falling: bool) -> datetime | None:
-        for i in range(1, len(alts)):
-            a, b = alts[i - 1], alts[i]
-            if (falling and a > threshold >= b) or (not falling and a < threshold <= b):
-                return samples[i]
-        return None
-
-    midnight = local_noon + timedelta(hours=12)
-    phase = _moon_phase_deg(midnight)
-    return NightSummary(
-        moon=MoonInfo(phase_deg=round(phase, 1), illumination=round(_illum(phase), 3), phase_name=_phase_name(phase)),
-        twilight=Twilight(
-            sunset=crossing(-0.833, True), civil_dusk=crossing(-6, True), nautical_dusk=crossing(-12, True),
-            astronomical_dusk=crossing(-18, True), astronomical_dawn=crossing(-18, False), sunrise=crossing(-0.833, False),
-        ),
-        planets=[],
-    )
+    _location(lat, lon)
+    return _night_cached(lat, lon, night, tz, os.environ.get('PLEIADES_EPHEMERIS_PATH', '')).model_copy(deep=True)
 
 
 def visible_objects(lat: float, lon: float, when: datetime) -> list[CandidateObject]:
-    """Objects above the horizon at (lat, lon, when), used as grounding candidates for vision."""
-    out: list[CandidateObject] = []
-    moon_alt = _moon_alt(when, lat, lon)
-    if moon_alt > 0:
-        out.append(CandidateObject(name="Moon", type="moon", alt_deg=round(moon_alt, 1), az_deg=0.0, magnitude=-10.0))
-    return out
+    ts, eph = _resources()
+    t = ts.from_datetime(_utc(when))
+    observer = (eph['earth'] + _location(lat, lon)).at(t)
+    candidates = []
+
+    def add(name, kind, target, magnitude=None):
+        alt, az, _ = observer.observe(target).apparent().altaz()
+        if alt.degrees > 0:
+            candidates.append(CandidateObject(name=name, type=kind, alt_deg=round(float(alt.degrees), 2),
+                                              az_deg=round(float(az.degrees), 2), magnitude=magnitude))
+
+    add('Moon', 'moon', eph['moon'])
+    for name, key in _PLANETS.items():
+        add(name, 'planet', eph[key])
+    for name, ra, dec, mag in _STARS:
+        add(name, 'star', Star(ra_hours=ra, dec_degrees=dec), mag)
+    for name, ra, dec, mag in _CLUSTERS:
+        kind = 'cluster' if name == 'Pleiades' else 'galaxy' if name == 'Andromeda Galaxy' else 'nebula'
+        add(name, kind, Star(ra_hours=ra, dec_degrees=dec), mag)
+    for name, ra, dec in _CONSTELLATIONS:
+        add(name, 'constellation', Star(ra_hours=ra, dec_degrees=dec))
+    return candidates

@@ -137,11 +137,20 @@ def test_ephemeris_stub_shapes():
     assert isinstance(ephemeris.visible_objects(42.7, -78.4, start), list)
 
 
-def test_ai_stub_shapes():
+def test_ai_seam_shapes(monkeypatch):
+    # The real vision seam validates image bytes and must remain offline here.
+    import io
+    from PIL import Image
+    from app.ai.types import VisionResult
+
+    image = io.BytesIO()
+    Image.new('RGB', (16, 16)).save(image, format='JPEG')
+    monkeypatch.setattr(vision, '_generate_json', lambda *a, **kw: VisionResult(
+        is_night_sky=True, description='Test sky', objects=[], milky_way_visible=False, sky_quality=5))
     ctx = VisionContext(lat=42.7, lon=-78.4, taken_at=datetime(2026, 11, 8, 3, tzinfo=UTC), candidates=[])
-    r = vision.analyze_photo(b"\xff\xd8", "image/jpeg", ctx)
+    r = vision.analyze_photo(image.getvalue(), "image/jpeg", ctx)
     assert r.is_night_sky in (True, False) and 1 <= r.sky_quality <= 10
-    e = explain.explain_score(ExplainContext(
+    e = explain.fallback_explanation(ExplainContext(
         cell_id=1, spot_name=None, valid_time=ctx.taken_at, local_time="Sat Nov 7, 10:00 PM", score=40.0,
         nelm=5.5, factors={"moon": -30.0, "clouds": -10.0}, bortle=4))
     assert "40" in e.summary and any("moon" in t.lower() for t in e.tips)

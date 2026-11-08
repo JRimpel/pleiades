@@ -1,131 +1,162 @@
-# Pleiades AI / ML / Astronomy Handoff
+﻿# Pleiades AI / ML / Astronomy Handoff
 
-Living implementation and integration record. Update this file as work is completed, contracts change, or tests reveal limitations.
+Living Role C implementation and integration record. Last updated: November 7, 2026 (America/New_York).
 
 ## Current status
 
-- Last updated: November 7, 2026.
-- Owner: AI / ML / Astronomy engineering (Role C in `Architecture.md`).
-- Priority tracks: Best AI/ML, Best General Hack, Radial Atoms, Spirit of the Hackathon.
-- Completed: reviewed `Architecture.md`, `plan.txt`, and `prize_tracks.txt`; proposed the implementation sequence below; created this handoff.
-- Implementation: not started. No AI/ML modules, API contracts, dependency setup, or runtime tests have been completed.
-- Repository at initial review: architecture and planning documents only; the code layout in `Architecture.md` is proposed.
+- **Implemented:** physics scoring v2; opt-in trained calibration v3; Skyfield astronomy; grounded Gemini vision/explanation code; real WNY grid; training, evaluation, and smoke-test tools.
+- **Offline verification:** **124 passed, 1 skipped** in the combined backend/Role C suite. The skipped test requires a live database. One upstream Skyfield/NumPy deprecation warning remains.
+- **Real data:** 364 WNY cells with atlas brightness and Open-Meteo elevation. Live weather-to-score smoke produced 72 hourly scores across three WNY spots.
+- **Training:** 7,845 training observations and 528 spatially/temporally withheld observations; learned NELM MAE 0.8603 versus physics 2.2869 and constant-mean 0.9846.
+- **Gemini live verification is unresolved:** SDK calls and authenticated model listing return HTTP 400 with HTML, including from the user's normal terminal. Key-format heuristics did not recognize the configured value; this is not definitive proof of an invalid key. No proxy environment was detected. A hidden-input configuration helper is available to replace the value from AI Studio without exposing it.
+- **Not verified:** live DB loading/ingestion/route persistence, S3 upload-to-result integration, deployment, real-photo recognition accuracy, and WNY-specific learned-model accuracy.
+- No routes, shared types, migrations, repository SQL modules, ingest jobs, or worker code were changed. Work is not committed or pushed. Existing user changes to `.env.example` were left intact.
 
-## Goal and ownership
+## Scope and accepted plan
 
-Help users choose where and when to stargaze in Western New York, explain recommendations using real conditions, and analyze sky photos with astronomical context.
+Role C owns scoring, astronomy, Gemini vision/explanations, static geographic preprocessing, and model evaluation. Priorities: **Best AI/ML**, **Best General Hack**, **Radial Atoms**, **Spirit of the Hackathon**.
 
-Our responsibilities:
+Reviewed context: `Architecture.md`, `plan.txt`, `prize_tracks.txt`, `backend-documentation.md`, `explanation.md`, actual seam types, worker/spot integration, and existing tests. The backend guide is the integration boundary: preserve the four seam signatures and coordinate shared-contract changes.
 
-- Static geographic features: grid, light pollution, and elevation preparation.
-- Physics-informed scoring and factor explanations.
-- Astronomy calculations, observing events, and photo candidate grounding.
-- Gemini vision and recommendation explanations.
-- Evaluation, model versioning, and optional learned calibration.
+The user specified **8–12 hours**, **both** physics-informed/LLM functionality and a trained scoring component, and requested real evaluation datasets. The accepted order was baseline verification → physics and astronomy → real-data training → Gemini → integration/evaluation → demo/handoff. The implementation follows that order; trained artifact creation is complete, with learned deployment opt-in pending local validation.
 
-Integration partners:
+## What changed and where
 
-- Backend / Data: database migrations, weather ingestion, Flask routes, storage, background execution, and deployment.
-- Frontend / UX: map, time slider, spot details, upload/results flow, and charts.
-- Shared boundary: Pydantic schemas in the proposed `backend/app/schemas/` directory. Agree on schemas before integrating; coordinate changes with the team.
-
-## Implementation sequence
-
-Times are planning estimates relative to the start of the architecture's 24-hour build, not elapsed work or completed milestones.
-
-| Order | Target hours | Deliverable | Completion evidence |
-|---|---|---|---|
-| 1 | 0–1 | Agree on scoring, astronomy, vision, and explanation contracts; UTC timestamps and explicit units | Shared example responses and agreed schemas |
-| 2 | 1–2 | Reproducible WNY fixtures and configuration | Modules runnable against fixtures without external services |
-| 3 | 2–4 | Sun, Moon, twilight, and exact-location astronomical candidates | Verified location/time cases |
-| 4 | 3–5 | Grid, light-pollution sampling, and elevation inputs | Traceable values or explicit missing-data states |
-| 5 | 4–7 | Vectorized baseline scoring | Reproducible cell-by-hour scores |
-| 6 | 6–8 | Factor effects, provenance, forecast freshness, and quality flags | Displayed explanations traceable to computed inputs |
-| 7 | 7–10 | Weather → scoring → database → API → map integration | Live map and time slider using real model output |
-| 8 | 10–13 | Grounded photo analysis with validated structured output | Useful results plus pending, completed, and failed states |
-| 9 | 12–14 | Grounded recommendation explanations and deterministic fallback | Text consistent with the current score revision |
-| 10 | 14–17 | Numerical and AI evaluation | Recorded results, errors, abstentions, latency, and failures |
-| 11 | 16–19 | Forecast-revision evidence and priority astronomy events | Traceable changes from environmental inputs to recommendations |
-| 12 | 19–21 | Optional constrained calibration | Held-out evaluation, or an explicit deferral |
-| 13 | 21–23 | Production failure handling and integrated verification | Usable experience during upstream failures |
-| 14 | 23–24 | Demo and judging evidence | Three-minute walkthrough based on actual results |
-
-Priority: working score map → grounded photo analysis → trustworthy explanations → evaluation → forecast revisions → extra astronomy events → optional calibration. Cut calibration and ISS passes first if time is limited.
-
-## Design decisions and issues to resolve
-
-These are planning decisions and review findings, not implemented behavior.
-
-1. **Describe the baseline accurately.** The proposed score is a physics-informed model, not a trained ML model. Treat it as a relative observing-condition index until observations validate stronger claims about visible star counts.
-2. **Validate units and approximations.** Check light-pollution raster units before conversion; label fallback estimates and approximate Bortle values. Check the region-centroid ephemeris approximation near twilight before accepting it.
-3. **Clarify factor attribution.** Log contributions are not directly additive points lost, and zero factors need special handling. Choose a documented counterfactual breakdown or show factor multipliers.
-4. **Ground vision conservatively.** Above-horizon objects are candidates, not confirmed detections. Capture time/location provenance and missing camera direction affect identification. Support uncertainty and unidentified objects.
-5. **Keep explanation caches fresh.** Include the score revision or input hash in cache identity alongside location, time, and model version. Weather revisions can change the explanation without changing model version.
-6. **Treat missing data explicitly.** Do not silently turn absent weather or static features into excellent observing conditions. Specify fallbacks and quality flags in the shared contract.
-7. **Use credible calibration labels.** Votes measure popularity; Gemini sky-quality ratings are noisy and camera-dependent. Any learned improvement needs reviewed observations and evaluation withheld by location or night.
-8. **Keep provenance honest.** Forecast revisions are environmental-data records, not readings from sensors we deployed. Record source and timestamps.
-9. **Make background analysis recoverable.** Coordinate retries and restart recovery with the backend owner so photos cannot remain pending indefinitely.
-
-## Files and modules
-
-| Path | Status | Purpose |
-|---|---|---|
-| `AI_ML_HANDOFF.md` | Created | Living implementation and integration record |
-| `backend/app/schemas/` | Planned; absent at initial review | Shared validated contracts |
-| `backend/app/scoring/` | Planned; absent at initial review | Feature processing, moonlight, vectorized scoring |
-| `backend/app/astro/` | Planned; absent at initial review | Ephemeris, events, photo candidates |
-| `backend/app/ai/` | Planned; absent at initial review | Gemini client, vision, explanations, prompts |
-| `backend/tests/` | Planned; absent at initial review | Numerical, astronomy, and AI validation |
-| `data/build_grid.py` | Planned; absent at initial review | Static geographic preprocessing |
-
-Add actual files, entry points, and usage examples here as they are implemented.
-
-## Contracts and integration
-
-No contracts have been implemented or agreed yet. `Architecture.md` contains proposed routes and payloads; do not treat them as verified runtime behavior.
-
-As work proceeds, document:
-
-- Feature names, units, ranges, missing-value handling, and UTC timestamp semantics.
-- Scoring inputs/outputs, factor attribution, model version, and provenance.
-- Astronomy candidate/event payloads and location/time assumptions.
-- Vision and explanation schemas, uncertainty handling, and status transitions.
-- Database fields, migrations, cache keys, and integration call sites.
-- Frontend examples and backend commands needed to connect each module.
-
-## Setup and operation
-
-No executable setup commands have been verified yet.
-
-- Proposed runtime: Python 3.11+, NumPy, Skyfield, Pydantic, and the Google Gen AI SDK; dependency versions remain to be established.
-- Proposed AI configuration: `GEMINI_API_KEY` and `GEMINI_MODEL`, consumed server-side. Never record secret values in this file or commit them.
-- Astronomy kernel, light-pollution dataset acquisition, local fixtures, and run commands: to be documented after implementation.
-- Database, object-storage, and deployment configuration: coordinate with the backend owner and document only relevant integration details here.
-
-## Verification record
-
-| Date | Check | Result |
-|---|---|---|
-| 2026-11-07 | Read architecture and planning files; inspect repository file list | Planning documents present; no application code observed |
-| 2026-11-07 | Runtime tests | Not run; implementation has not started |
-
-Record exact meaningful commands, results, fixture provenance, and remaining concerns as work proceeds. Planned tests are not passing tests.
-
-## Award evidence to collect
-
-| Track | Evidence |
+| File | Implemented behavior |
 |---|---|
-| Best AI/ML | Grounded vs. ungrounded vision comparison, validated outputs, error/abstention examples, reproducible scoring, honest model claims |
-| Best General Hack | Complete location/time recommendation and photo-analysis journey |
-| Radial Atoms | Real WNY environmental inputs, satellite-derived light pollution, and forecast revisions changing recommendations |
-| Spirit of the Hackathon | Astronomy driving recommendations, object candidates, and observing events |
+| `backend/app/scoring/model.py` | Shape checks, conservative missing-data policy, vectorized optical score, zenith Moon-scattering proxy, auditable point attribution, optional trained inference, version selection |
+| `backend/app/astro/ephemeris.py` | Offline DE421 Sun/Moon state, twilight/rise/set, planet visibility, bright-object candidates, cached local-night summary, Moon events, verified 2026 Leonids prediction |
+| `backend/app/ai/explain.py` | Bounded structured Gemini request, one SDK attempt, finite HTTP timeout, fact-constrained prompt, deterministic fallback |
+| `backend/app/ai/vision.py` | Actual image validation, grounded structured Gemini analysis, candidate-name/type filtering, uncertainty guidance, failure propagation |
+| `backend/requirements.txt` | Added `skyfield-data`, `tzdata`, `rasterio` |
+| `backend/tests/test_foundation.py` | Replaced the old fake two-byte JPEG assumption with a valid fixture and mocked Gemini; fallback check remains offline |
+| `backend/tests/conftest.py` | Isolated process settings for offline tests so explanation helper threads cannot inherit real developer credentials |
+| `data/atlas.py` | Shared atlas sampling and unit conversion for training and grid preprocessing |
+| `data/build_grid.py` | Real WNY grid artifact; optional transactional DB merge preserving existing IDs |
+| `data/train_calibration.py` | Supervised monotone affine NELM fit, filtering, disjoint holdout, metrics, bootstrap comparison, reproducible artifacts |
+| `data/models/calibration.json` | Fitted coefficients, source hashes, splits, metrics, evaluation gate, limitations |
+| `data/models/split_manifest.json` | Observation IDs/years, hashed spatial blocks, train/test/embargo assignment; no exact observer locations/comments |
+| `data/wny_grid.geojson` | 356 regular centres plus eight curated spots, real brightness and elevation, approximate Bortle, provenance |
+| `data/tests/test_role_c.py` | Numerical behavior, astronomy sanity checks/DST, trained inference, SDK/vision failure behavior, evaluation-label isolation |
+| `data/verify_runtime.py` | Full-grid offline integration/performance and region-centroid approximation checks |
+| `data/live_weather_smoke.py` | Live three-spot weather → exact-location astronomy → scoring without a DB |
+| `data/live_gemini_smoke.py` | Two explicit live calls: explanation and synthetic non-sky rejection; redacted failure reports |
+| `data/diagnose_gemini.py` | Safe read-only model-list diagnosis; no secret output |
+| `data/configure_gemini.py` | Hidden terminal input to replace duplicate key assignments while preserving other runtime configuration |
+| `data/evaluate_vision.py` | Reviewed-photo grounded/ungrounded pipeline evaluation; dry-run mode and metrics |
+| `data/README.md` | Setup, commands, model semantics, data acquisition/reproduction, evaluation schema, attribution, known limits |
+| `data/.gitignore` | Keeps downloaded raw archives/raster/photos out of Git |
+
+The two existing-test adjustments are limited AI integration repairs, outside the original seam-only production ownership. They make the real seam compatible with the backend guide's offline-testing requirement. Other new ML checks live under `data/tests/`.
+
+## Scoring contract and interpretation
+
+Existing `FeatureBatch`/`ScoreBatch` signatures and field units are unchanged. Arrays have shape `(N,)`; missing numerical inputs are NaN. Cloud/humidity values are percent, Moon illumination is a fraction, altitude is degrees, visibility/elevation are metres, wind is km/h, and timestamps are UTC.
+
+- **Default physics mode:** `MODEL_VERSION=2`; original NELM 4–7 index anchors retained.
+- **Trained mode:** set `PLEIADES_USE_CALIBRATION=1` before process startup; `MODEL_VERSION=3`; loads `data/models/calibration.json` and maps corrected observed NELM 1–7 to 0–100. Ship the artifact with the backend and use the real atlas grid first.
+- These are relative observing indices with different anchors. Compare versions explicitly; do not present equal scores from the two versions as calibrated equivalents.
+- Learned coefficients adjust dark background NELM. Moon decrements, clouds, haze, elevation and twilight remain physics/heuristic modeled. Historical clear/moonless training does not validate those weather-dependent effects.
+- Standard factor keys remain present. Added `calibration` key uses signed points. Attribution order: light pollution → calibration → Moon → clouds → haze → twilight → elevation. Effects reconcile to score minus 100, depend on order, and are not causal measurements.
+- Missing clouds default conservatively; missing solar altitude yields an invalid score for the existing backend to drop. Unknown or out-of-training-range static brightness retains physics behavior. Bortle fallback is approximate.
+- The zenith Moon model lacks target direction/separation. NELM is an estimated background quantity before explicit cloud/transparency score penalties. Wind and precipitation probability currently do not directly affect this optical index.
+
+## Training evidence and provenance
+
+Real observation archive: [Kyba et al., GFZ 2022](https://doi.org/10.5880/GFZ.1.4.2022.008), data CC BY 4.0. The archive includes 58,359 prefiltered clear/night observations. The trainer selects 2014–2017 near the atlas epoch, rejects potentially automatic SQM-paired labels, duplicate location/times and invalid records, and verifies Sun below −18° and Moon below −5° with Skyfield.
+
+Matching input: [Falchi et al., World Atlas](https://doi.org/10.5880/GFZ.1.4.2016.001), with its [paper](https://doi.org/10.1126/sciadv.1600377). Current DOI metadata specifies **artificial mcd/m²**; add natural background **0.171 mcd/m²** before conversion. The DOI records a November 2019 license update to **CC BY-NC 4.0**; the ZIP contains an older embargo README. Preserve current license provenance and both required citations with derived artifacts. Raw files remain ignored under `data/raw/`.
+
+| Evidence | Result |
+|---|---:|
+| Usable selected observations | 13,007 |
+| Training: 2014–2016 in training spatial blocks | 7,845 |
+| Test: 2017 in separate spatial blocks | 528 |
+| Cross-boundary observations embargoed | 4,634 |
+| Spatial blocks | 517 |
+| Physics test NELM MAE / RMSE | 2.2869 / 2.5524 mag |
+| Learned test NELM MAE / RMSE | 0.8603 / 1.1597 mag |
+| Constant training-mean test MAE | 0.9846 mag |
+| Exploratory block-bootstrap learned-minus-physics MAE interval | [−1.2788, −0.6287] mag |
+
+Splits use deterministic 2° spatial blocks and separate years, preventing shared sites/nights. Broader geographic bias and noisy ordinal labels remain. The test report is also used as an enable gate, so treat it as development evidence rather than a fresh post-selection audit. **These numbers are not WNY 2026 forecast accuracy or Gemini recognition accuracy.**
+
+## Verified commands and results
+
+From repository root unless noted; Linux uses `.venv/bin/python` instead of `.venv/Scripts/python.exe`.
+
+```powershell
+# From backend/:
+.venv/Scripts/python.exe -m pytest -q tests ../data/tests
+# 124 passed, 1 skipped; one upstream deprecation warning
+```
+
+```powershell
+backend/.venv/Scripts/python.exe data/train_calibration.py
+backend/.venv/Scripts/python.exe data/build_grid.py
+backend/.venv/Scripts/python.exe data/verify_runtime.py
+backend/.venv/Scripts/python.exe data/verify_runtime.py --trained
+backend/.venv/Scripts/python.exe data/live_weather_smoke.py
+```
+
+- Python 3.12 project environment is installed at `backend/.venv`. Default machine Python was a 3.15 beta without pytest. Windows Store interpreter calls needed approved execution outside the sandbox.
+- Full-grid benchmark: **26,208 cell-hours**, all finite and accepted by backend batch/snapshot conversion. Last reports: physics ~160 ms, trained ~109 ms. Earlier runs varied ~82–148 ms; these are local timings, not deployment promises.
+- Latest night summary: ~41–50 ms cold and ~0.17–0.19 ms warm. Reports are `data/runtime_report_v2.json` and `data/runtime_report_v3.json`.
+- Benchmark weather is explicitly **synthetic clear weather**, combined with real static inputs and computed ephemeris.
+- At the four bounding-box corners over the sampled 72 hourly timestamps, centroid Sun/Moon altitude differences reached ~1.25°. Twilight-gate difference reached **0.191** near a boundary. Retain this approximation as a hackathon limitation; exact per-cell twilight would require backend data/contract coordination. Photo grounding and live spot smoke use exact locations.
+- Live weather smoke: three WNY curated spots × 24 hours → **72 scored rows**; report `data/live_weather_report.json`. It uses local fixture ordinals, not database IDs.
+- Grid output has elevation for all 364 cells. Default generation makes no DB changes. Optional `--load` updates matching centres/inserts missing cells in one transaction and never deletes cells/renumbers IDs. Live SQL execution remains unverified.
+
+## Gemini configuration and current failure
+
+- Verified key presence without printing it. User confirmed configuration. The model name was found only in `.env.example`; added the nonsecret `GEMINI_MODEL=gemini-2.5-flash` setting to the ignored runtime `.env`. Did not print or replace the key.
+- `data/live_gemini_smoke.py` attempted one grounded synthetic explanation and one synthetic non-sky rejection. Both received **ClientError / HTTP 400 / HTML**. No successful live inference is claimed.
+- `data/diagnose_gemini.py` made a direct authenticated request to `/v1beta/models` using Requests, outside the SDK. It also received HTTP 400 with HTML. Provider/account/network diagnosis remains open; do not assume the key itself is invalid from this response alone.
+- User reproduced the same HTTP 400 HTML response from a normal terminal. Additional structural checks found no expected legacy token, no recognized modern auth prefix, no assignment text or whitespace in the configured value, and no proxy environment. These checks print no credential characters.
+- An initial legacy-only format check was too narrow; corrected it after consulting Google's current auth-key documentation. `configure_gemini.py` accepts single-value ASCII credentials without enforcing the old `AIza` prefix. No secret has been replaced automatically. Use the helper with the complete value from AI Studio, then retry diagnosis.
+- User was given this safe terminal command and asked for its output:
+
+```powershell
+Set-Location 'C:\Users\PC\Documents\Documents\TheWatchtower\pleiades'
+.\backend\.venv\Scripts\python.exe .\data\diagnose_gemini.py
+```
+
+- Live reports redact secret values and record status/error type. Never paste keys into chat, reports, test fixtures, or committed files.
+- Structured calls use finite HTTP timeouts and one SDK attempt. Explanation API errors reach the route's uncached fallback. Vision errors reach the worker's existing three-attempt/failed path.
+- If Gemini is unconfigured, `explain_score` returns deterministic offline template text. The existing route treats that return as cacheable; clear those cached templates when configuring Gemini, or add provenance-aware caching with Role B.
+- Transport timeouts do not establish a hard deadline for the entire background pipeline. Verify the deployed SDK/network path after the endpoint issue is resolved.
+
+## Integration actions for teammates
+
+1. Install updated `backend/requirements.txt`; keep `data/models/calibration.json` with the deployed repository if enabling v3.
+2. Coordinate loading `data/wny_grid.geojson` with Role B. `data/build_grid.py --load` preserves matching IDs, but its SQL path needs a real test DB check. Generate/load the grid before weather ingest; rerun astro/weather/score after updating static inputs.
+3. Restart API and scoring jobs together after model/config changes. Default v2 is ready for integration; use v3 explicitly after local validation. Preserve model-version labels in comparisons/history.
+4. Frontend: support the additional `calibration` factor label. Grid artifact Points are centres; existing API makes noncurated squares at `GRID_STEP_DEG=0.1`. Curated locations remain Points.
+5. **Fix forecast-sensitive explanation caching in Role B's route/repository layer:** current identity is cell/hour/model version, so forecast updates can leave stale text. Include score revision or input hash and test invalidation. Seam changes alone cannot fix this.
+6. **Extend photo context provenance with Role B before using capture metadata as strong evidence:** `VisionContext` lacks `taken_at_source` and camera orientation. Current worker substitutes upload time when capture time is absent. The prompt explicitly treats metadata as uncertain, but the API cannot yet distinguish that case.
+7. The spot route currently leaves `ExplainContext.visible_planets` empty. Populate it from verified astronomy if the UI needs planet-specific explanation text. Never infer moonset/event times absent from context.
+8. Helper threads lack Flask request context and use process settings. Production should keep environment settings consistent; backend tests now isolate that path from real keys. Coordinate explicit settings/context propagation if per-app settings are needed.
+9. Verify real DB migrations/aggregates, grid load, ingest jobs, API persistence, S3 upload and worker recovery with Role B. Existing worker already has retry/stale-pending startup recovery; it was not rebuilt here.
+
+## Evaluation and remaining work
+
+- `data/evaluate_vision.py` accepts reviewed real photos, verified capture metadata, canonical exhaustive supported-object labels, and source/permission information. `--dry-run` validates without model calls. Normal evaluation makes grounded and ungrounded calls per image and reports precision/recall, abstentions, classification, failures and latency. Labels never enter prompts.
+- Dataset research: [1,750-image constellation candidate](https://universe.roboflow.com/astro-tc3uc/constellation-detection), [SWINSEG cloud masks](https://malea.winkler.site/swinseg.html), and [LenghuSky-8](https://github.com/ruiyicheng/LenghuSky-8). Their suitability for reliable capture metadata/object labels has not been verified. Cloud masks do not label celestial identities or stargazing scores.
+- No real-photo benchmark has run and no recognition-accuracy percentage is available. Need reviewed real images/metadata and working Gemini endpoint first.
+- Grounded candidates are possibilities, not confirmed detections. Constellation anchors approximate an extended region. Confidence is self-assessment, not calibrated probability; candidate filtering does not validate every generated prose claim.
+- Star coordinates are rounded J2000 candidate anchors, not a plate-solving catalog. No camera orientation/field of view, terrain horizon, access hours, or current local lighting model exists.
+- Moon/twilight night-summary times interpolate five-minute samples; planet magnitudes are currently null. Only the sourced 2026 Leonids prediction and computed Moon events are emitted; ISS passes and a full meteor calendar remain unimplemented.
+- Shoreline masking reuses coarse development polygons. Better land/water data and local observing validation are follow-up work.
 
 ## Work log
 
-### November 7, 2026 — Planning and handoff creation
+- **Planning/context:** read architecture, backend guide and explanation; created this living document; recorded user scope and dataset request.
+- **Baseline/scoring:** installed Python environment; replaced scoring placeholder; first post-edit run 112 passed, 1 skipped. A true pre-edit baseline was unavailable because interpreter setup initially failed.
+- **Astronomy/AI:** replaced remaining seams; bundled offline kernel; repaired placeholder-only smoke assumptions and isolated test credentials.
+- **Real data/training:** obtained observation/atlas archives through current DOI links after obsolete paths returned 403; trained and evaluated the two-coefficient model; saved reproducible artifacts.
+- **Grid/integration:** generated real WNY brightness/elevation, verified both full-grid modes, measured centroid approximation, and scored real three-spot weather.
+- **Latest verification:** combined suite 123 passed, 1 skipped; Gemini live and direct API checks failed with HTTP 400 HTML; user is running safe diagnosis. No DB/deployment success or real-photo accuracy is claimed.
+- **Gemini follow-up:** user confirmed the same failure outside the agent. Added safe configuration helper and an offline test for replacing duplicate assignments without altering model/other settings. Removed an overly narrow legacy-key assumption. Next action requires a complete AI Studio credential entered privately, followed by endpoint verification.
+- **Follow-up verification:** combined suite **124 passed, 1 skipped** after adding the configuration helper test.
 
-- Reviewed the system architecture, project description, and local prize-track descriptions.
-- Established AI / ML / Astronomy ownership and the implementation sequence above.
-- Identified scoring attribution, cache freshness, astronomical grounding, and calibration-label issues to resolve during implementation.
-- Created this file at the user's request; update it incrementally as implementation, integration, and testing occur.
-- Next action: establish the shared contracts and initial fixtures before building scoring and astronomy modules.
+See [data/README.md](data/README.md) for detailed run commands, manifest schema, data retrieval, scientific references, and attribution.

@@ -1,0 +1,23 @@
+{
+  "kind": "live integration smoke; synthetic input; not recognition accuracy",
+  "checks": {
+    "explanation": {
+      "status": "failed",
+      "details": {
+        "error_type": "ClientError",
+        "code": 400,
+        "status": "Bad Request",
+        "message": "<html><title>Error 400 (Bad Request)!!1</title></html>"
+      }
+    },
+    "vision_non_sky": {
+      "status": "failed",
+      "details": {
+        "error_type": "ClientError",
+        "code": 400,
+        "status": "Bad Request",
+        "message": "<html><title>Error 400 (Bad Request)!!1</title></html>"
+      }
+    }
+  }
+}

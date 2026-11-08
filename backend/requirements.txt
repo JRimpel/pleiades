@@ -10,4 +10,7 @@ numpy>=1.26
 requests>=2.32
 # Used by AI/ML-owned modules (app/scoring, app/astro, app/ai)
 skyfield>=1.49
+skyfield-data>=7.0
+tzdata>=2025.2
+rasterio>=1.4
 google-genai>=1.0

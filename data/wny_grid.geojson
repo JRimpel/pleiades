@@ -1,0 +1,6204 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.8,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 396.0,
+        "sky_brightness_mpsas": 21.4109,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.7,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 560.0,
+        "sky_brightness_mpsas": 21.5362,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.6,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 523.0,
+        "sky_brightness_mpsas": 21.5986,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.5,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 487.0,
+        "sky_brightness_mpsas": 21.6497,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.4,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 503.0,
+        "sky_brightness_mpsas": 21.5628,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.3,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 412.0,
+        "sky_brightness_mpsas": 21.3933,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.2,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 437.0,
+        "sky_brightness_mpsas": 21.3893,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.1,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 550.0,
+        "sky_brightness_mpsas": 21.5959,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.0,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 522.0,
+        "sky_brightness_mpsas": 21.7522,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.9,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 637.0,
+        "sky_brightness_mpsas": 21.7991,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.8,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 650.0,
+        "sky_brightness_mpsas": 21.7639,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.7,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 735.0,
+        "sky_brightness_mpsas": 21.5161,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.6,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 502.0,
+        "sky_brightness_mpsas": 21.3158,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.5,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 679.0,
+        "sky_brightness_mpsas": 21.5361,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.4,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 627.0,
+        "sky_brightness_mpsas": 21.5512,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.3,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 450.0,
+        "sky_brightness_mpsas": 21.6523,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.2,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 551.0,
+        "sky_brightness_mpsas": 21.7485,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.1,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 474.0,
+        "sky_brightness_mpsas": 21.8539,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.0,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 656.0,
+        "sky_brightness_mpsas": 21.8603,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.9,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 534.0,
+        "sky_brightness_mpsas": 21.8198,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.8,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 674.0,
+        "sky_brightness_mpsas": 21.8704,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.7,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 669.0,
+        "sky_brightness_mpsas": 21.8484,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.6,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 634.0,
+        "sky_brightness_mpsas": 21.8594,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.5,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 447.0,
+        "sky_brightness_mpsas": 21.7896,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.4,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 489.0,
+        "sky_brightness_mpsas": 21.2742,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.3,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 410.0,
+        "sky_brightness_mpsas": 21.2574,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.2,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 516.0,
+        "sky_brightness_mpsas": 21.5769,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.1,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 476.0,
+        "sky_brightness_mpsas": 21.5265,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.0,
+          42.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 538.0,
+        "sky_brightness_mpsas": 21.5625,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.8,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 437.0,
+        "sky_brightness_mpsas": 21.3682,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.7,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 509.0,
+        "sky_brightness_mpsas": 21.5241,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.6,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 455.0,
+        "sky_brightness_mpsas": 21.6527,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.5,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 526.0,
+        "sky_brightness_mpsas": 21.5792,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.4,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 518.0,
+        "sky_brightness_mpsas": 21.252,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.3,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 400.0,
+        "sky_brightness_mpsas": 19.8314,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.2,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 426.0,
+        "sky_brightness_mpsas": 20.1823,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.1,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 513.0,
+        "sky_brightness_mpsas": 21.3994,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.0,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 663.0,
+        "sky_brightness_mpsas": 21.6877,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.9,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 458.0,
+        "sky_brightness_mpsas": 21.6328,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.8,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 485.0,
+        "sky_brightness_mpsas": 21.688,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.7,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 625.0,
+        "sky_brightness_mpsas": 21.6213,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.6,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 466.0,
+        "sky_brightness_mpsas": 21.5411,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.5,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 436.0,
+        "sky_brightness_mpsas": 20.7773,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.4,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 555.0,
+        "sky_brightness_mpsas": 20.9963,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.3,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 556.0,
+        "sky_brightness_mpsas": 21.6775,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.2,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 710.0,
+        "sky_brightness_mpsas": 21.7597,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.1,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 663.0,
+        "sky_brightness_mpsas": 21.7881,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.0,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 667.0,
+        "sky_brightness_mpsas": 21.5224,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.9,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 648.0,
+        "sky_brightness_mpsas": 21.5786,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.8,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 659.0,
+        "sky_brightness_mpsas": 21.8121,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.7,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 704.0,
+        "sky_brightness_mpsas": 21.8503,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.6,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 677.0,
+        "sky_brightness_mpsas": 21.8476,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.5,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 626.0,
+        "sky_brightness_mpsas": 21.8015,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.4,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 474.0,
+        "sky_brightness_mpsas": 21.7155,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.3,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 475.0,
+        "sky_brightness_mpsas": 21.6258,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.2,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 465.0,
+        "sky_brightness_mpsas": 21.4367,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.1,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 435.0,
+        "sky_brightness_mpsas": 21.2767,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.0,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 350.0,
+        "sky_brightness_mpsas": 21.2713,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.8,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 341.0,
+        "sky_brightness_mpsas": 21.1105,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.7,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 412.0,
+        "sky_brightness_mpsas": 21.5266,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.6,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 500.0,
+        "sky_brightness_mpsas": 21.5933,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.5,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 502.0,
+        "sky_brightness_mpsas": 21.4635,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.4,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 460.0,
+        "sky_brightness_mpsas": 21.4348,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.3,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 457.0,
+        "sky_brightness_mpsas": 21.3459,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.2,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 502.0,
+        "sky_brightness_mpsas": 21.3849,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.1,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 485.0,
+        "sky_brightness_mpsas": 21.5351,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.0,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 389.0,
+        "sky_brightness_mpsas": 21.6351,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.9,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 497.0,
+        "sky_brightness_mpsas": 21.6742,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.8,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 647.0,
+        "sky_brightness_mpsas": 21.5608,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.7,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 569.0,
+        "sky_brightness_mpsas": 21.4599,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.6,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 471.0,
+        "sky_brightness_mpsas": 21.6287,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.5,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 648.0,
+        "sky_brightness_mpsas": 21.6905,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.4,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 605.0,
+        "sky_brightness_mpsas": 21.6623,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.3,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 631.0,
+        "sky_brightness_mpsas": 21.6019,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.2,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 551.0,
+        "sky_brightness_mpsas": 21.7604,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.1,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 596.0,
+        "sky_brightness_mpsas": 21.717,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.0,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 433.0,
+        "sky_brightness_mpsas": 21.6709,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.9,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 618.0,
+        "sky_brightness_mpsas": 21.7427,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.8,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 616.0,
+        "sky_brightness_mpsas": 21.7043,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.7,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 674.0,
+        "sky_brightness_mpsas": 21.7861,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.6,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 581.0,
+        "sky_brightness_mpsas": 21.8036,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.5,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 652.0,
+        "sky_brightness_mpsas": 21.7977,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.4,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 408.0,
+        "sky_brightness_mpsas": 21.7069,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.3,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 501.0,
+        "sky_brightness_mpsas": 21.6233,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.2,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 442.0,
+        "sky_brightness_mpsas": 21.4397,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.1,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 482.0,
+        "sky_brightness_mpsas": 21.2277,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.0,
+          42.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 321.0,
+        "sky_brightness_mpsas": 21.3139,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.7,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 170.0,
+        "sky_brightness_mpsas": 21.5581,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.6,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 253.0,
+        "sky_brightness_mpsas": 21.3569,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.5,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 398.0,
+        "sky_brightness_mpsas": 21.4603,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.4,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 496.0,
+        "sky_brightness_mpsas": 21.5321,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.3,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 395.0,
+        "sky_brightness_mpsas": 21.4908,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.2,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 608.0,
+        "sky_brightness_mpsas": 21.6149,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.1,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 405.0,
+        "sky_brightness_mpsas": 21.543,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.0,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 496.0,
+        "sky_brightness_mpsas": 21.7004,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.9,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 566.0,
+        "sky_brightness_mpsas": 21.6811,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.8,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 531.0,
+        "sky_brightness_mpsas": 21.6474,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.7,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 605.0,
+        "sky_brightness_mpsas": 21.5109,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.6,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 609.0,
+        "sky_brightness_mpsas": 21.6499,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.5,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 634.0,
+        "sky_brightness_mpsas": 21.718,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.4,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 598.0,
+        "sky_brightness_mpsas": 21.7583,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.3,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 566.0,
+        "sky_brightness_mpsas": 21.7843,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.2,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 484.0,
+        "sky_brightness_mpsas": 21.7913,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.1,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 504.0,
+        "sky_brightness_mpsas": 21.7721,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.0,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 443.0,
+        "sky_brightness_mpsas": 21.7092,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.9,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 548.0,
+        "sky_brightness_mpsas": 21.796,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.8,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 613.0,
+        "sky_brightness_mpsas": 21.6385,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.7,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 585.0,
+        "sky_brightness_mpsas": 21.4315,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.6,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 525.0,
+        "sky_brightness_mpsas": 21.5076,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.5,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 538.0,
+        "sky_brightness_mpsas": 21.6572,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.4,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 478.0,
+        "sky_brightness_mpsas": 21.5476,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.3,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 379.0,
+        "sky_brightness_mpsas": 21.3325,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.2,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 336.0,
+        "sky_brightness_mpsas": 21.537,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.1,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 438.0,
+        "sky_brightness_mpsas": 21.6279,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.0,
+          42.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 560.0,
+        "sky_brightness_mpsas": 21.6068,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.5,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 170.0,
+        "sky_brightness_mpsas": 21.4489,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.4,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 246.0,
+        "sky_brightness_mpsas": 21.2255,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.3,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 313.0,
+        "sky_brightness_mpsas": 21.219,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.2,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 465.0,
+        "sky_brightness_mpsas": 21.4913,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.1,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 510.0,
+        "sky_brightness_mpsas": 21.5594,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.0,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 405.0,
+        "sky_brightness_mpsas": 21.5866,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.9,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 434.0,
+        "sky_brightness_mpsas": 21.629,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.8,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 406.0,
+        "sky_brightness_mpsas": 21.6502,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.7,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 597.0,
+        "sky_brightness_mpsas": 21.572,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.6,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 544.0,
+        "sky_brightness_mpsas": 21.5748,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.5,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 529.0,
+        "sky_brightness_mpsas": 21.5562,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.4,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 603.0,
+        "sky_brightness_mpsas": 21.7038,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.3,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 596.0,
+        "sky_brightness_mpsas": 21.7446,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.2,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 487.0,
+        "sky_brightness_mpsas": 21.6544,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.1,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 483.0,
+        "sky_brightness_mpsas": 21.7502,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.0,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 535.0,
+        "sky_brightness_mpsas": 21.8107,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.9,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 536.0,
+        "sky_brightness_mpsas": 21.8009,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.8,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 635.0,
+        "sky_brightness_mpsas": 21.7373,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.7,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 360.0,
+        "sky_brightness_mpsas": 21.2421,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.6,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 538.0,
+        "sky_brightness_mpsas": 21.6098,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.5,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 485.0,
+        "sky_brightness_mpsas": 21.6288,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.4,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 403.0,
+        "sky_brightness_mpsas": 21.4604,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.3,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 522.0,
+        "sky_brightness_mpsas": 21.4817,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.2,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 425.0,
+        "sky_brightness_mpsas": 21.5755,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.1,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 441.0,
+        "sky_brightness_mpsas": 21.6421,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.0,
+          42.4
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 605.0,
+        "sky_brightness_mpsas": 21.6626,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.3,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 197.0,
+        "sky_brightness_mpsas": 20.6331,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.2,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 239.0,
+        "sky_brightness_mpsas": 21.2892,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.1,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 281.0,
+        "sky_brightness_mpsas": 21.3283,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.0,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 261.0,
+        "sky_brightness_mpsas": 21.3159,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.9,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 303.0,
+        "sky_brightness_mpsas": 21.2656,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.8,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 432.0,
+        "sky_brightness_mpsas": 21.4337,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.7,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 392.0,
+        "sky_brightness_mpsas": 20.722,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.6,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 424.0,
+        "sky_brightness_mpsas": 21.4015,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.5,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 453.0,
+        "sky_brightness_mpsas": 21.2277,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.4,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 532.0,
+        "sky_brightness_mpsas": 21.2705,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.3,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 578.0,
+        "sky_brightness_mpsas": 21.6276,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.2,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 547.0,
+        "sky_brightness_mpsas": 21.717,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.1,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 432.0,
+        "sky_brightness_mpsas": 21.6566,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.0,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 607.0,
+        "sky_brightness_mpsas": 21.7513,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.9,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 592.0,
+        "sky_brightness_mpsas": 21.7111,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.8,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 576.0,
+        "sky_brightness_mpsas": 21.6841,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.7,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 437.0,
+        "sky_brightness_mpsas": 21.6051,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.6,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 586.0,
+        "sky_brightness_mpsas": 21.6188,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.5,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 395.0,
+        "sky_brightness_mpsas": 21.4351,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.4,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 438.0,
+        "sky_brightness_mpsas": 21.7136,
+        "bortle": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.3,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 547.0,
+        "sky_brightness_mpsas": 21.6765,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.2,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 474.0,
+        "sky_brightness_mpsas": 21.6727,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.1,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 344.0,
+        "sky_brightness_mpsas": 21.6525,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.0,
+          42.5
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 452.0,
+        "sky_brightness_mpsas": 21.5936,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.1,
+          42.6
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 209.0,
+        "sky_brightness_mpsas": 21.0238,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.0,
+          42.6
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 223.0,
+        "sky_brightness_mpsas": 21.0748,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.9,
+          42.6
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 351.0,
+        "sky_brightness_mpsas": 21.1372,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.8,
+          42.6
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 341.0,
+        "sky_brightness_mpsas": 21.1817,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.7,
+          42.6
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 384.0,
+        "sky_brightness_mpsas": 21.2235,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.6,
+          42.6
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 528.0,
+        "sky_brightness_mpsas": 21.3018,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.5,
+          42.6
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 423.0,
+        "sky_brightness_mpsas": 21.2707,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.4,
+          42.6
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 539.0,
+        "sky_brightness_mpsas": 21.4148,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.3,
+          42.6
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 599.0,
+        "sky_brightness_mpsas": 21.5449,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.2,
+          42.6
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 509.0,
+        "sky_brightness_mpsas": 21.649,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.1,
+          42.6
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 486.0,
+        "sky_brightness_mpsas": 21.5854,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.0,
+          42.6
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 256.0,
+        "sky_brightness_mpsas": 21.5799,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.9,
+          42.6
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 288.0,
+        "sky_brightness_mpsas": 21.5603,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.8,
+          42.6
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 387.0,
+        "sky_brightness_mpsas": 21.5557,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.7,
+          42.6
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 348.0,
+        "sky_brightness_mpsas": 21.4456,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.6,
+          42.6
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 440.0,
+        "sky_brightness_mpsas": 21.5373,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.5,
+          42.6
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 545.0,
+        "sky_brightness_mpsas": 21.6375,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.4,
+          42.6
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 391.0,
+        "sky_brightness_mpsas": 21.6042,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.3,
+          42.6
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 407.0,
+        "sky_brightness_mpsas": 21.684,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.2,
+          42.6
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 462.0,
+        "sky_brightness_mpsas": 21.6383,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.1,
+          42.6
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 293.0,
+        "sky_brightness_mpsas": 21.4559,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.0,
+          42.6
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 347.0,
+        "sky_brightness_mpsas": 21.567,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.0,
+          42.7
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 193.0,
+        "sky_brightness_mpsas": 20.4005,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.9,
+          42.7
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 245.0,
+        "sky_brightness_mpsas": 20.4779,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.8,
+          42.7
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 259.0,
+        "sky_brightness_mpsas": 20.3492,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.7,
+          42.7
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 398.0,
+        "sky_brightness_mpsas": 20.7178,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.6,
+          42.7
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 391.0,
+        "sky_brightness_mpsas": 20.9624,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.5,
+          42.7
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 456.0,
+        "sky_brightness_mpsas": 21.2253,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.4,
+          42.7
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 480.0,
+        "sky_brightness_mpsas": 21.3681,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.3,
+          42.7
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 464.0,
+        "sky_brightness_mpsas": 21.4871,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.2,
+          42.7
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 536.0,
+        "sky_brightness_mpsas": 21.4812,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.1,
+          42.7
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 470.0,
+        "sky_brightness_mpsas": 21.4002,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.0,
+          42.7
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 415.0,
+        "sky_brightness_mpsas": 21.2449,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.9,
+          42.7
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 287.0,
+        "sky_brightness_mpsas": 21.3195,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.8,
+          42.7
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 176.0,
+        "sky_brightness_mpsas": 21.3307,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.7,
+          42.7
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 250.0,
+        "sky_brightness_mpsas": 21.5109,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.6,
+          42.7
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 274.0,
+        "sky_brightness_mpsas": 21.5996,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.5,
+          42.7
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 247.0,
+        "sky_brightness_mpsas": 21.6234,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.4,
+          42.7
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 600.0,
+        "sky_brightness_mpsas": 21.5565,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.3,
+          42.7
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 454.0,
+        "sky_brightness_mpsas": 21.5662,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.2,
+          42.7
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 281.0,
+        "sky_brightness_mpsas": 21.5562,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.1,
+          42.7
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 347.0,
+        "sky_brightness_mpsas": 21.4326,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.0,
+          42.7
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 265.0,
+        "sky_brightness_mpsas": 21.4578,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.9,
+          42.8
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 170.0,
+        "sky_brightness_mpsas": 19.9593,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.8,
+          42.8
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 196.0,
+        "sky_brightness_mpsas": 19.185,
+        "bortle": 6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.7,
+          42.8
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 262.0,
+        "sky_brightness_mpsas": 19.9015,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.6,
+          42.8
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 270.0,
+        "sky_brightness_mpsas": 20.4291,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.5,
+          42.8
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 337.0,
+        "sky_brightness_mpsas": 20.9864,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.4,
+          42.8
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 384.0,
+        "sky_brightness_mpsas": 21.2252,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.3,
+          42.8
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 388.0,
+        "sky_brightness_mpsas": 21.3058,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.2,
+          42.8
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 510.0,
+        "sky_brightness_mpsas": 21.3626,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.1,
+          42.8
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 293.0,
+        "sky_brightness_mpsas": 21.3561,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.0,
+          42.8
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 394.0,
+        "sky_brightness_mpsas": 21.3997,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.9,
+          42.8
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 236.0,
+        "sky_brightness_mpsas": 21.1893,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.8,
+          42.8
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 257.0,
+        "sky_brightness_mpsas": 20.2915,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.7,
+          42.8
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 287.0,
+        "sky_brightness_mpsas": 21.1897,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.6,
+          42.8
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 278.0,
+        "sky_brightness_mpsas": 21.3416,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.5,
+          42.8
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 306.0,
+        "sky_brightness_mpsas": 21.3365,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.4,
+          42.8
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 278.0,
+        "sky_brightness_mpsas": 21.3677,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.3,
+          42.8
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 229.0,
+        "sky_brightness_mpsas": 21.3067,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.2,
+          42.8
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 338.0,
+        "sky_brightness_mpsas": 21.3714,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.1,
+          42.8
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 303.0,
+        "sky_brightness_mpsas": 21.3715,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.0,
+          42.8
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 201.0,
+        "sky_brightness_mpsas": 21.2915,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.8,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 199.0,
+        "sky_brightness_mpsas": 21.2796,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.7,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 184.0,
+        "sky_brightness_mpsas": 21.188,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.6,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 177.0,
+        "sky_brightness_mpsas": 20.5503,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.5,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 178.0,
+        "sky_brightness_mpsas": 21.1044,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.4,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 175.0,
+        "sky_brightness_mpsas": 21.0868,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.3,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 167.0,
+        "sky_brightness_mpsas": 20.5717,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.2,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 182.0,
+        "sky_brightness_mpsas": 20.5579,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.1,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 192.0,
+        "sky_brightness_mpsas": 20.5014,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.0,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 183.0,
+        "sky_brightness_mpsas": 19.9114,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.9,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 181.0,
+        "sky_brightness_mpsas": 18.4181,
+        "bortle": 7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.8,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 191.0,
+        "sky_brightness_mpsas": 18.4589,
+        "bortle": 7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.7,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 197.0,
+        "sky_brightness_mpsas": 18.9545,
+        "bortle": 6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.6,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 226.0,
+        "sky_brightness_mpsas": 20.0493,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.5,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 261.0,
+        "sky_brightness_mpsas": 20.2764,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.4,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 304.0,
+        "sky_brightness_mpsas": 20.9459,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.3,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 329.0,
+        "sky_brightness_mpsas": 21.0676,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.2,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 317.0,
+        "sky_brightness_mpsas": 21.2076,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.1,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 365.0,
+        "sky_brightness_mpsas": 21.2929,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.0,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 321.0,
+        "sky_brightness_mpsas": 21.2823,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.9,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 264.0,
+        "sky_brightness_mpsas": 21.2526,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.8,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 171.0,
+        "sky_brightness_mpsas": 21.1054,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.7,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 258.0,
+        "sky_brightness_mpsas": 20.8725,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.6,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 245.0,
+        "sky_brightness_mpsas": 20.9742,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.5,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 310.0,
+        "sky_brightness_mpsas": 21.0986,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.4,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 263.0,
+        "sky_brightness_mpsas": 21.0032,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.3,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 242.0,
+        "sky_brightness_mpsas": 19.9206,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.2,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 249.0,
+        "sky_brightness_mpsas": 21.0007,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.1,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 239.0,
+        "sky_brightness_mpsas": 21.1578,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.0,
+          42.9
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 172.0,
+        "sky_brightness_mpsas": 20.6203,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.8,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 206.0,
+        "sky_brightness_mpsas": 21.0283,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.7,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 186.0,
+        "sky_brightness_mpsas": 21.0039,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.6,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 190.0,
+        "sky_brightness_mpsas": 20.7722,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.5,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 175.0,
+        "sky_brightness_mpsas": 20.9036,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.4,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 186.0,
+        "sky_brightness_mpsas": 20.8198,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.3,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 184.0,
+        "sky_brightness_mpsas": 20.0913,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.2,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 186.0,
+        "sky_brightness_mpsas": 20.0734,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.1,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 183.0,
+        "sky_brightness_mpsas": 20.2096,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.0,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 185.0,
+        "sky_brightness_mpsas": 19.8386,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.9,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 185.0,
+        "sky_brightness_mpsas": 18.9092,
+        "bortle": 7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.8,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 180.0,
+        "sky_brightness_mpsas": 18.5738,
+        "bortle": 7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.7,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 186.0,
+        "sky_brightness_mpsas": 19.1413,
+        "bortle": 6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.6,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 209.0,
+        "sky_brightness_mpsas": 20.1916,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.5,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 244.0,
+        "sky_brightness_mpsas": 20.4856,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.4,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 256.0,
+        "sky_brightness_mpsas": 20.7794,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.3,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 265.0,
+        "sky_brightness_mpsas": 20.9476,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.2,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 272.0,
+        "sky_brightness_mpsas": 19.6675,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.1,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 271.0,
+        "sky_brightness_mpsas": 20.9142,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.0,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 263.0,
+        "sky_brightness_mpsas": 20.9073,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.9,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 236.0,
+        "sky_brightness_mpsas": 21.0006,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.8,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 194.0,
+        "sky_brightness_mpsas": 20.7926,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.7,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 192.0,
+        "sky_brightness_mpsas": 20.4562,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.6,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 204.0,
+        "sky_brightness_mpsas": 20.4712,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.5,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 175.0,
+        "sky_brightness_mpsas": 20.3588,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.4,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 202.0,
+        "sky_brightness_mpsas": 20.299,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.3,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 197.0,
+        "sky_brightness_mpsas": 20.8745,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.2,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 178.0,
+        "sky_brightness_mpsas": 21.04,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.1,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 162.0,
+        "sky_brightness_mpsas": 21.0434,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.0,
+          43.0
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 150.0,
+        "sky_brightness_mpsas": 21.2598,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.8,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 200.0,
+        "sky_brightness_mpsas": 20.3891,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.7,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 204.0,
+        "sky_brightness_mpsas": 20.6056,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.6,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 193.0,
+        "sky_brightness_mpsas": 20.6613,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.5,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 188.0,
+        "sky_brightness_mpsas": 20.6875,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.4,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 183.0,
+        "sky_brightness_mpsas": 20.6153,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.3,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 158.0,
+        "sky_brightness_mpsas": 20.1463,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.2,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 179.0,
+        "sky_brightness_mpsas": 19.4563,
+        "bortle": 6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.1,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 193.0,
+        "sky_brightness_mpsas": 18.6971,
+        "bortle": 7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.0,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 184.0,
+        "sky_brightness_mpsas": 18.9517,
+        "bortle": 6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.9,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 176.0,
+        "sky_brightness_mpsas": 19.7958,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.8,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 180.0,
+        "sky_brightness_mpsas": 20.1391,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.7,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 178.0,
+        "sky_brightness_mpsas": 20.1958,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.6,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 179.0,
+        "sky_brightness_mpsas": 20.7331,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.5,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 184.0,
+        "sky_brightness_mpsas": 21.0416,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.4,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 192.0,
+        "sky_brightness_mpsas": 21.1427,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.3,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 200.0,
+        "sky_brightness_mpsas": 21.1323,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.2,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 213.0,
+        "sky_brightness_mpsas": 21.1454,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.1,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 197.0,
+        "sky_brightness_mpsas": 21.1904,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.0,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 181.0,
+        "sky_brightness_mpsas": 21.0756,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.9,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 179.0,
+        "sky_brightness_mpsas": 20.3887,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.8,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 173.0,
+        "sky_brightness_mpsas": 19.9017,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.7,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 158.0,
+        "sky_brightness_mpsas": 19.2536,
+        "bortle": 6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.6,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 154.0,
+        "sky_brightness_mpsas": 18.8333,
+        "bortle": 7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.5,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 147.0,
+        "sky_brightness_mpsas": 19.4404,
+        "bortle": 6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.4,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 158.0,
+        "sky_brightness_mpsas": 20.0735,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.3,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 164.0,
+        "sky_brightness_mpsas": 20.7943,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.2,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 151.0,
+        "sky_brightness_mpsas": 21.1283,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.1,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 159.0,
+        "sky_brightness_mpsas": 21.2025,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.0,
+          43.1
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 168.0,
+        "sky_brightness_mpsas": 21.302,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.8,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 185.0,
+        "sky_brightness_mpsas": 18.7831,
+        "bortle": 7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.7,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 196.0,
+        "sky_brightness_mpsas": 19.6102,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.6,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 92.0,
+        "sky_brightness_mpsas": 19.6783,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.5,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 74.0,
+        "sky_brightness_mpsas": 19.9985,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.4,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 74.0,
+        "sky_brightness_mpsas": 20.4204,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.3,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 74.0,
+        "sky_brightness_mpsas": 19.7985,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.2,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 93.0,
+        "sky_brightness_mpsas": 19.5591,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.1,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 96.0,
+        "sky_brightness_mpsas": 20.1557,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -79.0,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 100.0,
+        "sky_brightness_mpsas": 20.3129,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.9,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 116.0,
+        "sky_brightness_mpsas": 20.628,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.8,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 120.0,
+        "sky_brightness_mpsas": 20.7029,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.7,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 117.0,
+        "sky_brightness_mpsas": 20.4051,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.6,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 143.0,
+        "sky_brightness_mpsas": 20.8237,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.5,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 184.0,
+        "sky_brightness_mpsas": 21.0383,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.4,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 185.0,
+        "sky_brightness_mpsas": 20.8666,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.3,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 195.0,
+        "sky_brightness_mpsas": 21.2716,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.2,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 201.0,
+        "sky_brightness_mpsas": 21.2051,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.1,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 206.0,
+        "sky_brightness_mpsas": 21.2071,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.0,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 183.0,
+        "sky_brightness_mpsas": 20.7603,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.9,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 171.0,
+        "sky_brightness_mpsas": 20.5116,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.8,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 148.0,
+        "sky_brightness_mpsas": 19.8238,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.7,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 142.0,
+        "sky_brightness_mpsas": 18.9449,
+        "bortle": 6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.6,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 130.0,
+        "sky_brightness_mpsas": 18.6546,
+        "bortle": 7
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.5,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 140.0,
+        "sky_brightness_mpsas": 19.4332,
+        "bortle": 6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.4,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 150.0,
+        "sky_brightness_mpsas": 20.3533,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.3,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 150.0,
+        "sky_brightness_mpsas": 20.9003,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.2,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 167.0,
+        "sky_brightness_mpsas": 21.1592,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.1,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 138.0,
+        "sky_brightness_mpsas": 21.3403,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.0,
+          43.2
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 119.0,
+        "sky_brightness_mpsas": 21.4103,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.9,
+          43.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 74.0,
+        "sky_brightness_mpsas": 21.0742,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.8,
+          43.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 94.0,
+        "sky_brightness_mpsas": 21.0829,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.7,
+          43.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 112.0,
+        "sky_brightness_mpsas": 20.9514,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.6,
+          43.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 111.0,
+        "sky_brightness_mpsas": 21.267,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.5,
+          43.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 113.0,
+        "sky_brightness_mpsas": 21.3628,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.4,
+          43.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 104.0,
+        "sky_brightness_mpsas": 21.3663,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.3,
+          43.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 108.0,
+        "sky_brightness_mpsas": 21.4033,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.2,
+          43.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 114.0,
+        "sky_brightness_mpsas": 21.2586,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.1,
+          43.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 128.0,
+        "sky_brightness_mpsas": 21.3613,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.0,
+          43.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 113.0,
+        "sky_brightness_mpsas": 21.2133,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.9,
+          43.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 92.0,
+        "sky_brightness_mpsas": 20.9765,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.8,
+          43.3
+        ]
+      },
+      "properties": {
+        "name": null,
+        "is_curated": false,
+        "elevation_m": 88.0,
+        "sky_brightness_mpsas": 20.3839,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.3864,
+          42.6678
+        ]
+      },
+      "properties": {
+        "name": "Beaver Meadow Audubon Center",
+        "is_curated": true,
+        "elevation_m": 458.0,
+        "sky_brightness_mpsas": 21.3995,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.747,
+          42.1
+        ]
+      },
+      "properties": {
+        "name": "Allegany State Park",
+        "is_curated": true,
+        "elevation_m": 428.0,
+        "sky_brightness_mpsas": 21.6243,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.05,
+          42.58
+        ]
+      },
+      "properties": {
+        "name": "Letchworth State Park",
+        "is_curated": true,
+        "elevation_m": 395.0,
+        "sky_brightness_mpsas": 21.5585,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.754,
+          42.713
+        ]
+      },
+      "properties": {
+        "name": "Chestnut Ridge Park",
+        "is_curated": true,
+        "elevation_m": 341.0,
+        "sky_brightness_mpsas": 20.35,
+        "bortle": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.425,
+          42.909
+        ]
+      },
+      "properties": {
+        "name": "Darien Lakes State Park",
+        "is_curated": true,
+        "elevation_m": 283.0,
+        "sky_brightness_mpsas": 20.9373,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.86,
+          42.995
+        ]
+      },
+      "properties": {
+        "name": "Genesee Country Village & Museum",
+        "is_curated": true,
+        "elevation_m": 188.0,
+        "sky_brightness_mpsas": 20.7748,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.95,
+          42.44
+        ]
+      },
+      "properties": {
+        "name": "Zoar Valley Multiple Use Area",
+        "is_curated": true,
+        "elevation_m": 303.0,
+        "sky_brightness_mpsas": 21.3412,
+        "bortle": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.53,
+          42.765
+        ]
+      },
+      "properties": {
+        "name": "Hunters Creek County Park",
+        "is_curated": true,
+        "elevation_m": 286.0,
+        "sky_brightness_mpsas": 20.8648,
+        "bortle": 4
+      }
+    }
+  ],
+  "metadata": {
+    "atlas_doi": "10.5880/GFZ.1.4.2016.001",
+    "paper_doi": "10.1126/sciadv.1600377",
+    "license": "CC BY-NC 4.0",
+    "raster_units": "artificial mcd/m2",
+    "natural_background_mcd_m2": 0.171,
+    "grid_step_deg": 0.1,
+    "elevation_source": "Open-Meteo",
+    "bortle": "approximate brightness-derived class",
+    "geometry_limitations": "Reuses rough development lake polygons; shoreline accuracy is limited."
+  }
+}

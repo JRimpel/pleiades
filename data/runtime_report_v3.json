@@ -1,0 +1,288 @@
+{
+  "model_version": 3,
+  "conditions": "synthetic clear weather; real atlas + computed ephemeris",
+  "cells": 364,
+  "rows": 26208,
+  "snapshot_rows": 26208,
+  "score_ms": 108.63,
+  "astro_72h_ms": 17.14,
+  "night_summary_cold_ms": 41.03,
+  "night_summary_warm_ms": 0.19,
+  "finite_scores": true,
+  "max_factor_reconciliation_error": 1.4210854715202004e-14,
+  "centroid_validation_hourly_corners": [
+    {
+      "lat": 42,
+      "lon": -79.8,
+      "max_sun_alt_difference_deg": 1.2490000000000023,
+      "max_moon_alt_difference_deg": 1.247,
+      "max_twilight_gate_difference": 0.01783333333333322
+    },
+    {
+      "lat": 42,
+      "lon": -77,
+      "max_sun_alt_difference_deg": 1.2490000000000006,
+      "max_moon_alt_difference_deg": 1.25,
+      "max_twilight_gate_difference": 0.14400000000000013
+    },
+    {
+      "lat": 43.4,
+      "lon": -79.8,
+      "max_sun_alt_difference_deg": 1.2390000000000043,
+      "max_moon_alt_difference_deg": 1.2399999999999998,
+      "max_twilight_gate_difference": 0.04716666666666658
+    },
+    {
+      "lat": 43.4,
+      "lon": -77,
+      "max_sun_alt_difference_deg": 1.240000000000002,
+      "max_moon_alt_difference_deg": 1.237,
+      "max_twilight_gate_difference": 0.19100000000000011
+    }
+  ],
+  "night_summary": {
+    "moon": {
+      "phase_deg": 347.53,
+      "illumination": 0.01344,
+      "phase_name": "New Moon",
+      "rise": "2026-11-08T11:25:05.889264Z",
+      "set": "2026-11-07T20:47:40.934178Z"
+    },
+    "twilight": {
+      "sunset": "2026-11-07T21:58:48.114630Z",
+      "civil_dusk": "2026-11-07T22:28:36.198370Z",
+      "nautical_dusk": "2026-11-07T23:02:16.728992Z",
+      "astronomical_dusk": "2026-11-07T23:35:18.960733Z",
+      "astronomical_dawn": "2026-11-08T10:19:46.844147Z",
+      "sunrise": "2026-11-08T11:56:31.985656Z"
+    },
+    "planets": [
+      {
+        "name": "Mercury",
+        "rise": "2026-11-08T11:11:55.871768Z",
+        "set": "2026-11-07T21:41:14.835476Z",
+        "max_alt_deg": 1.7,
+        "magnitude": null
+      },
+      {
+        "name": "Venus",
+        "rise": "2026-11-08T10:07:23.100042Z",
+        "set": "2026-11-07T20:45:35.472613Z",
+        "max_alt_deg": 12.6,
+        "magnitude": null
+      },
+      {
+        "name": "Mars",
+        "rise": "2026-11-08T04:40:40.554937Z",
+        "set": "2026-11-07T18:49:20.122768Z",
+        "max_alt_deg": 62.7,
+        "magnitude": null
+      },
+      {
+        "name": "Jupiter",
+        "rise": "2026-11-08T04:58:53.861874Z",
+        "set": "2026-11-07T18:51:54.137362Z",
+        "max_alt_deg": 60.5,
+        "magnitude": null
+      },
+      {
+        "name": "Saturn",
+        "rise": "2026-11-07T20:35:10.285162Z",
+        "set": "2026-11-08T08:47:05.301044Z",
+        "max_alt_deg": 48.4,
+        "magnitude": null
+      },
+      {
+        "name": "Uranus",
+        "rise": "2026-11-07T22:48:55.066834Z",
+        "set": "2026-11-08T13:38:16.770241Z",
+        "max_alt_deg": 68.2,
+        "magnitude": null
+      },
+      {
+        "name": "Neptune",
+        "rise": "2026-11-07T20:13:39.377864Z",
+        "set": "2026-11-08T08:13:58.035246Z",
+        "max_alt_deg": 46.8,
+        "magnitude": null
+      }
+    ]
+  },
+  "example_candidates": [
+    {
+      "name": "Saturn",
+      "type": "planet",
+      "alt_deg": 34.9,
+      "az_deg": 127.8,
+      "magnitude": null
+    },
+    {
+      "name": "Uranus",
+      "type": "planet",
+      "alt_deg": 11.4,
+      "az_deg": 72.03,
+      "magnitude": null
+    },
+    {
+      "name": "Neptune",
+      "type": "planet",
+      "alt_deg": 37.32,
+      "az_deg": 135.98,
+      "magnitude": null
+    },
+    {
+      "name": "Vega",
+      "type": "star",
+      "alt_deg": 52.95,
+      "az_deg": 281.13,
+      "magnitude": 0.03
+    },
+    {
+      "name": "Capella",
+      "type": "star",
+      "alt_deg": 17.83,
+      "az_deg": 42.96,
+      "magnitude": 0.08
+    },
+    {
+      "name": "Altair",
+      "type": "star",
+      "alt_deg": 46.81,
+      "az_deg": 227.62,
+      "magnitude": 0.76
+    },
+    {
+      "name": "Aldebaran",
+      "type": "star",
+      "alt_deg": 3.67,
+      "az_deg": 70.76,
+      "magnitude": 0.85
+    },
+    {
+      "name": "Fomalhaut",
+      "type": "star",
+      "alt_deg": 16.34,
+      "az_deg": 165.53,
+      "magnitude": 1.16
+    },
+    {
+      "name": "Deneb",
+      "type": "star",
+      "alt_deg": 76.67,
+      "az_deg": 287.84,
+      "magnitude": 1.25
+    },
+    {
+      "name": "Alioth",
+      "type": "star",
+      "alt_deg": 15.6,
+      "az_deg": 335.64,
+      "magnitude": 1.76
+    },
+    {
+      "name": "Dubhe",
+      "type": "star",
+      "alt_deg": 15.27,
+      "az_deg": 351.45,
+      "magnitude": 1.79
+    },
+    {
+      "name": "Mirfak",
+      "type": "star",
+      "alt_deg": 35.36,
+      "az_deg": 51.5,
+      "magnitude": 1.79
+    },
+    {
+      "name": "Alkaid",
+      "type": "star",
+      "alt_deg": 15.13,
+      "az_deg": 324.8,
+      "magnitude": 1.86
+    },
+    {
+      "name": "Polaris",
+      "type": "star",
+      "alt_deg": 42.82,
+      "az_deg": 0.83,
+      "magnitude": 1.98
+    },
+    {
+      "name": "Hamal",
+      "type": "star",
+      "alt_deg": 34.97,
+      "az_deg": 88.9,
+      "magnitude": 2.0
+    },
+    {
+      "name": "Mizar",
+      "type": "star",
+      "alt_deg": 17.2,
+      "az_deg": 331.41,
+      "magnitude": 2.23
+    },
+    {
+      "name": "Merak",
+      "type": "star",
+      "alt_deg": 9.98,
+      "az_deg": 350.47,
+      "magnitude": 2.37
+    },
+    {
+      "name": "Phecda",
+      "type": "star",
+      "alt_deg": 9.63,
+      "az_deg": 342.46,
+      "magnitude": 2.44
+    },
+    {
+      "name": "Pleiades",
+      "type": "cluster",
+      "alt_deg": 17.22,
+      "az_deg": 72.66,
+      "magnitude": 1.6
+    },
+    {
+      "name": "Andromeda Galaxy",
+      "type": "galaxy",
+      "alt_deg": 58.93,
+      "az_deg": 77.71,
+      "magnitude": 3.44
+    },
+    {
+      "name": "Cassiopeia",
+      "type": "constellation",
+      "alt_deg": 57.08,
+      "az_deg": 41.73,
+      "magnitude": null
+    },
+    {
+      "name": "Ursa Major",
+      "type": "constellation",
+      "alt_deg": 9.68,
+      "az_deg": 346.22,
+      "magnitude": null
+    },
+    {
+      "name": "Cygnus",
+      "type": "constellation",
+      "alt_deg": 74.47,
+      "az_deg": 274.94,
+      "magnitude": null
+    },
+    {
+      "name": "Lyra",
+      "type": "constellation",
+      "alt_deg": 51.66,
+      "az_deg": 277.09,
+      "magnitude": null
+    },
+    {
+      "name": "Taurus",
+      "type": "constellation",
+      "alt_deg": 4.69,
+      "az_deg": 69.66,
+      "magnitude": null
+    }
+  ]
+}

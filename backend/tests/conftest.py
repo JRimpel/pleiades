@@ -10,9 +10,17 @@ from app.auth import hash_token
 from app.config import Settings
 from app.repo import users as users_repo
 from app.storage import s3
+from app import config as app_config
 
 GOOD_TOKEN = "good-token"
 FAKE_USER = {"id": uuid.UUID("11111111-1111-1111-1111-111111111111"), "username": "stargazer"}
+
+
+@pytest.fixture(autouse=True)
+def offline_ai_settings(monkeypatch):
+    # Explanation helper threads have no Flask context. Never let them inherit
+    # real Gemini credentials loaded from a developer's ignored .env file.
+    monkeypatch.setattr(app_config, '_settings', Settings())
 
 
 def make_settings(**overrides) -> Settings:

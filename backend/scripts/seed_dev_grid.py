@@ -1,7 +1,8 @@
-"""DEV ONLY: seed `grid_cells` with a synthetic Western New York grid + curated spots.
+"""SYNTHETIC, DEV ONLY: seed `grid_cells` with a fake Western New York grid + curated spots.
 
-The real loader is data/build_grid.py (owned by AI/ML), which samples the Falchi
-light-pollution atlas. This script exists so the backend can run end to end without it:
+Prefer the real grid: `python -m app.ingest grid` loads the committed data/wny_grid.geojson
+(Falchi atlas values) with no network or raster needed. Use this script only when you want
+fabricated data on purpose:
 
 - 0.1° grid over lat 42.0–43.4, lon −79.8–−77.0 (~435 points).
 - Points in Lake Erie / Lake Ontario are dropped with a CRUDE hand-drawn polygon test

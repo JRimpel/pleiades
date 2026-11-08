@@ -25,8 +25,8 @@ Pleiades is a hackathon project (UB Hacking 2026) with three roles:
 
 | Role | Owns |
 |---|---|
-| Frontend | The React + MapLibre web app (`frontend/`, not written yet) |
-| **Backend** | Everything in this repo today: the API, database, data pipeline, storage, and deployment |
+| Frontend | The React + MapLibre web app in `frontend/`. The score map is built; see [frontend-documentation.md](frontend-documentation.md). |
+| **Backend** | The API, database, data pipeline, storage, and deployment |
 | AI/ML | The "smart" parts: the scoring model, the astronomy calculations, and the Gemini prompts |
 
 **This document covers the backend.**
@@ -43,8 +43,8 @@ Pleiades is a hackathon project (UB Hacking 2026) with three roles:
 | Database | PostgreSQL with the **TimescaleDB** (time-series) and **PostGIS** (geospatial) extensions. "Tiger Data" / Tiger Cloud is the hosted version. | [db/migrations/](db/migrations/) |
 | DB driver | `psycopg` 3 with a connection pool. Raw SQL, **no ORM**. | [backend/app/db.py](backend/app/db.py), [backend/app/repo/](backend/app/repo/) |
 | Weather data | Open-Meteo (free forecast API) | [backend/app/ingest/openmeteo.py](backend/app/ingest/openmeteo.py) |
-| Astronomy | `skyfield` (sun, moon, planets). Currently a placeholder. | [backend/app/astro/](backend/app/astro/) |
-| AI | Google Gemini via `google-genai`. Currently a placeholder. | [backend/app/ai/](backend/app/ai/) |
+| Astronomy | `skyfield` (sun, moon, planets), implemented by the AI/ML role | [backend/app/astro/](backend/app/astro/) |
+| AI | Google Gemini via `google-genai`, implemented by the AI/ML role. Live score explanations work (`gemini-3.5-flash`); the template text is used on timeout or error. | [backend/app/ai/](backend/app/ai/) |
 | Photo storage | Vultr Object Storage (S3-compatible), accessed with `boto3` | [backend/app/storage/](backend/app/storage/) |
 | Numerical work | NumPy | [backend/app/scoring/](backend/app/scoring/) |
 | Hosting | One Vultr Linux VM: nginx in front, gunicorn for the API, systemd timers for scheduled jobs | [infra/](infra/) |
@@ -87,7 +87,7 @@ pleiades/
 ├── infra/                  # nginx config, systemd units/timers, deploy.sh
 └── backend/
     ├── requirements*.txt
-    ├── scripts/seed_dev_grid.py   # creates a fake grid for local development
+    ├── scripts/seed_dev_grid.py   # synthetic fallback grid for offline work (the real grid is data/wny_grid.geojson)
     ├── tests/                     # pytest; offline by default
     └── app/                       # the Python package
 ```
@@ -106,7 +106,7 @@ Inside `backend/app/`:
 | `api/` | **Flask blueprints**, one per area: `scores`, `spots`, `photos`, `users`, `sky`, `health`. Thin route handlers. | [api/scores.py](backend/app/api/scores.py) |
 | `schemas/` | Pydantic models for every request and response. **This is the API contract** with the frontend. | [schemas/scores.py](backend/app/schemas/scores.py) |
 | `repo/` | **All SQL lives here.** One module per area. The functions return plain dicts. | [repo/scores.py](backend/app/repo/scores.py) |
-| `ingest/` | The scheduled jobs: `weather`, `astro`, `score`. The entry point is `python -m app.ingest`. | [ingest/__main__.py](backend/app/ingest/__main__.py) |
+| `ingest/` | The jobs: `grid` (one-off load of `data/wny_grid.geojson`), `weather`, `astro`, `score`, and `bootstrap` (all four in order). The entry point is `python -m app.ingest`. | [ingest/__main__.py](backend/app/ingest/__main__.py) |
 | `scoring/` | The scoring model (AI/ML seam) and its input/output types | [scoring/model.py](backend/app/scoring/model.py) |
 | `astro/` | Sun, moon, planets, and sky events (AI/ML seam) | [astro/ephemeris.py](backend/app/astro/ephemeris.py) |
 | `ai/` | Gemini photo analysis and score explanations (AI/ML seams) | [ai/vision.py](backend/app/ai/vision.py) |
@@ -170,8 +170,10 @@ There are no passwords:
 
 The database stores only a SHA-256 **hash** of the token, so a leaked database doesn't leak working tokens. See [auth.py](backend/app/auth.py).
 
-### 5.7 Seams (placeholder functions)
-The backend was built before the AI/ML work was done. To unblock everyone, the AI/ML entry points are **seams**: functions with fixed signatures and simple placeholder bodies. The pipeline runs end to end today, and the AI/ML teammate can later replace the bodies without touching anything else.
+### 5.7 Seams
+The backend was built before the AI/ML work was done. To unblock everyone, the AI/ML entry points are **seams**: functions with fixed signatures that started with simple placeholder bodies, so the pipeline could run end to end early.
+
+The AI/ML teammate has since replaced the bodies with real implementations: physics scoring v2, Skyfield astronomy, and Gemini vision and explanations. See [AI_ML_HANDOFF.md](AI_ML_HANDOFF.md). The seam mechanism still applies to any future change.
 
 | Seam | Used by |
 |---|---|
@@ -195,7 +197,7 @@ Each job is a CLI command run by a systemd timer (see [infra/](infra/)). You can
 | 2 | `python -m app.ingest weather` | every 3 h at :05 | `grid_cells`, Open-Meteo API | `weather_forecast` (new revision) |
 | 3 | `python -m app.ingest score` | hourly at :15, and right after each weather run | latest forecast + `astro_conditions` + `grid_cells` | `score_snapshots`, then refreshes both aggregates |
 
-`python -m app.ingest all` runs all three in order, which is what you'll use locally.
+`python -m app.ingest all` runs these three in order. On a fresh database, use `python -m app.ingest bootstrap` instead. It first runs `ingest grid`, which loads the real grid from `data/wny_grid.geojson` and does nothing once loaded, then astro, weather, and score.
 
 Every run is wrapped by `run_job()` in [ingest/__main__.py](backend/app/ingest/__main__.py), which records it in the `ingest_runs` table with status `ok` or `error`. `/api/health` uses that table to report when data was last refreshed.
 
@@ -279,11 +281,13 @@ docker compose up -d db                       # local TimescaleDB + PostGIS
 cd backend && python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
 cp ../.env.example ../.env                    # defaults point at the docker DB
 .venv/bin/python -m app.migrate               # create tables
-.venv/bin/python scripts/seed_dev_grid.py --no-elevation   # fake grid
-.venv/bin/python -m app.ingest all            # astro -> weather -> score
-.venv/bin/flask --app app run --debug         # http://localhost:5000/api/health
+.venv/bin/python -m app.ingest bootstrap      # real grid -> astro -> weather -> score
+.venv/bin/flask --app app run --debug         # http://localhost:5001/api/health (port from backend/.flaskenv)
 .venv/bin/python -m pytest -q                 # offline tests
+cd ../frontend && npm ci && npm run dev       # map at http://localhost:5173 (proxies /api to :5001)
 ```
+
+Flask runs on port **5001**, set by `FLASK_RUN_PORT` in `backend/.flaskenv` (macOS AirPlay occupies 5000). That file is not committed yet. If yours is missing, add `--port 5001` to the `flask run` command.
 
 The app starts even without a database or storage configured. In that case `/api/health` reports `degraded`, and DB-backed routes return 500. Photo uploads need real S3 credentials. The [README](README.md) has the full instructions, including how to run the integration tests safely.
 
@@ -316,21 +320,18 @@ The app starts even without a database or storage configured. In that case `/api
 | **PostGIS / `geography`** | The Postgres geospatial extension. `geography` columns store lat/lon points and support distance and bounding-box queries. |
 | **Presigned URL** | A temporary URL that lets the holder upload or download one object in a storage bucket without credentials. |
 | **Bearer token** | A secret string sent in the `Authorization` header. Whoever has it is treated as that user. |
-| **Seam** | A function boundary with a fixed signature and a placeholder body, meant to be replaced by another teammate. |
+| **Seam** | A function boundary with a fixed signature, whose body one teammate replaces (it starts as a placeholder) without changing anyone else's code. |
 | **Revision** | One fetched forecast or one score computation. Pleiades keeps all of them. |
 
 ---
 
 ## 12. Current status and known gaps
 
-- **The SQL has never run against a real database.** All offline tests mock the repo layer. Running `docker compose up` and then `pytest -m db` will be the first real check, so expect some fixes.
-- **The AI/ML seams are placeholders.**
-  - The sun position is roughly right, but the moon altitude is crude, and moonrise/moonset and planets are empty. Moon-related scores aren't realistic yet.
-  - Vision and explanations return neutral or template text.
-- **`cell_nightly_best` needs a recent TimescaleDB (about 2.13+)** because it uses a time-zone-aware daily bucket.
-- **Not built yet:**
-  - the frontend (`frontend/`)
-  - the real grid builder (`data/build_grid.py`), which will sample the real light-pollution atlas. Until then, [scripts/seed_dev_grid.py](backend/scripts/seed_dev_grid.py) creates a fake grid.
+- **The database path is verified.** `pytest -m db` passes (6/6) against TimescaleDB 2.31 + PostGIS. A local `ingest bootstrap --reset-grid` loaded the real 364-cell grid and scored 26,208 cell-hours.
+- **The AI/ML seams are implemented** (see [AI_ML_HANDOFF.md](AI_ML_HANDOFF.md)). The Gemini HTTP 400 is fixed (the cause was a request deadline under 10 s, which Gemini rejects with 400 INVALID_ARGUMENT), and live explanations were verified on Nov 8. Template explanations cached while no Gemini key was loaded keep being served for those cells and hours; run `DELETE FROM score_explanations;` after configuring the key. Photo analysis has not been verified end to end.
+- **`cell_nightly_best` needs a recent TimescaleDB (about 2.13+)** because it uses a time-zone-aware daily bucket. TimescaleDB 2.2x+ also requires the hourly and nightly aggregates to share a time zone and offset. See [backend-documentation.md §9](backend-documentation.md).
+- **The real grid exists.** `data/build_grid.py` produced `data/wny_grid.geojson`, which `ingest grid` loads. [scripts/seed_dev_grid.py](backend/scripts/seed_dev_grid.py) is now only a synthetic offline fallback.
+- **Frontend:** the score map, hour slider, spot panel (with history and drift charts), "Tonight's best", Sky tonight, and the user's location are built. Photos, upload, and voting aren't built yet. See [frontend-documentation.md](frontend-documentation.md).
 - **The integration tests truncate tables.** Always point `TEST_DATABASE_URL` at a throwaway database.
 
 For the full list, see [backend-documentation.md §9](backend-documentation.md).

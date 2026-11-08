@@ -160,7 +160,7 @@ def explain_score(ctx: ExplainContext) -> Explanation          # replace the bod
 def fallback_explanation(ctx: ExplainContext) -> Explanation   # keep: used on timeout or error
 ```
 
-- **Called by:** `GET /api/spots/:id`, **synchronously** during the request. The call runs in a helper thread with an `EXPLAIN_TIMEOUT_S` timeout (default 8 s).
+- **Called by:** `GET /api/spots/:id`, **synchronously** during the request. The call runs in a helper thread with an `EXPLAIN_TIMEOUT_S` timeout (default 12 s; Gemini requires a deadline of at least 10 s).
 - **Input: `ExplainContext`**
   - Cell and spot name, `valid_time` plus a readable `local_time`.
   - `score`, `nelm`, `factors`, `bortle`.
@@ -420,7 +420,7 @@ Policies:
 
 - **Deploy:** run `infra/deploy.sh` on the VM. It runs `git pull`, builds the frontend, installs the backend dependencies, runs `migrate` and `ingest bootstrap`, installs the systemd units, and restarts the API.
 - **Configuration:** see `.env.example` for the full list. The main variables:
-  - Database and AI: `DATABASE_URL`, `GEMINI_API_KEY`, `GEMINI_MODEL`.
+  - Database and AI: `DATABASE_URL`, `GEMINI_API_KEY`, `GEMINI_MODEL` (`.env.example` uses `gemini-3.5-flash`).
   - Storage: `VULTR_S3_ENDPOINT/ACCESS_KEY/SECRET_KEY/BUCKET`, plus optional `VULTR_S3_PUBLIC_BASE`.
   - Region and grid: `REGION_TZ`, `GRID_STEP_DEG`, `REGION_CENTROID_LAT/LON`, `FORECAST_HOURS`, `GRID_GEOJSON_PATH`.
   - Limits: `MAX_UPLOAD_BYTES`, `UPLOADS_PER_HOUR`, `PHOTO_WORKERS`, `EXPLAIN_TIMEOUT_S`.
@@ -453,11 +453,12 @@ Policies:
 3. **Stale hourly scores between refreshes:** future buckets of `cell_hourly_score` are materialized, so a new score revision shows up only after a refresh. The score job refreshes straight after each run; this only matters if that refresh fails.
 4. **`ingest grid --reset` is destructive.** It runs `TRUNCATE grid_cells … CASCADE`, which also deletes forecasts, scores, explanations, **photos and votes**. Don't run it once real uploads exist. Use `data/build_grid.py --load` (merges and keeps IDs, still untested) or write a migration instead.
 5. **Sky data is thin.** The only meteor shower is the hard-coded 2026 Leonids, there are no ISS passes, and the spot route leaves `ExplainContext.visible_planets` empty. Sun/Moon are computed at the region centroid (≤ ~1.25° error at the corners).
-6. **Gemini live calls fail** with HTTP 400 (HTML body), and the cause is still unresolved (see AI_ML_HANDOFF.md). Without Gemini, explanations fall back to template text and photo analysis cannot finish.
-7. **Explanation cache staleness:** `score_explanations` is keyed on cell, hour and model version only. A new forecast can leave old text in place.
-8. **Frontend integration is partial** *(updated by Role A, Nov 7)*.
+6. **Gemini HTTP 400 is resolved** *(Nov 8)*: the cause was a request deadline under 10 s, which Gemini rejects with 400 INVALID_ARGUMENT. `explain_score` now sends at least 10 s and `EXPLAIN_TIMEOUT_S` defaults to 12 s. A live explanation with `gemini-3.5-flash` was verified (about 6 s). Photo analysis has not been verified end to end.
+7. **Explanation cache staleness:** `score_explanations` is keyed on cell, hour and model version only. A new forecast can leave old text in place. Template explanations cached while no Gemini key was loaded keep being served for those cells and hours; run `DELETE FROM score_explanations;` after configuring the key. *(Nov 8: all 85 rows in the local DB were template text.)*
+8. **Frontend integration** *(updated by Role A, Nov 8)*.
    - **Wired up:** the map calls `GET /api/scores?time=` and `GET /api/scores/range` through the Vite proxy (default `localhost:5001`). It shows real v2 scores with an hour slider.
-   - **Not called yet:** `/spots/:id` (with history and drift), `/best`, `/sky-events`, `/photos`, and `/users`.
+   - **Also wired up:** `/spots/:id` with `/history` and `/drift` (spot panel), `/best` with `near`/`radius_km` (Tonight's best), and `/sky-events` with `lat`/`lon` (Sky tonight and the slider's Dark/Dawn ticks).
+   - **Not called yet:** `/photos` and `/users`.
    - **Not committed yet:** `backend/.flaskenv` (port 5001).
 9. **The integration test truncates its tables.** Always point `TEST_DATABASE_URL` at a throwaway database.
 10. **Git state:** the grid-ingestion work (`app/ingest/grid.py`, `bootstrap`, deploy step, tests, docs) and the aggregate fix are not committed yet.

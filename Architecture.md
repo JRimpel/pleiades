@@ -380,14 +380,16 @@ The design above is the plan. This is what the frontend currently does, and wher
 | Area | As built |
 |---|---|
 | Score layer | A **smooth surface**. Cell scores are blended (Gaussian-weighted) into one image drawn under the basemap labels, with a soft fade at the grid edge and over the lakes. The polygons stay only as invisible click targets. |
-| Palette | **Red (0) → yellow (50) → green (100)**, chosen by the team. Unlike the planned cividis/viridis palette, this is **not color-blind-safe**. Popups show the number and label, and the legend shows the label names. *Open UI/UX item.* |
+| Palette | **Red (0) → yellow (50) → green (100)**, chosen by the team. Unlike the planned cividis/viridis palette, this is **not color-blind-safe**. The spot panel shows the number and label, and the legend shows the label names. *Open UI/UX item.* |
 | Curated spots | Colored circles with names, not star-shaped pins. |
-| Time slider | Hourly steps across `/scores/range`, in a floating card at the bottom center. No sunset or dusk ticks and no "Tonight's best" button yet. |
-| Layout | Full-window map. The title and subtitle are a translucent card at the top left, and the legend is at the bottom right. |
+| Time slider | Hourly steps across `/scores/range`, in a floating card at the bottom center. Ticks mark astronomical dusk and dawn ("Dark" / "Dawn"). A **"★ Tonight's best"** button calls `/best` and lists the top 5 spots. Picking one flies the map there, moves the slider to its best hour, and opens the spot panel. Best hours that have already passed are labeled "earlier tonight"; the panel shows that hour even though the slider can't reach it. |
+| Layout | Full-window map. The title and subtitle are a translucent card at the top left, and the legend is at the bottom right. While the spot panel is open on desktop, the legend is hidden and the slider and map controls move left. |
 | Bounds and zoom | Opens fitted to the score data, 0.5 zoom level closer. Panning is limited to about 2° beyond the data, and zoom-out is limited too. |
-| Interaction | Click a cell or spot for a popup with score and label, Bortle class, and biggest factor. Hover highlights curated spots only. |
+| Interaction | Clicking a cell or spot opens the **spot panel**. A selected curated spot gets a blue ring; grid squares get no outline. Unnamed areas are titled by the nearest town ("5 mi SW of Naples", with coordinates underneath) from a bundled list of ~200 WNY, PA, and Ontario towns (`lib/wnyTowns.ts`, `lib/placeName.ts`). The same names appear in "Tonight's best". It is a right-side sheet on desktop and a bottom sheet on phones, and Esc or × closes it. It shows: a score gauge with its label, NELM, Bortle class, sky brightness and elevation, the Gemini explanation and tips (template fallback on timeout or error), factor bars (points lost or gained), conditions, a score-history chart (`/history`), a forecast-drift chart (`/drift`, Recharts), and a Google Maps directions link. Hover highlights curated spots only. |
 | Styling and data | Plain CSS instead of Tailwind. TanStack Query, as planned. |
-| Not built yet | Spot panel, sky panel, photo layer and upload, voting, night mode, "Locate me". |
+| Sky tonight | A toggle in the title card expands moon phase (graphic, % lit, rise and set), sunset, dark start and end, sunrise, planets that climb at least 5°, and events such as the Leonids, from `/sky-events`. ISS passes are not ingested yet. |
+| Your location | The browser location is requested on page load and tracked live. It is drawn as a blue dot with an accuracy ring. A map button (under the zoom controls) centers on it; the camera never moves on its own. When the user is inside the region, these features use it: "Tonight's best" gets a **Near me (50 mi)** / All of WNY toggle with distances, Sky tonight is computed for the user's position, and a **"Your sky"** pill in the title card shows the score of the user's own cell for the slider hour and opens it. The spot panel shows the straight-line distance, and the directions link starts from the user. Outside the region, a short notice explains why there is no dot. Needs HTTPS or localhost. |
+| Not built yet | Photo layer and upload, voting, night mode. |
 
 ---
 

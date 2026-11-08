@@ -1,4 +1,13 @@
-import type { ApiErrorBody, ScoreRangeResponse, ScoresResponse } from './types'
+import type {
+  ApiErrorBody,
+  BestResponse,
+  ScoreRangeResponse,
+  ScoresResponse,
+  SkyEventsResponse,
+  SpotDetail,
+  SpotDrift,
+  SpotHistory,
+} from './types'
 
 export class ApiError extends Error {
   readonly status: number
@@ -47,4 +56,41 @@ export function fetchScoreRange(signal?: AbortSignal) {
 export function fetchScores(time?: string, signal?: AbortSignal) {
   const query = time ? `?${new URLSearchParams({ time })}` : ''
   return getJson<ScoresResponse>(`/api/scores${query}`, signal)
+}
+
+function withQuery(path: string, params: Record<string, string | number | undefined>) {
+  const query = new URLSearchParams()
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined) query.set(key, String(value))
+  }
+  const text = query.toString()
+  return text ? `${path}?${text}` : path
+}
+
+/** Score, factors, conditions, and explanation for one cell at one UTC hour. */
+export function fetchSpot(cellId: number, time?: string, signal?: AbortSignal) {
+  return getJson<SpotDetail>(withQuery(`/api/spots/${cellId}`, { time }), signal)
+}
+
+/** Hourly scores (past week through the forecast) and nightly bests. */
+export function fetchSpotHistory(cellId: number, signal?: AbortSignal) {
+  return getJson<SpotHistory>(`/api/spots/${cellId}/history`, signal)
+}
+
+/** Every forecast revision for tonight. */
+export function fetchSpotDrift(cellId: number, signal?: AbortSignal) {
+  return getJson<SpotDrift>(`/api/spots/${cellId}/drift`, signal)
+}
+
+/** Top spots. Without `time`, ranks by tonight's best hour per spot. `near` is "lat,lon"; it adds `distance_km`. */
+export function fetchBest(
+  params: { time?: string; limit?: number; near?: string; radius_km?: number },
+  signal?: AbortSignal,
+) {
+  return getJson<BestResponse>(withQuery('/api/best', params), signal)
+}
+
+/** Moon, twilight, planets, and events for tonight, at `at` or else the region centroid. */
+export function fetchSkyEvents(signal?: AbortSignal, at?: { lat: number; lon: number }) {
+  return getJson<SkyEventsResponse>(withQuery('/api/sky-events', { lat: at?.lat, lon: at?.lon }), signal)
 }

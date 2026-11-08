@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import type { ReactNode } from 'react'
 import { HOUR_MS, formatLocalHour } from '../lib/time'
 
 interface TimeSliderProps {
@@ -8,9 +9,13 @@ interface TimeSliderProps {
   valueMs: number
   onChange: (ms: number) => void
   status?: string
+  /** Extra controls shown in the header, e.g. the "Tonight's best" button. */
+  actions?: ReactNode
+  /** Moments to mark under the track, e.g. astronomical dusk and dawn. */
+  ticks?: { ms: number; label: string }[]
 }
 
-function TimeSlider({ minMs, maxMs, valueMs, onChange, status }: TimeSliderProps) {
+function TimeSlider({ minMs, maxMs, valueMs, onChange, status, actions, ticks = [] }: TimeSliderProps) {
   const id = useId()
   const hours = Math.max(0, Math.round((maxMs - minMs) / HOUR_MS))
   const index = Math.round((valueMs - minMs) / HOUR_MS)
@@ -26,6 +31,7 @@ function TimeSlider({ minMs, maxMs, valueMs, onChange, status }: TimeSliderProps
         <span className="time-slider-status" role="status">
           {status}
         </span>
+        {actions}
       </div>
       <input
         id={id}
@@ -38,6 +44,22 @@ function TimeSlider({ minMs, maxMs, valueMs, onChange, status }: TimeSliderProps
         disabled={hours === 0}
         onChange={(event) => onChange(minMs + Number(event.target.value) * HOUR_MS)}
       />
+      {ticks.length > 0 && maxMs > minMs && (
+        <div className="time-slider-ticks" aria-hidden="true">
+          {ticks
+            .filter((tick) => tick.ms >= minMs && tick.ms <= maxMs)
+            .map((tick) => (
+              <span
+                key={`${tick.label}-${tick.ms}`}
+                className="time-slider-tick"
+                style={{ left: `${((tick.ms - minMs) / (maxMs - minMs)) * 100}%` }}
+                title={tick.label}
+              >
+                {tick.label}
+              </span>
+            ))}
+        </div>
+      )}
       <div className="time-slider-ends" aria-hidden="true">
         <span>{formatLocalHour(minMs)}</span>
         <span>{formatLocalHour(maxMs)}</span>

@@ -44,7 +44,7 @@ Pleiades is a hackathon project (UB Hacking 2026) with three roles:
 | DB driver | `psycopg` 3 with a connection pool. Raw SQL, **no ORM**. | [backend/app/db.py](backend/app/db.py), [backend/app/repo/](backend/app/repo/) |
 | Weather data | Open-Meteo (free forecast API) | [backend/app/ingest/openmeteo.py](backend/app/ingest/openmeteo.py) |
 | Astronomy | `skyfield` (sun, moon, planets), implemented by the AI/ML role | [backend/app/astro/](backend/app/astro/) |
-| AI | Google Gemini via `google-genai`, implemented by the AI/ML role. Live calls currently fail (HTTP 400), so explanations use the fallback text. | [backend/app/ai/](backend/app/ai/) |
+| AI | Google Gemini via `google-genai`, implemented by the AI/ML role. Live score explanations work (`gemini-3.5-flash`); the template text is used on timeout or error. | [backend/app/ai/](backend/app/ai/) |
 | Photo storage | Vultr Object Storage (S3-compatible), accessed with `boto3` | [backend/app/storage/](backend/app/storage/) |
 | Numerical work | NumPy | [backend/app/scoring/](backend/app/scoring/) |
 | Hosting | One Vultr Linux VM: nginx in front, gunicorn for the API, systemd timers for scheduled jobs | [infra/](infra/) |
@@ -328,10 +328,10 @@ The app starts even without a database or storage configured. In that case `/api
 ## 12. Current status and known gaps
 
 - **The database path is verified.** `pytest -m db` passes (6/6) against TimescaleDB 2.31 + PostGIS. A local `ingest bootstrap --reset-grid` loaded the real 364-cell grid and scored 26,208 cell-hours.
-- **The AI/ML seams are implemented** (see [AI_ML_HANDOFF.md](AI_ML_HANDOFF.md)), but **live Gemini calls fail with HTTP 400**. Explanations fall back to template text, and photo analysis cannot finish.
+- **The AI/ML seams are implemented** (see [AI_ML_HANDOFF.md](AI_ML_HANDOFF.md)). The Gemini HTTP 400 is fixed (the cause was a request deadline under 10 s, which Gemini rejects with 400 INVALID_ARGUMENT), and live explanations were verified on Nov 8. Template explanations cached while no Gemini key was loaded keep being served for those cells and hours; run `DELETE FROM score_explanations;` after configuring the key. Photo analysis has not been verified end to end.
 - **`cell_nightly_best` needs a recent TimescaleDB (about 2.13+)** because it uses a time-zone-aware daily bucket. TimescaleDB 2.2x+ also requires the hourly and nightly aggregates to share a time zone and offset. See [backend-documentation.md §9](backend-documentation.md).
 - **The real grid exists.** `data/build_grid.py` produced `data/wny_grid.geojson`, which `ingest grid` loads. [scripts/seed_dev_grid.py](backend/scripts/seed_dev_grid.py) is now only a synthetic offline fallback.
-- **Frontend:** the score map, with its hour slider, calls `/api/scores` and `/api/scores/range`. The spot panel, photos, and voting aren't built yet. See [frontend-documentation.md](frontend-documentation.md).
+- **Frontend:** the score map, hour slider, spot panel (with history and drift charts), "Tonight's best", Sky tonight, and the user's location are built. Photos, upload, and voting aren't built yet. See [frontend-documentation.md](frontend-documentation.md).
 - **The integration tests truncate tables.** Always point `TEST_DATABASE_URL` at a throwaway database.
 
 For the full list, see [backend-documentation.md §9](backend-documentation.md).

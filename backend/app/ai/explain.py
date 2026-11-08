@@ -33,7 +33,7 @@ def fallback_explanation(ctx: ExplainContext) -> Explanation:
     return Explanation(summary=summary, tips=tips)
 
 
-def _generate_json(prompt, schema, *, image_bytes=None, mime_type=None, timeout_ms=6500):
+def _generate_json(prompt, schema, *, image_bytes=None, mime_type=None, timeout_ms=10_000):
     """One bounded SDK attempt. Caller/worker owns fallback or retry behavior."""
     settings = current_settings()
     if not settings.gemini_api_key or not settings.gemini_model:
@@ -70,7 +70,8 @@ def explain_score(ctx: ExplainContext) -> Explanation:
         'Omit unsupported facts. Tips must be actionable and conditional where appropriate. Context JSON:\n'
         + json.dumps(ctx.model_dump(mode='json'), allow_nan=False)
     )
-    timeout_ms = max(100, min(6500, int(settings.explain_timeout_s * 1000) - 250))
+    # The SDK forwards this as a server deadline; Gemini rejects deadlines under 10s (400 INVALID_ARGUMENT).
+    timeout_ms = max(10_000, int(settings.explain_timeout_s * 1000) - 250)
     result = _generate_json(prompt, Explanation, timeout_ms=timeout_ms)
     if not result.summary.strip() or len(result.summary) > 700 or len(result.tips) > 3 or any(len(t) > 240 for t in result.tips):
         raise ValueError('Explanation exceeds the supported response bounds')

@@ -1,35 +1,26 @@
 import { useEffect, useRef, useState } from 'react'
-import { Map, NavigationControl, Popup, ScaleControl, setWorkerUrl } from 'maplibre-gl'
+import { Map, NavigationControl, ScaleControl, setWorkerUrl } from 'maplibre-gl'
 import type {
   ExpressionSpecification,
   GeoJSONSource,
+  IControl,
   ImageSource,
-  MapGeoJSONFeature,
   MapLayerMouseEvent,
+  MapMouseEvent,
 } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
-import type { ScoreFeatureProperties, ScoresResponse } from '../api/types'
-import { factorLabel, scoreColorExpression } from '../lib/scoreColors'
+import type { ScoresResponse } from '../api/types'
+import { DATA_BOUNDS, PAN_BOUNDS, isWithinBounds } from '../lib/region'
+import type { Bounds } from '../lib/region'
+import { scoreColorExpression } from '../lib/scoreColors'
 import { TRANSPARENT_PNG, buildScoreSurface } from '../lib/scoreSurface'
 import type { ImageCorners } from '../lib/scoreSurface'
+import type { UserLocation } from '../lib/useUserLocation'
 
 // Let Vite bundle the background worker that decodes the map tiles.
 setWorkerUrl(workerUrl)
 
-// MapLibre uses [longitude, latitude].
-// Extent of the drawn score data: grid centres (−79.8..−77.0, 42.0..43.3) plus the 1.5-step
-// fade margin that scoreSurface.ts draws around them. Used for the starting view.
-type Bounds = [[number, number], [number, number]]
-const DATA_BOUNDS: Bounds = [
-  [-79.95, 41.85],
-  [-76.85, 43.45],
-]
-// Panning limit: DATA_BOUNDS plus ~2° on every side.
-const PAN_BOUNDS: Bounds = [
-  [-81.95, 39.85],
-  [-74.85, 45.45],
-]
 /** How many zoom levels closer than "fit" the map starts, and than "PAN_BOUNDS fills the screen" it stops zooming out. */
 const ZOOM_CLOSER = 0.5
 
@@ -64,8 +55,130 @@ const EMPTY_IMAGE_CORNERS: ImageCorners = [
   [-79.8, 42.0],
 ]
 
+const USER_SOURCE = 'user-location'
+const USER_ACCURACY_LAYER = 'user-accuracy'
+const USER_ACCURACY_OUTLINE_LAYER = 'user-accuracy-outline'
+const USER_DOT_LAYER = 'user-dot'
+const USER_BLUE = '#3b82f6'
+const EARTH_RADIUS_M = 6_371_008.8
+
+/** Approximate circle of `radiusM` metres around (lat, lon), as a closed polygon ring. */
+function circlePolygon(lat: number, lon: number, radiusM: number, steps = 64): GeoJSON.Polygon {
+  const angular = (radiusM / EARTH_RADIUS_M) * (180 / Math.PI)
+  const lonScale = Math.max(Math.cos((lat * Math.PI) / 180), 1e-6)
+  const ring: [number, number][] = []
+  for (let i = 0; i <= steps; i++) {
+    const theta = (2 * Math.PI * i) / steps
+    ring.push([lon + (angular * Math.sin(theta)) / lonScale, lat + angular * Math.cos(theta)])
+  }
+  return { type: 'Polygon', coordinates: [ring] }
+}
+
+/** The blue dot and its accuracy ring, or nothing when the location is unknown or outside the region. */
+function userLocationData(location: UserLocation | null | undefined): GeoJSON.FeatureCollection {
+  if (!location || !isWithinBounds(location.lat, location.lon)) return EMPTY_COLLECTION
+  return {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        properties: {},
+        geometry: circlePolygon(location.lat, location.lon, location.accuracyM),
+      },
+      { type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [location.lon, location.lat] } },
+    ],
+  }
+}
+
+/** Map button that flies to the user's position. Disabled until a position inside the region is known. */
+class LocateControl implements IControl {
+  private container: HTMLDivElement | null = null
+  private readonly button: HTMLButtonElement
+
+  constructor(onClick: () => void) {
+    this.button = document.createElement('button')
+    this.button.type = 'button'
+    this.button.className = 'locate-button'
+    this.button.addEventListener('click', onClick)
+    const icon = document.createElement('span')
+    icon.className = 'locate-icon'
+    icon.setAttribute('aria-hidden', 'true')
+    this.button.append(icon)
+    this.setEnabled(false)
+  }
+
+  onAdd() {
+    this.container = document.createElement('div')
+    this.container.className = 'maplibregl-ctrl maplibregl-ctrl-group'
+    this.container.append(this.button)
+    return this.container
+  }
+
+  onRemove() {
+    this.container?.remove()
+    this.container = null
+  }
+
+  setEnabled(enabled: boolean) {
+    this.button.disabled = !enabled
+    const label = enabled ? 'Center on my location' : 'Your location is not available'
+    this.button.setAttribute('aria-label', label)
+    this.button.title = label
+  }
+}
+
+/** Accuracy ring under the curated spots; the dot above everything. Neither is clickable. */
+function addUserLocationLayers(map: Map) {
+  map.addSource(USER_SOURCE, { type: 'geojson', data: EMPTY_COLLECTION })
+  map.addLayer(
+    {
+      id: USER_ACCURACY_LAYER,
+      type: 'fill',
+      source: USER_SOURCE,
+      filter: ['==', ['geometry-type'], 'Polygon'],
+      paint: { 'fill-color': USER_BLUE, 'fill-opacity': 0.12 },
+    },
+    SPOT_LAYER,
+  )
+  map.addLayer(
+    {
+      id: USER_ACCURACY_OUTLINE_LAYER,
+      type: 'line',
+      source: USER_SOURCE,
+      filter: ['==', ['geometry-type'], 'Polygon'],
+      paint: { 'line-color': USER_BLUE, 'line-opacity': 0.4, 'line-width': 1 },
+    },
+    SPOT_LAYER,
+  )
+  map.addLayer({
+    id: USER_DOT_LAYER,
+    type: 'circle',
+    source: USER_SOURCE,
+    filter: ['==', ['geometry-type'], 'Point'],
+    paint: {
+      'circle-color': USER_BLUE,
+      'circle-radius': 7,
+      'circle-stroke-color': '#ffffff',
+      'circle-stroke-width': 2,
+    },
+  })
+}
+
+/** Where to fly the camera. Change `key` to fly again to the same place. */
+export interface MapFocus {
+  lat: number
+  lon: number
+  key: number
+}
+
 interface StargazingMapProps {
   scores?: ScoresResponse
+  /** Called with the cell id when the user clicks a grid square or curated spot. */
+  onSelectCell?: (cellId: number) => void
+  selectedCellId?: number | null
+  focus?: MapFocus
+  /** Drawn as a blue dot with an accuracy ring when inside the region. */
+  userLocation?: UserLocation | null
   children?: React.ReactNode
 }
 
@@ -87,6 +200,8 @@ function addScoreLayers(map: Map) {
 
   const firstSymbolLayer = map.getStyle().layers.find((layer) => layer.type === 'symbol')?.id
   const hovered: ExpressionSpecification = ['boolean', ['feature-state', 'hover'], false]
+  const selected: ExpressionSpecification = ['boolean', ['feature-state', 'selected'], false]
+  const emphasized: ExpressionSpecification = ['any', hovered, selected]
 
   map.addLayer(
     {
@@ -119,9 +234,9 @@ function addScoreLayers(map: Map) {
     filter: ['==', ['geometry-type'], 'Point'],
     paint: {
       'circle-color': scoreColorExpression,
-      'circle-radius': ['case', hovered, 10, 8],
-      'circle-stroke-color': '#ffffff',
-      'circle-stroke-width': ['case', hovered, 3, 2],
+      'circle-radius': ['case', emphasized, 10, 8],
+      'circle-stroke-color': ['case', selected, '#b3cbff', '#ffffff'],
+      'circle-stroke-width': ['case', selected, 4, hovered, 3, 2],
     },
   })
   map.addLayer({
@@ -145,57 +260,23 @@ function addScoreLayers(map: Map) {
   })
 }
 
-function formatScore(props: ScoreFeatureProperties) {
-  if (props.score === null) return 'No score for this hour'
-  return `${Math.round(props.score)} / 100 · ${props.label ?? 'Unlabeled'}`
-}
-
-/** Build the popup with DOM nodes (not HTML strings) so names are never interpreted as markup. */
-function popupContent(props: ScoreFeatureProperties) {
-  const root = document.createElement('div')
-  root.className = 'score-popup'
-
-  const title = document.createElement('h2')
-  title.textContent = props.name ?? `Grid cell #${props.cell_id}`
-  root.append(title)
-
-  const rows: [string, string][] = [
-    ['Score', formatScore(props)],
-    ['Bortle class', props.bortle === null ? 'Unknown' : String(props.bortle)],
-    ['Biggest factor', props.score === null ? '—' : factorLabel(props.top_factor)],
-  ]
-  const list = document.createElement('dl')
-  for (const [term, value] of rows) {
-    const dt = document.createElement('dt')
-    dt.textContent = term
-    const dd = document.createElement('dd')
-    dd.textContent = value
-    list.append(dt, dd)
-  }
-  root.append(list)
-  return root
-}
-
-/** GeoJSON properties from MapLibre lose `null` values, so restore them explicitly. */
-function readProps(feature: MapGeoJSONFeature): ScoreFeatureProperties {
-  const p = feature.properties
-  return {
-    cell_id: Number(p.cell_id),
-    name: typeof p.name === 'string' ? p.name : null,
-    score: typeof p.score === 'number' ? p.score : null,
-    label: typeof p.label === 'string' ? (p.label as ScoreFeatureProperties['label']) : null,
-    bortle: typeof p.bortle === 'number' ? p.bortle : null,
-    top_factor: typeof p.top_factor === 'string' ? p.top_factor : null,
-    is_curated: p.is_curated === true,
-  }
-}
-
-function StargazingMap({ scores, children }: StargazingMapProps) {
+function StargazingMap({ scores, onSelectCell, selectedCellId, focus, userLocation, children }: StargazingMapProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<Map | null>(null)
+  const locateRef = useRef<LocateControl | null>(null)
+  // The locate button is created once, so it reads the latest position through a ref.
+  const userLocationRef = useRef(userLocation)
+  useEffect(() => {
+    userLocationRef.current = userLocation
+  }, [userLocation])
   const [mapReady, setMapReady] = useState(false)
   const [status, setStatus] = useState('Loading the map…')
   const [error, setError] = useState<string | null>(null)
+  // The click handler is registered once, so read the latest callback through a ref.
+  const onSelectRef = useRef(onSelectCell)
+  useEffect(() => {
+    onSelectRef.current = onSelectCell
+  }, [onSelectCell])
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -234,6 +315,19 @@ function StargazingMap({ scores, children }: StargazingMapProps) {
     }
 
     map.addControl(new NavigationControl(), 'top-right')
+    const locate = new LocateControl(() => {
+      const location = userLocationRef.current
+      if (!location || !isWithinBounds(location.lat, location.lon)) return
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      map.flyTo({
+        center: [location.lon, location.lat],
+        zoom: Math.max(map.getZoom(), 10),
+        essential: true,
+        duration: reduceMotion ? 0 : 1200,
+      })
+    })
+    locateRef.current = locate
+    map.addControl(locate, 'top-right')
     map.addControl(new ScaleControl({ unit: 'imperial' }), 'bottom-left')
     map.getCanvas().setAttribute('aria-label', 'Interactive map of Western New York stargazing scores')
     map.getCanvas().setAttribute('aria-describedby', 'map-instructions')
@@ -261,21 +355,22 @@ function StargazingMap({ scores, children }: StargazingMapProps) {
       map.getCanvas().style.cursor = overScores ? 'pointer' : ''
     }
 
-    const popup = new Popup({ closeButton: true, maxWidth: '280px', className: 'score-popup-container' })
-    const onClick = (event: MapLayerMouseEvent) => {
+    const onClick = (event: MapMouseEvent) => {
       const [feature] = map.queryRenderedFeatures(event.point, { layers: [SPOT_LAYER, FILL_LAYER] })
-      if (!feature) return
-      popup.setLngLat(event.lngLat).setDOMContent(popupContent(readProps(feature))).addTo(map)
+      const cellId = Number(feature?.properties.cell_id)
+      if (feature && Number.isFinite(cellId)) onSelectRef.current?.(cellId)
     }
 
     map.on('load', () => {
       setStatus('')
       addScoreLayers(map)
+      addUserLocationLayers(map)
       for (const layer of [FILL_LAYER, SPOT_LAYER]) {
         map.on('mousemove', layer, onHover)
         map.on('mouseleave', layer, clearHover)
-        map.on('click', layer, onClick)
       }
+      // One click handler for both layers, so a spot over a square only selects once.
+      map.on('click', onClick)
       setMapReady(true)
     })
     map.on('error', () => {
@@ -299,9 +394,9 @@ function StargazingMap({ scores, children }: StargazingMapProps) {
     // React development mode mounts twice; remove the old map each time.
     return () => {
       resizeObserver.disconnect()
-      popup.remove()
       map.remove()
       mapRef.current = null
+      locateRef.current = null
       setMapReady(false)
     }
   }, [])
@@ -317,11 +412,44 @@ function StargazingMap({ scores, children }: StargazingMapProps) {
       ?.updateImage(surface ?? { url: TRANSPARENT_PNG, coordinates: EMPTY_IMAGE_CORNERS })
   }, [mapReady, scores])
 
+  // Move the blue dot and enable the locate button whenever the position changes.
+  useEffect(() => {
+    if (!mapReady) return
+    mapRef.current?.getSource<GeoJSONSource>(USER_SOURCE)?.setData(userLocationData(userLocation))
+    locateRef.current?.setEnabled(!!userLocation && isWithinBounds(userLocation.lat, userLocation.lon))
+  }, [mapReady, userLocation])
+
+  // Ring the selected curated spot (grid squares have no visible layer, so they show nothing).
+  // Feature state survives setData because ids are promoted.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!mapReady || !map || selectedCellId == null) return
+    map.setFeatureState({ source: SCORE_SOURCE, id: selectedCellId }, { selected: true })
+    return () => {
+      if (map.getSource(SCORE_SOURCE)) {
+        map.setFeatureState({ source: SCORE_SOURCE, id: selectedCellId }, { selected: false })
+      }
+    }
+  }, [mapReady, selectedCellId])
+
+  // Fly to a requested place (e.g. a "Tonight's best" pick).
+  useEffect(() => {
+    const map = mapRef.current
+    if (!mapReady || !map || !focus) return
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    map.flyTo({
+      center: [focus.lon, focus.lat],
+      zoom: Math.max(map.getZoom(), 9),
+      essential: true,
+      duration: reduceMotion ? 0 : 1200,
+    })
+  }, [mapReady, focus])
+
   return (
     <section className="map-section" aria-label="Explore Western New York">
       {/* Read by screen readers via the canvas's aria-describedby; not shown visually. */}
       <p id="map-instructions" className="visually-hidden">
-        Drag to explore. Scroll or use plus and minus to zoom. Click a square or spot for details. You can
+        Drag to explore. Scroll or use plus and minus to zoom. Click a square or spot to open its details panel. You can
         also focus the map and use the arrow keys.
       </p>
       <div className="map-frame">

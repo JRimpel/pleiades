@@ -65,7 +65,7 @@ class Settings:
     max_upload_bytes: int = 15 * 1024 * 1024
     uploads_per_hour: int = 20
     photo_workers: int = 4
-    explain_timeout_s: float = 8.0
+    explain_timeout_s: float = 12.0
 
     allowed_mime_types: dict[str, str] = field(default_factory=lambda: dict(ALLOWED_MIME_TYPES))
 
@@ -97,7 +97,7 @@ class Settings:
             max_upload_bytes=_int("MAX_UPLOAD_BYTES", 15 * 1024 * 1024),
             uploads_per_hour=_int("UPLOADS_PER_HOUR", 20),
             photo_workers=_int("PHOTO_WORKERS", 4),
-            explain_timeout_s=_float("EXPLAIN_TIMEOUT_S", 8.0),
+            explain_timeout_s=_float("EXPLAIN_TIMEOUT_S", 12.0),
         )
 
 

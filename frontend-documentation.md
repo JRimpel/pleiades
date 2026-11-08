@@ -12,7 +12,7 @@ Read alongside:
 
 ## 1. Current status
 
-**The frontend draws real stargazing scores from Flask on the dark map of Western New York as a smooth color surface, with an hour slider, a legend, click popups, and spot hover highlighting.**
+**The frontend draws real stargazing scores from Flask on the dark map of Western New York as a smooth color surface, with an hour slider, a legend, a spot details panel, "Tonight's best", a Sky tonight panel, and the user's location.**
 
 | Item | Status |
 | --- | --- |
@@ -29,8 +29,13 @@ Read alongside:
 | Score surface | Smooth red → yellow → green surface blended between cells; gray for missing scores; soft fade at edges and lakes |
 | Curated spot markers | Colored circles with names |
 | Hour slider | Floating card over the bottom of the map; steps through the ~72 h forecast window |
-| Legend, click popup, spot hover highlight | Added |
-| Spot details panel, photos, charts, voting | Planned |
+| Legend, spot hover highlight | Added |
+| Spot panel (score, factors, explanation, history and drift charts, directions) | Added (§13) |
+| "★ Tonight's best" list, with Dark/Dawn ticks on the slider | Added (§13) |
+| Sky tonight (moon, twilight, planets, events) | Added (§13) |
+| Unnamed cells titled by nearest town ("5 mi SW of Naples") | Added (§13) |
+| Your location (blue dot) and location-aware features | Added (§12) |
+| Photos, upload, voting, night mode | Planned |
 
 The score layer uses the team's API directly; no sample data is bundled. See §11 for how it works.
 
@@ -48,7 +53,7 @@ These are packages inside one frontend project, rather than separate application
 | OpenFreeMap | Supplies the map style and geographic tiles | Used by the current map |
 | TanStack Query | Fetches and caches API responses per hour | `@tanstack/react-query` 5 installed |
 | Tailwind CSS | Planned styling tool in the architecture | Not installed; current styling uses ordinary CSS |
-| Recharts | Will draw history and forecast charts | Not installed yet |
+| Recharts | Draws the score-history and forecast-drift charts in the spot panel | `recharts` ^2.15.3 installed |
 | `exifr` | Will read photo location and capture time | Not installed yet |
 
 `package.json` lists dependencies and version ranges. `package-lock.json` records the resolved dependency versions so teammates can reproduce the installation with `npm ci`.
@@ -131,7 +136,7 @@ maxBounds: PAN_BOUNDS  // panning limit
 
 | File | Responsibility |
 | --- | --- |
-| [frontend/src/App.css](frontend/src/App.css) | Header, full-height map layout, overlay cards (slider, legend, popup), status messages, focus indicators, and mobile layout |
+| [frontend/src/App.css](frontend/src/App.css) | Header, full-height map layout, overlay cards (slider, legend, spot panel, best-spots list, sky panel, "Your sky" pill), status messages, focus indicators, and mobile layout |
 | [frontend/src/index.css](frontend/src/index.css) | Global font, dark background, sizing, and page reset |
 | [frontend/index.html](frontend/index.html) | Browser title and page description |
 | [frontend/src/main.tsx](frontend/src/main.tsx) | Existing React entry point; renders `App` inside `StrictMode` |
@@ -196,11 +201,11 @@ Frontend TypeScript types should match these schemas. Changes to response fields
 | `GET /api/health` | Check backend/database readiness during setup | Checked manually with `curl`; not called by the app |
 | `GET /api/scores/range` | Bounds of the hour slider | **Used** |
 | `GET /api/scores?time=...` | Smooth score surface and curated spot markers | **Used** (no `bbox`; the whole region is fetched) |
-| `GET /api/spots/:cell_id?time=...` | Show details when a user selects a cell or spot | Planned (next milestone) |
-| `GET /api/best` | Show the best locations for a night or hour | Planned |
-| `GET /api/spots/:cell_id/history` | Draw hourly and nightly history | Planned |
-| `GET /api/spots/:cell_id/drift` | Show how forecasts changed between computations | Planned |
-| `GET /api/sky-events` | Display moon information, twilight, planets, and events | Planned |
+| `GET /api/spots/:cell_id?time=...` | Spot panel: score, factors, conditions, explanation | **Used** |
+| `GET /api/best` | "Tonight's best" list (nightly-best mode, `limit=5`; `near` + `radius_km=80` for Near me) | **Used** |
+| `GET /api/spots/:cell_id/history` | Score-history chart in the spot panel | **Used** |
+| `GET /api/spots/:cell_id/drift` | Forecast-drift chart in the spot panel | **Used** |
+| `GET /api/sky-events` | Sky tonight panel and the slider's Dark/Dawn ticks (`lat`/`lon` when the user is in the region) | **Used** |
 
 Important rules from the backend guide:
 
@@ -341,21 +346,34 @@ Checks for the later layout and map changes (November 7, 2026):
 - **Build and lint.** `npm run build` passed after each change. `npm run lint` still reports only the pre-existing `set-state-in-effect` error.
 - **Not tested.** The agent did not visually test the title card, slider card, legend placement, surface, or zoom limits in a browser.
 
-The next milestone is a **spot details panel** using `GET /api/spots/:cell_id?time=...`, with factor bars and the explanation, which needs a loading skeleton.
+Checks for the spot panel, best spots, sky panel and location (November 8, 2026):
+
+- One live `explain_score` call (Zoar Valley, cell 363) returned Gemini text in about 6 s. See [backend-documentation.md §9](backend-documentation.md) about cached template explanations.
+- The agent did not visually test the spot panel, charts, best-spots list, sky panel, or location features in a browser.
+
+Next up: photos and upload, voting, and night mode.
 
 ## 11. How the score layer works
 
 | File | Responsibility |
 | --- | --- |
-| [frontend/src/api/types.ts](frontend/src/api/types.ts) | TypeScript mirror of [backend/app/schemas/scores.py](backend/app/schemas/scores.py) and the error shape |
-| [frontend/src/api/client.ts](frontend/src/api/client.ts) | `fetchScores(time)`, `fetchScoreRange()`; turns `{error:{code,message}}` bodies into a thrown `ApiError` |
-| [frontend/src/api/hooks.ts](frontend/src/api/hooks.ts) | TanStack Query hooks; the previous hour stays visible while the next loads |
+| [frontend/src/api/types.ts](frontend/src/api/types.ts) | TypeScript mirror of the backend schemas for scores, spots (`SpotDetail`, `SpotHistory`, `SpotDrift`), best spots (`BestResponse`) and sky events (`SkyEventsResponse`), plus the error shape |
+| [frontend/src/api/client.ts](frontend/src/api/client.ts) | `fetchScores`, `fetchScoreRange`, `fetchSpot`, `fetchSpotHistory`, `fetchSpotDrift`, `fetchBest`, `fetchSkyEvents`; turns `{error:{code,message}}` bodies into a thrown `ApiError` |
+| [frontend/src/api/hooks.ts](frontend/src/api/hooks.ts) | TanStack Query hooks (`useScores`, `useScoreRange`, `useSpot`, `useSpotHistory`, `useSpotDrift`, `useBest`, `useSkyEvents`); the previous hour stays visible while the next loads |
 | [frontend/src/lib/scoreColors.ts](frontend/src/lib/scoreColors.ts) | Gradient stops, the MapLibre color expression, `scoreToRgb()` for canvas drawing, the legend CSS gradient, factor names |
 | [frontend/src/lib/scoreSurface.ts](frontend/src/lib/scoreSurface.ts) | Turns the grid cells into a smooth image (`sampleScoreSurface`, `buildScoreSurface`) |
-| [frontend/src/lib/time.ts](frontend/src/lib/time.ts) | Eastern-time hour labels and ISO UTC request strings |
+| [frontend/src/lib/time.ts](frontend/src/lib/time.ts) | Eastern-time hour labels, `formatLocalTime`/`formatLocalDayTime`, and ISO UTC request strings |
 | [frontend/src/components/TimeSlider.tsx](frontend/src/components/TimeSlider.tsx) | Hourly slider over `/api/scores/range` |
 | [frontend/src/components/ScoreLegend.tsx](frontend/src/components/ScoreLegend.tsx) | Color key over the map |
-| [frontend/src/components/StargazingMap.tsx](frontend/src/components/StargazingMap.tsx) | Bounds and zoom, score sources and layers, spot hover, and popups |
+| [frontend/src/components/StargazingMap.tsx](frontend/src/components/StargazingMap.tsx) | Bounds and zoom, score sources and layers, spot hover, click-to-select with a ring on the selected curated spot, the blue location dot and the locate button |
+| [frontend/src/components/SpotPanel.tsx](frontend/src/components/SpotPanel.tsx) | Spot details sheet (§13) |
+| [frontend/src/components/BestSpots.tsx](frontend/src/components/BestSpots.tsx) | "★ Tonight's best" button and list (§13) |
+| [frontend/src/components/SkyPanel.tsx](frontend/src/components/SkyPanel.tsx) | Sky tonight panel (§13) |
+| [frontend/src/lib/placeName.ts](frontend/src/lib/placeName.ts) | `spotTitle()` ("5 mi SW of Naples"), distances, bearings, coordinate formatting |
+| [frontend/src/lib/wnyTowns.ts](frontend/src/lib/wnyTowns.ts) | Bundled list of ~200 WNY, PA and Ontario towns |
+| [frontend/src/lib/region.ts](frontend/src/lib/region.ts) | `DATA_BOUNDS`, `PAN_BOUNDS`, and `isWithinBounds()` |
+| [frontend/src/lib/useUserLocation.ts](frontend/src/lib/useUserLocation.ts) | The single browser location watch (§12) |
+| [frontend/src/lib/nearestCell.ts](frontend/src/lib/nearestCell.ts) | The grid cell or spot closest to a point, for the "Your sky" pill |
 
 **Colors.** Scores are blended continuously: 0 = red `#d7301f`, 50 = yellow `#f5d000`, 100 = green `#1a9850`. A `null` score is gray `#6b7280`. It is never drawn as zero. To change the palette, edit `SCORE_STOPS` in `scoreColors.ts`. The surface, spot circles and legend all read it.
 
@@ -366,14 +384,14 @@ The next milestone is a **spot details panel** using `GET /api/spots/:cell_id?ti
 - Null scores pull the color toward gray. They are never treated as zero.
 - Image rows are spaced in Web Mercator so the image lines up with the map.
 
-The image goes into a MapLibre `image` source drawn by the `score-surface` raster layer at 55% opacity, under the basemap's place names. The blending means a single cell's color on the map is partly influenced by its neighbors. The popup always shows the cell's exact score.
+The image goes into a MapLibre `image` source drawn by the `score-surface` raster layer at 55% opacity, under the basemap's place names. The blending means a single cell's color on the map is partly influenced by its neighbors. The spot panel always shows the cell's exact score.
 
 **Layers.** One GeoJSON source (`promoteId: cell_id`) feeds three layers:
 
 - `score-fill` draws the grid polygons fully transparent. It exists only so clicks can find the cell.
 - `spot-circle` and `spot-label` draw the curated `Point`s on top of everything.
 
-**Interaction.** Hovering over the surface shows a pointer cursor; no box is drawn, so the surface stays seamless. Hovering a curated spot enlarges its circle. Clicking opens a popup with the name (or `Grid cell #id`), score and label, Bortle class, and biggest factor. The popup is built from DOM nodes, not HTML strings.
+**Interaction.** Hovering over the surface shows a pointer cursor; no box is drawn, so the surface stays seamless. Hovering a curated spot enlarges its circle. Clicking a cell or spot opens the spot panel (§13). A selected curated spot gets a blue ring; grid squares get no outline.
 
 **Time.** App startup reads `/api/scores/range` and puts the slider on the current hour. Moving the slider requests `/api/scores?time=<ISO UTC hour>` after a 150 ms pause. Each hour is cached for 5 minutes. Labels are shown in `America/New_York`.
 
@@ -381,3 +399,52 @@ The image goes into a MapLibre `image` source drawn by the `score-surface` raste
 
 **Without the backend.** The basemap still loads. The bottom card shows “Scores unavailable. Is the backend running?”
 
+## 12. Your location
+
+[useUserLocation()](frontend/src/lib/useUserLocation.ts) is called **once**, in `App`. It asks for the browser location when the page loads and keeps it updated (`watchPosition`). It returns `{ location, error }`:
+
+- `location` is `{ lat, lon, accuracyM, timestamp }` or `null`.
+- `error` is one of `unsupported`, `insecure`, `denied`, `unavailable`, `timeout`, or `null`.
+- After a timeout or lost signal, the last good position is kept.
+
+New features should take `location` as a prop from `App`. They should not start their own watch.
+
+**Region rule.** `App` computes `regionLocation`: the location if it is inside `PAN_BOUNDS` ([region.ts](frontend/src/lib/region.ts)), otherwise `null`. The map dot, near-me best spots, sky-at-your-location and the "Your sky" pill all use `regionLocation`. Outside the region, the user gets an 8-second notice instead of a dot. The spot panel's distance uses the raw location, because a distance is correct from anywhere.
+
+| Feature | Where | How |
+| --- | --- | --- |
+| Blue dot + accuracy ring | `StargazingMap` | Source `user-location` with layers `user-accuracy`, `user-accuracy-outline` (under the curated spots), and `user-dot` (on top). These layers aren't clickable, so clicking the dot opens the cell under it. |
+| Center on my location | `StargazingMap` (`LocateControl`) | Map button under zoom/compass. It is disabled until a position inside the region is known. The camera never moves to the user on its own. |
+| Best spots near me | `BestSpots`, `useBest(…, near, radiusKm)` | `/api/best?near=lat,lon&radius_km=80`. The toggle is Near me (50 mi) / All of WNY, and each row shows "· N mi away". |
+| Sky tonight at your location | `SkyPanel`, `useSkyEvents(enabled, at)` | `/api/sky-events?lat=&lon=`, which also drives the slider's Dark/Dawn ticks. A caption shows "For your location" or "For Western New York". |
+| Your sky | `App`, `nearestCell()` | The pill under "Sky tonight" shows the nearest cell's score for the slider hour (within 6 mi), and opens that cell's panel. |
+| Distance + directions origin | `SpotPanel` | "About N mi from you (straight line)" and `origin=` on the Google Maps link. |
+
+GPS updates arrive every few seconds. To avoid refetching on each one, query keys round coordinates: `near` to 2 decimals (~1 km) and sky events to 1 decimal (~10 km).
+
+**HTTPS.** Browsers only allow geolocation on `https://` or `localhost`. A phone opening the dev server by LAN IP over `http://` gets no location (`error: 'insecure'`). The rest of the app still works. For testing in a desktop browser, use Chrome DevTools → **Sensors** → Location to set coordinates. For example, Buffalo is 42.886, −78.878.
+
+## 13. Spot panel, best spots, and sky panel
+
+**Spot panel** ([SpotPanel.tsx](frontend/src/components/SpotPanel.tsx)) opens when a cell or spot is clicked, when a "Tonight's best" row is picked, or from the "Your sky" pill.
+- It is a right-side sheet on desktop and a bottom sheet on phones (≤640 px). Esc or × closes it. While it is open on desktop, the legend is hidden and the slider and map controls move left.
+- `useSpot(cellId, time)` loads `/api/spots/:id?time=` for the slider hour. A loading skeleton shows until it arrives.
+- It shows a score gauge and label, NELM, Bortle class, sky brightness and elevation, the explanation and tips, factor bars (points lost or gained), and conditions.
+- The explanation comes from Gemini via the backend. The backend falls back to template text on timeout or error.
+- `useSpotHistory` and `useSpotDrift` draw the score-history and forecast-drift charts with Recharts.
+- A Google Maps directions link is included. It starts from the user's location when known, and the panel also shows the straight-line distance.
+- Unnamed cells are titled by `spotTitle()` from [placeName.ts](frontend/src/lib/placeName.ts): the nearest bundled town plus distance and direction, with coordinates underneath.
+
+**Tonight's best** ([BestSpots.tsx](frontend/src/components/BestSpots.tsx)) is a "★ Tonight's best" button that calls `useBest` (`/api/best`, nightly-best mode, top 5).
+- Picking a row flies the map there, moves the slider to that spot's best hour, and opens the spot panel.
+- A best hour before the slider's first hour is labeled "(earlier tonight)". The panel still shows that hour.
+- With the user inside the region, a Near me (50 mi) / All of WNY toggle appears (see §12).
+
+**Sky tonight** ([SkyPanel.tsx](frontend/src/components/SkyPanel.tsx)) is a toggle in the title card. It shows data from `useSkyEvents` (`/api/sky-events`):
+- Moon phase graphic, % lit, and rise and set times.
+- Sunset, dark start and end, and sunrise.
+- Planets that climb at least 5°.
+- Events such as the Leonids.
+`App` calls the same hook to place the slider's Dark/Dawn ticks.
+
+**Caching.** Spot, history, drift, and best queries are fresh for 5 minutes, and sky events for 30 minutes. That matters most for the spot explanation, which can take several seconds to generate the first time.

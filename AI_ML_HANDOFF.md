@@ -9,7 +9,7 @@ Living Role C implementation and integration record. Last updated: November 7, 2
 - **Real DB verified (Role B):** the new `python -m app.ingest grid` job loads `data/wny_grid.geojson` into `grid_cells`. On local TimescaleDB 2.31 + PostGIS, `ingest bootstrap --reset-grid` loaded 364 cells (8 curated; Beaver Meadow 21.3995 mag/arcsec²) and wrote 26,208 live Open-Meteo forecast rows. It then scored all 26,208 cell-hours end to end with model v2. `pytest -m db`: 6 passed.
 - **Real data:** 364 WNY cells with atlas brightness and Open-Meteo elevation. Live weather-to-score smoke produced 72 hourly scores across three WNY spots.
 - **Training:** 7,845 training observations and 528 spatially/temporally withheld observations; learned NELM MAE 0.8603 versus physics 2.2869 and constant-mean 0.9846.
-- **Gemini live verification is unresolved:** SDK calls and authenticated model listing return HTTP 400 with HTML, including from the user's normal terminal. Key-format heuristics did not recognize the configured value; this is not definitive proof of an invalid key. No proxy environment was detected. A hidden-input configuration helper is available to replace the value from AI Studio without exposing it.
+- **Gemini HTTP 400 resolved (Nov 8):** Gemini rejects request deadlines under 10 s (400 INVALID_ARGUMENT). `explain_score` now sends at least 10 s, `EXPLAIN_TIMEOUT_S` defaults to 12 s, and the model is `gemini-3.5-flash`. A live score explanation was verified. Vision has not been verified live.
 - **Not verified:** S3 upload-to-result integration, deployment, real-photo recognition accuracy, and WNY-specific learned-model accuracy.
 - No routes, shared types, migrations, repository SQL modules, ingest jobs, or worker code were changed. Work is not committed or pushed. Existing user changes to `.env.example` were left intact.
 
@@ -133,8 +133,8 @@ Set-Location 'C:\Users\PC\Documents\Documents\TheWatchtower\pleiades'
 
 - Live reports redact secret values and record status/error type. Never paste keys into chat, reports, test fixtures, or committed files.
 - Structured calls use finite HTTP timeouts and one SDK attempt. Explanation API errors reach the route's uncached fallback. Vision errors reach the worker's existing three-attempt/failed path.
-- If Gemini is unconfigured, `explain_score` returns deterministic offline template text. The existing route treats that return as cacheable; clear those cached templates when configuring Gemini, or add provenance-aware caching with Role B.
-- Transport timeouts do not establish a hard deadline for the entire background pipeline. Verify the deployed SDK/network path after the endpoint issue is resolved.
+- If Gemini is unconfigured, `explain_score` returns deterministic offline template text. The existing route treats that return as cacheable; clear those cached templates when configuring Gemini (`DELETE FROM score_explanations;`), or add provenance-aware caching with Role B. On Nov 8 all 85 cached rows in the local DB were template text.
+- Transport timeouts do not establish a hard deadline for the entire background pipeline. The endpoint issue is resolved locally; verify the deployed SDK/network path separately.
 
 ## Integration actions for teammates
 
@@ -185,5 +185,11 @@ Set-Location 'C:\Users\PC\Documents\Documents\TheWatchtower\pleiades'
     - Up to 44 at 05:00Z on Nov 8.
     - Up to 69 at 05:00Z on Nov 9.
   - No seam, contract, or backend code was changed.
+
+- **Gemini fix and frontend features (Nov 8):**
+  - Cause of the HTTP 400: the SDK forwards the HTTP timeout as a server deadline, and Gemini rejects deadlines under 10 s. `_generate_json` now defaults to 10 s, `explain_score` uses `max(10 s, EXPLAIN_TIMEOUT_S − 0.25 s)`, and `EXPLAIN_TIMEOUT_S` defaults to 12 s (`config.py`, `.env.example`). `GEMINI_MODEL` in `.env.example` is now `gemini-3.5-flash`.
+  - Live check: one `explain_score` call for Zoar Valley (cell 363, Nov 10 4 AM, score 50) returned grounded text and three tips in about 6 s. Nothing was written to the DB.
+  - All 85 cached explanations in the local DB are template text from before the key was loaded. Clear them to see Gemini text for those cells and hours.
+  - Role A frontend: spot panel (explanation, factors, history and drift charts), Tonight's best, Sky tonight, and user location now call `/spots/:id`, `/history`, `/drift`, `/best`, and `/sky-events`.
 
 See [data/README.md](data/README.md) for detailed run commands, manifest schema, data retrieval, scientific references, and attribution.

@@ -8,6 +8,7 @@ Updated November 8, 2026 (America/New_York). Start with the current guidance bel
 - The explorer has **263 models**, **73 constellations**, all **110 Messier targets**, all seven other planets and the Moon, bright stars and deep-sky targets. All objects have dedicated **2D thumbnails**. Nebula clouds and most model depth are enhanced educational illustrations; the Moon uses NASA lunar surface imagery.
 - Models rotate automatically at 12 degrees/second, including reduced-motion mode, per the user's explicit choice. Pause/Resume is always available. Left/right camera buttons and Reset pause rotation; pointer dragging does not explicitly pause it.
 - Default **Visibility** sorting uses the selected location/time: above horizon, unknown, below horizon. Fixed objects have approximate catalog-based altitude estimates, including during API outages. Planets/Moon use matched nightly rise/set estimates. Search/filter/sort operate on the full collection before 24-card pagination; Name (A–Z) is also available.
+- An optional **Visible tonight** switch now filters objects estimated above the horizon sometime during the selected local night. It defaults off, combines with category/search, and runs before sorting/pagination. The matched night window prefers astronomical dusk/dawn, falling back to sunset/sunrise; unknown estimates are excluded. Missing night data are explained and users can turn the switch off to browse all objects. Current-hour card statuses/sorting remain distinct from whole-night inclusion. No endpoint or asset regeneration is needed for this filter; the detailed helper contracts are in the explorer guide.
 - No atlas change introduced a backend endpoint/schema, changed the scoring seam, or added a Gemini dependency. Photo upload/voting and storage-to-vision UI integration remain separate work.
 - For exact props, data types, stable IDs, generated-file ownership, regeneration order, scientific limits and extension steps, use [the current explorer integration guide](frontend/EXPLORE_3D_HANDOFF.md). [Frontend setup](frontend/README.md), [frontend overview](frontend-documentation.md) and [AI/ML handoff](AI_ML_HANDOFF.md) cover adjacent ownership.
 - Implementation/docs are working-tree changes; no commit or deployment is claimed. Include the untracked generated assets, metadata, thumbnail set/manifests, new scripts/components/tests and relevant tracked changes when preparing the integration commit. `git diff` alone omits untracked files; inspect `git status --short --untracked-files=normal`.
@@ -50,7 +51,7 @@ When scores fail, distinguish: proxy `ECONNREFUSED` means no reachable Flask lis
 
 ## Current verification and integration directions
 
-The most recent application pass completed `npm run build`, **7 unit tests**, and **14 browser tests** (7 explorer, 3 map/API integration, 2 thumbnail, 2 sorting). All generated assets and all 263 thumbnails passed structural/coverage validation; the grid and updated lunar/nebula renders were visually reviewed. Browser tests use API fixtures with real local assets, so their results do not establish live DB/Gemini/storage availability. Lint passed earlier, but was not rerun for the final atlas/sorting changes. The current task is documentation-only.
+The most recent application pass completed `npm run build`, **10 unit tests**, and **17 browser tests** (7 explorer, 3 map/API integration, 2 thumbnail, 2 sorting, 3 Visible tonight). All generated assets and all 263 thumbnails passed structural/coverage validation; the grid and updated lunar/nebula renders were visually reviewed. Browser tests use API fixtures with real local assets, so their results do not establish live DB/Gemini/storage availability. Lint passed earlier, but was not rerun for the final atlas/sorting changes. The Visible tonight implementation passed the current checks; earlier documentation-only notes do not override these results.
 
 From `frontend/`:
 
@@ -58,7 +59,7 @@ From `frontend/`:
 npm run build
 npm run test:unit
 npm run test:browser:install  # if project-local Chromium is missing
-npm run test:browser -- visibility-sort.spec.ts explore.spec.ts integration.spec.ts thumbnails.spec.ts
+npm run test:browser -- visible-tonight.spec.ts visibility-sort.spec.ts explore.spec.ts integration.spec.ts thumbnails.spec.ts
 ```
 
 Run `python frontend/scripts/verify-explore-assets.py` from repository root. Asset regeneration is optional for ordinary startup; if needed, run original preparation, expansion, thumbnails, then verification in exactly the order documented in [the explorer guide](frontend/EXPLORE_3D_HANDOFF.md#ids-assets-and-extension-workflow). Original preparation alone replaces upgraded legacy model geometry with earlier schematics. Ship runtime assets/manifests/licenses together; keep caches, test output and credentials out of changes.

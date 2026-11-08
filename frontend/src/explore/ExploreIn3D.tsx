@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { availabilityFor, isObservation, localTime, nightDate, sortByVisibility } from './astronomy'
+import { useId, useState } from 'react'
+import { availabilityFor, isObservation, localTime, nightDate, observingNightWindow, sortByVisibility, visibleTonightFor } from './astronomy'
 import type { ObservationContext, ObservingConditions, PhotoIdentification } from './astronomy'
 import { catalog, findObject } from './catalog'
 import ObjectExplorerModal from './ObjectExplorerModal'
@@ -41,10 +41,13 @@ function ExploreContent({ context, updateContext, hideControls, conditions, cont
   const [filter, setFilter] = useState('All objects')
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState('visibility')
+  const [tonightOnly, setTonightOnly] = useState(false)
   const [limit, setLimit] = useState(24)
+  const nightFilterNoteId = useId()
   const selected = selectedId ? findObject(selectedId) : undefined
   const available = (object: typeof catalog[number]) => availabilityFor(object, context, sky.data)
-  const matches = catalog.filter(object => (filter === 'All objects' || (filter === 'Planets & Moon' && ['Planet', 'Moon'].includes(object.category)) || (filter === 'Stars & clusters' && ['Star', 'Star cluster', 'Star field'].includes(object.category)) || (filter === 'Galaxies' && object.category === 'Galaxy') || (filter === 'Nebulae' && object.category === 'Nebula') || (filter === 'Constellations' && object.category === 'Constellation')) && `${object.name} ${object.subtitle}`.toLowerCase().includes(search.toLowerCase().trim()))
+  const categoryMatches = catalog.filter(object => (filter === 'All objects' || (filter === 'Planets & Moon' && ['Planet', 'Moon'].includes(object.category)) || (filter === 'Stars & clusters' && ['Star', 'Star cluster', 'Star field'].includes(object.category)) || (filter === 'Galaxies' && object.category === 'Galaxy') || (filter === 'Nebulae' && object.category === 'Nebula') || (filter === 'Constellations' && object.category === 'Constellation')) && `${object.name} ${object.subtitle}`.toLowerCase().includes(search.toLowerCase().trim()))
+  const matches = tonightOnly ? categoryMatches.filter(object => visibleTonightFor(object, context, sky.data) === true) : categoryMatches
   const sorted = sort === 'visibility' ? sortByVisibility(matches, context, sky.data) : [...matches].sort((a, b) => a.name.localeCompare(b.name))
   const visible = sorted.slice(0, limit)
   return <section className="explore-section" aria-labelledby="explore-title">
@@ -55,6 +58,7 @@ function ExploreContent({ context, updateContext, hideControls, conditions, cont
     </div>
     <div className="explore-atlas-tools"><label htmlFor="explore-search">Find an object or constellation<input id="explore-search" type="search" placeholder="Try Orion, M42, Mars…" value={search} onChange={event => { setSearch(event.target.value); setLimit(24) }} /></label><p>{catalog.length} models · year-round WNY atlas<br />Includes partial southern constellations. Availability depends on season, time, horizon and equipment.</p></div>
     <div className="explore-filter-row"><div className="explore-filters" role="group" aria-label="Filter celestial objects">{['All objects', 'Planets & Moon', 'Stars & clusters', 'Galaxies', 'Nebulae', 'Constellations'].map(label => <button type="button" key={label} aria-pressed={filter === label} onClick={() => { setFilter(label); setLimit(24) }}>{label}</button>)}</div><label className="explore-sort">Sort objects<select value={sort} onChange={event => { setSort(event.target.value); setLimit(24) }}><option value="visibility">Visibility</option><option value="name">Name (A–Z)</option></select></label><p aria-live="polite">{matches.length} objects · {visible.length} shown</p></div>
+    <div className="explore-night-filter"><label className="explore-night-toggle"><input type="checkbox" role="switch" checked={tonightOnly} aria-describedby={nightFilterNoteId} onChange={event => { setTonightOnly(event.target.checked); setLimit(24) }} /><span>Visible tonight</span></label><p id={nightFilterNoteId} aria-live="polite">{tonightOnly ? observingNightWindow(context, sky.data) ? 'Estimated above the horizon sometime during the selected night, not necessarily at the selected hour. Weather and equipment still matter. Unknown visibility is excluded.' : 'Nighttime astronomy is unavailable. Turn off Visible tonight to browse all objects.' : 'Filter by the selected observing night.'}</p></div>
     {sort === 'visibility' && <p className="explore-sort-note">Above-horizon objects first, then unknown, then below-horizon. Estimated visibility also depends on weather, daylight and equipment.</p>}
     <div className="explore-object-grid">{visible.map(object => {
       const availability = available(object)
@@ -63,7 +67,7 @@ function ExploreContent({ context, updateContext, hideControls, conditions, cont
         <div className="explore-card-body"><span className={`explore-card-status tone-${availability.tone}`}>{availability.label}</span><h3>{object.name}</h3><p>{object.subtitle}</p><button type="button" className="explore-open-button" onClick={() => setSelectedId(object.id)} aria-label={`Explore ${object.name} in 3D`}>Explore in 3D <span aria-hidden="true">↗</span></button></div>
       </article>
     })}</div>
-    {matches.length === 0 && <p role="status">No matching objects. Try another name or category.</p>}
+    {matches.length === 0 && <p role="status">{tonightOnly ? 'No objects match Visible tonight and your filters. Try another category or turn off Visible tonight.' : 'No matching objects. Try another name or category.'}</p>}
     {matches.length > limit && <button className="explore-load-more" type="button" onClick={() => setLimit(value => value + 24)}>Show more objects ({matches.length - limit} remaining)</button>}
     <p className="explore-footnote">Close-ups are educational models with enhanced colors and schematic depth. Reference images may use spacecraft observations, infrared or ultraviolet light. They are not a prediction of an unaided-eye view. <a href={`${import.meta.env.BASE_URL}explore/atlas-credits.json`} target="_blank" rel="noreferrer">Atlas sources and licenses</a> · <a href={`${import.meta.env.BASE_URL}explore/d3-celestial-LICENSE.txt`} target="_blank" rel="noreferrer">Constellation data license</a></p>
     {selectedId !== null && <ObjectExplorerModal key={selectedId} object={selected} requestedName={selectedId} observation={context}

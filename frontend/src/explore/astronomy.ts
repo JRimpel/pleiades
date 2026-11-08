@@ -46,6 +46,13 @@ export function aboveFromEvents(time: string, rise: string | null, set: string |
   return r < s ? t >= r && t < s : t >= r || t < s
 }
 
+function meanSiderealDegrees(time: string): number {
+  const days = Date.parse(time) / 86400000 + 2440587.5 - 2451545
+  const centuries = days / 36525
+  // Continuous (unwrapped) GMST supports detecting a transit across midnight.
+  return (18.697375 + 24.065709824279 * days + .0000258 * centuries ** 2) * 15
+}
+
 // Approximate geometric altitude using J2000 catalog coordinates and mean sidereal
 // time. UTC approximates UT1; precession, nutation, proper motion and refraction
 // are omitted. This is a horizon estimate for browsing, not pointing precision.
@@ -53,17 +60,54 @@ export function aboveFromEvents(time: string, rise: string | null, set: string |
 export function catalogAltitude(position: CelestialObject['catalogPosition'], context: ObservationContext): number | null {
   if (!position || !isObservation(context) || !Number.isFinite(position.raHours) || !Number.isFinite(position.decDeg)
     || position.raHours < 0 || position.raHours >= 24 || Math.abs(position.decDeg) > 90) return null
-  const jd = Date.parse(context.time) / 86400000 + 2440587.5
-  const midnight = Math.floor(jd - .5) + .5
-  const hours = (jd - midnight) * 24
-  const centuries = (jd - 2451545) / 36525
-  const gmst = 6.697375 + .065709824279 * (midnight - 2451545) + 1.0027379 * hours + .0000258 * centuries ** 2
   const radians = Math.PI / 180
-  const hourAngle = ((gmst - position.raHours) * 15 + context.lon) * radians
+  const hourAngle = (meanSiderealDegrees(context.time) - position.raHours * 15 + context.lon) * radians
   const dec = position.decDeg * radians
   const lat = context.lat * radians
   const sine = Math.cos(hourAngle) * Math.cos(dec) * Math.cos(lat) + Math.sin(dec) * Math.sin(lat)
   return Math.asin(Math.max(-1, Math.min(1, sine))) / radians
+}
+
+export function observingNightWindow(context: ObservationContext, summary: NightSummary | null): { start: number; end: number } | null {
+  if (!isObservation(context) || !summary || summary.date !== nightDate(context.time)
+    || !Number.isFinite(summary.lat) || !Number.isFinite(summary.lon)
+    || Math.abs(summary.lat - context.lat) > .0001 || Math.abs(summary.lon - context.lon) > .0001) return null
+  // Prefer full darkness; use the sunset/sunrise pair when twilight is incomplete.
+  for (const [from, to] of [[summary.twilight.astronomical_dusk, summary.twilight.astronomical_dawn],
+    [summary.twilight.sunset, summary.twilight.sunrise]]) {
+    const start = Date.parse(from ?? ''), end = Date.parse(to ?? '')
+    if (Number.isFinite(start) && Number.isFinite(end) && end > start && end - start <= 86400000
+      && nightDate(new Date((start + end) / 2).toISOString()) === summary.date) return { start, end }
+  }
+  return null
+}
+
+/** Known geometric horizon overlap with the selected night, not visual detectability. */
+export function visibleTonightFor(object: CelestialObject, context: ObservationContext, summary: NightSummary | null): boolean | null {
+  const window = observingNightWindow(context, summary)
+  if (!window) return null
+  const startContext = { ...context, time: new Date(window.start).toISOString() }
+  if (object.category !== 'Planet' && object.category !== 'Moon') {
+    const startAltitude = catalogAltitude(object.catalogPosition, startContext)
+    const endAltitude = catalogAltitude(object.catalogPosition, { ...context, time: new Date(window.end).toISOString() })
+    if (startAltitude === null || endAltitude === null) return null
+    if (Math.max(startAltitude, endAltitude) > 0) return true
+    // The object can rise and set entirely between the endpoints. Check its
+    // upper transit analytically, so brief low southern arcs are not missed.
+    const startAngle = meanSiderealDegrees(startContext.time) + context.lon - object.catalogPosition!.raHours * 15
+    const phase = (startAngle % 360 + 360) % 360
+    const travel = meanSiderealDegrees(new Date(window.end).toISOString()) - meanSiderealDegrees(startContext.time)
+    const toTransit = phase === 0 ? 0 : 360 - phase
+    return travel > toTransit && 90 - Math.abs(context.lat - object.catalogPosition!.decDeg) > 0
+  }
+  const body = object.category === 'Moon' ? summary!.moon
+    : summary!.planets.find(planet => planet.name.toLowerCase() === object.name.toLowerCase())
+  if (!body) return null
+  const atStart = aboveFromEvents(startContext.time, body.rise, body.set)
+  if (atStart === null) return null
+  const rise = Date.parse(body.rise ?? '')
+  // A rise at dawn, or a set exactly at dusk, is not a positive-length window.
+  return atStart || (rise >= window.start && rise < window.end)
 }
 
 export function availabilityFor(object: CelestialObject, context: ObservationContext, summary: NightSummary | null): Availability {

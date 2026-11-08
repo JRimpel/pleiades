@@ -105,6 +105,11 @@
 .explore-sort { display: flex; align-items: center; gap: 8px; margin-left: auto; color: #c4d3eb; font-size: 12px; white-space: nowrap; }
 .explore-sort select { min-width: 126px; padding: 9px 12px; background: #111c30; border: 1px solid #52678f; border-radius: 8px; color: #f0f5ff; color-scheme: dark; cursor: pointer; }
 .explore-sort-note { max-width: 1440px; margin: -6px auto 20px; color: #b4c1d7; font-size: 12px; line-height: 1.7; }
+.explore-night-filter { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; max-width: 1440px; margin: -4px auto 20px; }
+.explore-night-toggle { display: inline-flex; align-items: center; gap: 9px; min-height: 40px; padding: 8px 13px; border: 1px solid #52678f; border-radius: 22px; background: #172033; color: #dce7fb; font-size: 12px; cursor: pointer; }
+.explore-night-toggle:has(input:checked) { background: #294635; border-color: #81bea1; color: #c9f3df; }
+.explore-night-toggle input { width: 16px; height: 16px; margin: 0; accent-color: #a4e4cd; cursor: pointer; }
+.explore-night-filter p { flex: 1 1 260px; margin: 0; color: #b4c1d7; font-size: 12px; line-height: 1.7; }
 @media (max-width: 960px) { .explore-sort { margin-left: 0; } }
 .explore-filters { flex-wrap: wrap; }
 .explore-load-more { display: block; margin: 24px auto; background: #233350; border: 1px solid #52678f; border-radius: 8px; padding: 12px 20px; color: #e3eaff; cursor: pointer; }

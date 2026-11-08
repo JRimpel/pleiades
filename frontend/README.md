@@ -1,75 +1,55 @@
-# React + TypeScript + Vite
+# Pleiades frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React, TypeScript and Vite serve the WNY score map and the Explore in 3D atlas. Start with [EXPLORE_3D_HANDOFF.md](EXPLORE_3D_HANDOFF.md) for the reusable explorer contract and asset details, and [../INTEGRATION_HANDOFF.md](../INTEGRATION_HANDOFF.md) for full-stack integration status. Broader map/UI documentation is in [../frontend-documentation.md](../frontend-documentation.md).
 
-Currently, two official plugins are available:
+## Run locally
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+From the repository root, start the database and Flask using [../README.md](../README.md). Keep Flask on port 5001 running in a separate terminal. Then:
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```powershell
+# Repository root
+Set-Location frontend
+npm ci
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Stop Vite with **Ctrl+C before `npm ci`** on Windows: the running server can lock Rolldown's native binding. Reuse an existing installed environment rather than reinstalling on every run. Vite forwards `/api` to `http://127.0.0.1:5001`; overrides are `API_PROXY_TARGET`, then `PLEIADES_DEV_API_TARGET`. A proxy change requires restarting Vite. Production keeps same-origin `/api` behind nginx.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Current explorer behavior
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- 263 objects: 73 wholly/partly rising WNY constellations, all seven other planets, the Moon, bright stars and all 110 Messier targets.
+- Local 2D thumbnails on every card; only opening a model loads its GLB and the viewer library. No Gemini dependency.
+- Search and category filtering, then **Visibility** sorting, then pagination in batches of 24. Above-horizon estimates come first, unknown next, below-horizon last. **Name (A–Z)** is optional.
+- The selected map coordinates and forecast hour drive the explorer. Without a selection it uses an in-region GPS fix or the WNY center. Matching cloud/Bortle information is passed through; stale spot conditions are omitted.
+- Fixed-object visibility uses approximate J2000 catalog-based altitude. Constellation estimates refer to the center, not every star. Planets and Moon use matched backend night-summary rise/set events. Weather, daylight, terrain, brightness and equipment still affect practical visibility.
+- Rotation starts automatically at 12 degrees/second with **Pause rotation / Resume rotation**. The user explicitly requested this even under reduced motion; camera-button changes still snap when reduced motion is requested. Left/right camera buttons and Reset pause auto-rotation; pointer dragging does not explicitly pause it.
+- Nebula colors and depths are educational illustrations; the Moon uses NASA LRO surface imagery. See the canonical handoff and asset credits before reusing or changing representations.
 
+## Rebuild assets
+
+The generated assets in this checkout are ready to use; normal development needs no regeneration. Include new runtime files when integrating the working-tree changes. If changing the catalog or reproducing assets, run the standard-library Python scripts **from the repository root in this order**. The first two steps need network access when their caches are missing.
+
+```powershell
+python frontend/scripts/prepare-explore-assets.py
+python frontend/scripts/expand-explore-assets.py
+python frontend/scripts/prepare-explore-thumbnails.py
+python frontend/scripts/verify-explore-assets.py
 ```
+
+The first script creates the original assets and HYG subset; the expansion then replaces the simple original schematics with richer versions. Do not rerun only the first script after expansion. Thumbnail generation follows expansion. Ship `public/explore/` and preserve its source/license manifests. See [EXPLORE_3D_HANDOFF.md](EXPLORE_3D_HANDOFF.md) for stable object IDs, attribution and extension instructions.
+
+## Verify changes
+
+From `frontend/`:
+
+```powershell
+npm run build
+npm run test:unit
+npm run test:browser:install  # once, or after the Playwright browser revision changes
+npm run test:browser -- visibility-sort.spec.ts explore.spec.ts integration.spec.ts thumbnails.spec.ts
+npm run lint
+```
+
+The latest implementation run passed the production build, **7 unit tests** and **14 browser tests**. Asset validation also passed, including all 263 standalone thumbnails. Browser tests use API fixtures and real local models; they do not establish current live database, Gemini or storage readiness. Lint was not rerun for the latest atlas/sort update. The existing large-bundle build advisory remains.
+
+Playwright starts its own Vite server on port 4173 and uses project-local Chromium. Keep that port free. If a restricted execution environment passes assertions but stalls during browser teardown, rerun with the appropriate normal process permissions; do not report a stalled invocation as a clean completed run.

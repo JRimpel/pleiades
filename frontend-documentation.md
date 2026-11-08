@@ -1,6 +1,18 @@
 # Pleiades Frontend: Progress and Team Integration
 
-Updated: November 7, 2026 (score map, smooth surface, overlay layout, and bounds/zoom changes).
+**November 8 integration update:** committed merge markers have been resolved while retaining map scores, location services, panels/charts and 3D exploration. The app keeps its full-height map, with exploration below it and a header shortcut. Explore now consumes the selected spot, forecast hour and matching weather/Bortle data. Sky details and darkness ticks use the selected local night. `API_PROXY_TARGET` takes precedence over the compatible `PLEIADES_DEV_API_TARGET` override; default backend port is 5001. See [INTEGRATION_HANDOFF.md](INTEGRATION_HANDOFF.md) for current checks and remaining gaps. Older dated sections below describe the earlier implementation.
+
+Updated: November 8, 2026. The current integration summary below supersedes older dated map implementation and verification notes.
+
+## Current explorer integration handoff
+
+The explorer now contains **263 objects**, including 73 constellations that rise wholly or partly from WNY and all 110 Messier targets. It retains the full-height map and consumes the selected spot/cell coordinates and forecast hour; an in-region GPS fix or WNY center supplies the fallback. Only cloud/Bortle conditions matching that selection are passed through. The atlas and viewer use local assets and do not require Gemini.
+
+Every card has a dedicated local **2D thumbnail**, with an accessible fallback on load failure. Search and category filters apply before sorting, and sorting applies before pagination in batches of 24. **Visibility** is the default: above-horizon estimates first, unknown next, below-horizon last; **Name (A–Z)** is also available. Fixed objects use approximate catalog-coordinate altitude estimates; planets/Moon use matched night-summary rise/set events. A constellation's center can be above the horizon while part of its figure is below it. None of these estimates guarantees visual observing conditions.
+
+All models start rotating at 12 degrees/second with **Pause rotation / Resume rotation**, including when reduced motion is requested, following the user's explicit preference. Left/right camera buttons and Reset pause rotation; pointer dragging does not explicitly pause it. Nebula/cloud depth and enhanced colors are educational; lunar surface imagery comes from NASA LRO.
+
+Use [frontend/EXPLORE_3D_HANDOFF.md](frontend/EXPLORE_3D_HANDOFF.md) as the canonical integration contract, asset-generation and extension guide. [frontend/README.md](frontend/README.md) contains exact setup, ordered asset regeneration and verification commands. [INTEGRATION_HANDOFF.md](INTEGRATION_HANDOFF.md) owns full-stack readiness and cross-team status. Latest frontend verification passed the production build, **7 astronomy unit tests**, all generated-asset checks and **14 browser tests** across explorer, shared context, thumbnails and visibility sorting. Lint was not rerun in the latest atlas/sort pass; old lint results below are historical, not a current failure claim.
 
 This document records the frontend work completed so far, explains how it fits with the backend and AI/ML work, and identifies the next steps. It describes the current code, not a completed version of every feature in the architecture.
 
@@ -23,7 +35,7 @@ Read alongside:
 | Zoom controls, compass, distance scale | Added |
 | Return-to-region button | Removed (it had no visible effect while panning was locked to WNY) |
 | Navigation bounds and zoom | Starts fitted to the score data, 0.5 zoom level closer; panning allowed ~2° beyond the data; zoom-out limited (§3) |
-| Responsive layout and focus indicators | Added; browser accessibility/mobile review still needed |
+| Responsive layout and focus indicators | Representative desktop/mobile, focus containment and restoration verified; physical handset/GPU checks remain |
 | Production build | Passed after the score layer was added |
 | Backend API connection | `/api/scores` and `/api/scores/range` through the Vite proxy |
 | Score surface | Smooth red → yellow → green surface blended between cells; gray for missing scores; soft fade at edges and lakes |
@@ -35,6 +47,7 @@ Read alongside:
 | Sky tonight (moon, twilight, planets, events) | Added (§13) |
 | Unnamed cells titled by nearest town ("5 mi SW of Naples") | Added (§13) |
 | Your location (blue dot) and location-aware features | Added (§12) |
+| Explore in 3D atlas | 263 objects, 2D thumbnails, shared map/time context, default visibility sorting and automatic rotation; canonical contract linked above |
 | Photos, upload, voting, night mode | Planned |
 
 The score layer uses the team's API directly; no sample data is bundled. See §11 for how it works.
@@ -48,7 +61,7 @@ These are packages inside one frontend project, rather than separate application
 | React | Builds the page from reusable components | React and React DOM 18.3.1 installed |
 | TypeScript | Checks types and catches coding mistakes before deployment | Project specifies `~6.0.3` |
 | Vite | Runs the development server and creates the production build | Project specifies `^8.3.6` |
-| ESLint | Checks code for common problems | Configured; `npm run lint` reports one pre-existing error (§10) |
+| ESLint | Checks code for common problems | Configured; earlier map-error reports in §10 are historical. Run `npm run lint` for current changes |
 | MapLibre GL JS | Draws the interactive map | 6.17.0 installed |
 | OpenFreeMap | Supplies the map style and geographic tiles | Used by the current map |
 | TanStack Query | Fetches and caches API responses per hour | `@tanstack/react-query` 5 installed |
@@ -281,7 +294,7 @@ A reachable health endpoint alone is not proof that scores are ready. Flask can 
 
 ## 9. Frontend connection
 
-**Port note:** on macOS, port 5000 is taken by AirPlay Receiver (it answers `403`). [backend/.flaskenv](backend/.flaskenv) therefore runs Flask on **5001**, and the proxy targets `http://localhost:5001` by default. If Flask runs on another computer, point the proxy there:
+**Port note:** macOS AirPlay can occupy port 5000. [backend/.flaskenv](backend/.flaskenv) therefore runs Flask on **5001**, and the current proxy targets `http://127.0.0.1:5001` by default. `API_PROXY_TARGET` takes precedence over the compatible `PLEIADES_DEV_API_TARGET` override. Restart Vite when changing either. If Flask runs on another computer, point the proxy there:
 
 ```bash
 API_PROXY_TARGET=http://<other-computer>:5001 npm run dev
@@ -307,7 +320,7 @@ export default defineConfig({
 
 The frontend requests `/api/scores`, and Vite forwards the request to Flask. In production, nginx forwards that same path.
 
-## 10. Verification and next milestone
+## 10. Historical map verification and next milestone
 
 Completed checks during map implementation:
 

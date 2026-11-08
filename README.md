@@ -4,12 +4,16 @@ Pleiades finds the best places to stargaze in Western New York. It combines ligh
 
 Built for UB Hacking 2026. See [Architecture.md](Architecture.md) for the full design.
 
+Current integration status and verification: [INTEGRATION_HANDOFF.md](INTEGRATION_HANDOFF.md). The score map, spot details/charts, sky summary, location services and Explore in 3D now share selected observing context. Photo upload/voting UI remains planned.
+
 - `backend/`: Flask API, ingest and scoring jobs (Python 3.11+)
 - `db/migrations/`: Tiger Data (TimescaleDB + PostGIS) schema
 - `infra/`: nginx, systemd units, and the deploy script for the Vultr VM
 - `frontend/`: React + MapLibre single-page app
 
 ## Backend quickstart
+
+Prerequisites: Docker running Linux containers, Python 3.12+, and Node.js for the frontend. On Windows, install Docker Desktop and its WSL 2 prerequisite before `docker compose`; a Windows restart may be required. Keep an existing `.env` rather than copying over its credentials.
 
 ```bash
 # 1. Database (local TimescaleDB + PostGIS; Tiger Cloud in prod)
@@ -19,11 +23,11 @@ docker compose up -d db
 cd backend
 python3 -m venv .venv
 .venv/bin/pip install -r requirements-dev.txt
-cp ../.env.example ../.env          # then edit; DATABASE_URL defaults to the docker DB
+test -f ../.env || cp ../.env.example ../.env  # preserve existing credentials; edit a new file
 
 # 3. Schema + dev data
 .venv/bin/python -m app.migrate
-.venv/bin/python scripts/seed_dev_grid.py            # add --no-elevation to skip the Open-Meteo call
+.venv/bin/python -m app.ingest grid                  # load the committed real WNY grid
 
 # 4. Data pipeline: astro, weather, then score
 .venv/bin/python -m app.ingest all
@@ -32,6 +36,22 @@ cp ../.env.example ../.env          # then edit; DATABASE_URL defaults to the do
 .venv/bin/flask --app app run --debug
 curl localhost:5001/api/health
 ```
+
+Windows PowerShell equivalent, after Docker Desktop is running:
+
+```powershell
+# Repository root; reuse the existing Python environment if already installed.
+docker compose up -d db
+py -3.12 -m venv backend/.venv
+backend/.venv/Scripts/python.exe -m pip install -r backend/requirements-dev.txt
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+Set-Location backend
+.venv/Scripts/python.exe -m app.migrate
+.venv/Scripts/python.exe -m app.ingest bootstrap  # real grid -> astronomy -> live weather -> scores
+.venv/Scripts/python.exe -m flask --app app --no-debug run --port 5001 --no-reload
+```
+
+Keep Flask running, then start the frontend in another terminal. `GET /api/scores/range` should return a forecast range, and `GET /api/scores` should contain scored cells. Photo storage can be unavailable while scores still work; `/api/health` may therefore report `degraded` for storage only.
 
 ### Tests
 
@@ -61,7 +81,7 @@ On the VM, clone to `/opt/pleiades`, create `/opt/pleiades/.env`, and run `sudo 
 
 ## AI/ML seams
 
-The backend calls the following functions. Their current bodies are **placeholders** that let the pipeline run end to end. The AI/ML owner replaces the bodies but keeps the signatures; the shared types live in each package's `types.py`.
+The backend calls these implemented functions through stable shared types. Physics scoring v2, optional trained calibration v3, Skyfield astronomy, and Gemini vision/explanations are documented in [AI_ML_HANDOFF.md](AI_ML_HANDOFF.md). The 3D viewer and deterministic score explanations remain usable without Gemini.
 
 | File | Function | Called by |
 |---|---|---|
@@ -73,3 +93,21 @@ The backend calls the following functions. Their current bodies are **placeholde
 | `backend/app/ai/explain.py` | `explain_score(ExplainContext) -> Explanation` | `/api/spots/:id` (cached, with timeout fallback) |
 
 `backend/scripts/seed_dev_grid.py` is a dev-only stand-in for `data/build_grid.py`, which samples the real light-pollution atlas.
+
+## Frontend quickstart
+
+Stop an existing Vite server with **Ctrl+C before running `npm ci`**, especially on Windows. A running server can lock Rolldown's native `.node` file and cause `EPERM: unlink`. After dependency installation, start Vite again.
+
+```powershell
+cd frontend
+npm ci
+npm run dev
+```
+
+Vite forwards `/api` to `http://127.0.0.1:5001`; run Flask separately with `--port 5001`. Override with `API_PROXY_TARGET` (or the older `PLEIADES_DEV_API_TARGET`). Production nginx still forwards to Gunicorn on port 8000.
+
+Select a map spot or Tonight's best, choose a forecast hour, then use **Explore in 3D**. The viewer uses that spot/time; without a selected spot it uses an available in-region GPS fix or the WNY center. The sky panel and darkness ticks follow the same local night.
+
+The explorer has **263 objects**, including 73 constellations that rise at least partly from WNY and all 110 Messier targets. Every card has a local 2D thumbnail. Search, category filters and batches of 24 make the atlas navigable. Visibility is the default sort: above-horizon estimates first, unknown next, below-horizon last; name sorting is also available. Fixed objects use approximate catalog-based altitude estimates, while planets/Moon use the matching backend rise/set summary. These estimates do not guarantee an observable view. Models start rotating automatically with **Pause rotation / Resume rotation**, including under reduced motion per the user's explicit preference. The atlas and viewer use local assets and do not require Gemini.
+
+For integration, read [frontend/EXPLORE_3D_HANDOFF.md](frontend/EXPLORE_3D_HANDOFF.md) first for the component contract, asset-generation order, scientific limits and test coverage. [frontend/README.md](frontend/README.md) gives runnable frontend setup and verification commands; [INTEGRATION_HANDOFF.md](INTEGRATION_HANDOFF.md) records full-stack status. Latest frontend verification: production build, **7 unit tests** and **14 browser tests** passed. Lint was not rerun for the atlas/sort update; run `npm run lint` when changing code. Install browser binaries with `npm run test:browser:install` before browser checks.

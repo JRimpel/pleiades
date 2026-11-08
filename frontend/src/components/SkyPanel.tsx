@@ -28,7 +28,7 @@ function riseSet(rise: string | null, set: string | null) {
   const parts: [number, string][] = []
   if (rise) parts.push([Date.parse(rise), `Rises ${formatLocalTime(rise)}`])
   if (set) parts.push([Date.parse(set), `Sets ${formatLocalTime(set)}`])
-  if (parts.length === 0) return 'Up all night'
+  if (parts.length === 0) return 'Rise/set times unavailable'
   return parts
     .sort((a, b) => a[0] - b[0])
     .map(([, text]) => text)
@@ -54,8 +54,8 @@ function eventIcon(event: SkyEvent) {
 }
 
 /** Expanding "Sky tonight" section inside the title card. */
-function SkyPanel({ id, at }: { id: string; at?: { lat: number; lon: number } }) {
-  const sky = useSkyEvents(true, at)
+function SkyPanel({ id, at, date }: { id: string; at?: { lat: number; lon: number }; date?: string }) {
+  const sky = useSkyEvents(true, at, date)
 
   if (sky.isLoading) {
     return (
@@ -80,7 +80,7 @@ function SkyPanel({ id, at }: { id: string; at?: { lat: number; lon: number } })
   return (
     <div id={id} className="sky-panel">
       <p className="spot-muted sky-caption">
-        {at && !sky.isPlaceholderData ? 'For your location' : 'For Western New York'}
+        {date ? `Local night starting ${date}` : 'Tonight'} · {at && !sky.isPlaceholderData ? 'For the selected location' : 'For Western New York'}
       </p>
       <section className="sky-moon" aria-label="Moon">
         <MoonGraphic moon={moon} />
@@ -117,7 +117,7 @@ function SkyPanel({ id, at }: { id: string; at?: { lat: number; lon: number } })
       <section aria-labelledby={`${id}-planets`}>
         <h3 id={`${id}-planets`}>Planets</h3>
         {visiblePlanets.length === 0 ? (
-          <p className="spot-muted">No bright planets up tonight.</p>
+          <p className="spot-muted">No bright planets listed for this night.</p>
         ) : (
           <ul className="sky-list">
             {visiblePlanets.map((planet) => (

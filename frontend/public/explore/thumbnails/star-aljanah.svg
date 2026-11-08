@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+<title>Aljanah — 2D educational preview</title>
+<defs><radialGradient id="bg"><stop stop-color="#1b2b46"/><stop offset="1" stop-color="#060b17"/></radialGradient><radialGradient id="halo"><stop stop-color="rgb(191, 164, 117)" stop-opacity=".85"/><stop offset=".3" stop-color="rgb(191, 164, 117)" stop-opacity=".24"/><stop offset="1" stop-color="rgb(191, 164, 117)" stop-opacity="0"/></radialGradient><radialGradient id="star" cx="37%" cy="30%"><stop stop-color="#fff"/><stop offset=".65" stop-color="rgb(191, 164, 117)"/><stop offset="1" stop-color="rgb(191, 164, 117)" stop-opacity=".7"/></radialGradient></defs>
+<path d="M0 0h400v300H0z" fill="url(#bg)"/><circle cx="200" cy="150" r="119" fill="url(#halo)"/><path d="M200 58v184M108 150h184" stroke="rgb(191, 164, 117)" stroke-width="1" opacity=".3"/><circle cx="200" cy="150" r="37" fill="url(#star)"/></svg>

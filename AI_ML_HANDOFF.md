@@ -1,22 +1,19 @@
-﻿# Pleiades AI / ML / Astronomy Handoff
+# Pleiades AI / ML / Astronomy Handoff
 
-Living Role C implementation and integration record. Last updated: November 7, 2026 (America/New_York). The latest update is from Role B: grid ingestion and verification against a real DB.
+Living Role C implementation and integration record. Last updated: November 8, 2026 (America/New_York). Latest cross-team integration: [INTEGRATION_HANDOFF.md](INTEGRATION_HANDOFF.md). Historical work-log entries below retain their original verification context.
 
 ## Current status
+
+**Latest frontend astronomy integration:** [Explore in 3D handoff](frontend/EXPLORE_3D_HANDOFF.md) documents the 263-object atlas, complete 2D thumbnail set, default visibility sorting and existing API boundary. Fixed objects now have local approximate geometric altitude estimates from J2000 coordinates and selected WNY time/location; they are not precision ephemeris positions or weather/brightness-aware observability predictions. Constellations use their catalog centers. Planets/Moon still use matched nightly rise/set events, with incomplete information kept unknown; the nightly maximum is not used as a selected-hour altitude. No scoring seam, backend endpoint/schema or Gemini behavior changed. Any future exact-position integration should replace these estimates through a coordinated typed contract while preserving unknown/stale-context handling. Latest frontend checks were 7 unit and 14 browser tests, separate from the backend/ML results below. The later local Docker/score-service startup success is recorded in [the project handoff](INTEGRATION_HANDOFF.md#local-apidatabase-startup-resolved-follow-up); older startup blockers below are historical.
 
 - **Implemented:** physics scoring v2; opt-in trained calibration v3; Skyfield astronomy; grounded Gemini vision/explanation code; real WNY grid; training, evaluation, and smoke-test tools.
 - **Offline verification:** **149 passed, 1 skipped** in the combined backend/Role C suite (`tests` + `data/tests`; 12 of those are Role C tests). The skipped module is the live-DB integration test; run it with `pytest -m db` (below). One upstream Skyfield/NumPy deprecation warning remains.
 - **Real DB verified (Role B):** the new `python -m app.ingest grid` job loads `data/wny_grid.geojson` into `grid_cells`. On local TimescaleDB 2.31 + PostGIS, `ingest bootstrap --reset-grid` loaded 364 cells (8 curated; Beaver Meadow 21.3995 mag/arcsec²) and wrote 26,208 live Open-Meteo forecast rows. It then scored all 26,208 cell-hours end to end with model v2. `pytest -m db`: 6 passed.
 - **Real data:** 364 WNY cells with atlas brightness and Open-Meteo elevation. Live weather-to-score smoke produced 72 hourly scores across three WNY spots.
 - **Training:** 7,845 training observations and 528 spatially/temporally withheld observations; learned NELM MAE 0.8603 versus physics 2.2869 and constant-mean 0.9846.
-<<<<<<< HEAD
-- **Gemini live verification is unresolved:** after the user saved a new credential, the response changed from HTML HTTP 400 to Google's JSON **401 UNAUTHENTICATED / ACCESS_TOKEN_TYPE_UNSUPPORTED**. The value has a modern auth-key format, matches the ignored project `.env` at runtime, and contains no whitespace. SDK explanation/vision, direct model listing, and a Flash Lite generation probe all fail authentication. Awaiting confirmation that the key was created in AI Studio and is shown active; no successful live inference is claimed.
-- **Not verified:** live DB loading/ingestion/route persistence, S3 upload-to-result integration, deployment, real-photo recognition accuracy, and WNY-specific learned-model accuracy.
-=======
 - **Gemini HTTP 400 resolved (Nov 8):** Gemini rejects request deadlines under 10 s (400 INVALID_ARGUMENT). `explain_score` now sends at least 10 s, `EXPLAIN_TIMEOUT_S` defaults to 12 s, and the model is `gemini-3.5-flash`. A live score explanation was verified. Vision has not been verified live.
 - **Not verified:** S3 upload-to-result integration, deployment, real-photo recognition accuracy, and WNY-specific learned-model accuracy.
->>>>>>> 316d78010979697cd916b8318a9824a734ab9056
-- No routes, shared types, migrations, repository SQL modules, ingest jobs, or worker code were changed. Work is not committed or pushed. Existing user changes to `.env.example` were left intact.
+- The original Role C implementation preserved backend seam signatures. Later Role B ingestion/deadline fixes and Role A map features are recorded below. The integration pass resolves committed merge markers, connects frontend observing context, and updates the old timeout test; it does not change scoring behavior or database contents.
 
 ## Scope and accepted plan
 
@@ -122,9 +119,11 @@ TEST_DATABASE_URL=postgres://…/pleiades_test .venv/bin/python -m pytest -m db
 # 6 passed (throwaway DB; the test truncates tables)
 ```
 
-## Gemini configuration and current failure
+## Historical Gemini configuration and failure diagnostics
 
-**Latest check after the user's “saved” reply:** the configured value now has a recognized modern auth-key format and runtime equality with the project `.env` was verified without exposing it. Google returns JSON HTTP 401 `UNAUTHENTICATED`, reason `ACCESS_TOKEN_TYPE_UNSUPPORTED`, message “API key not valid. Please pass a valid API key.” Both actual SDK smoke calls fail with this response. A direct `gemini-2.5-flash-lite:generateContent` probe also returns 401, so changing only the model does not resolve current authentication. Earlier HTTP 400 notes below are historical.
+These diagnostics precede the later Role B deadline/model fix and successful explanation recorded under Current status. They preserve earlier evidence, not a current provider-readiness claim; no live Gemini check was repeated during the atlas or documentation passes.
+
+**Earlier check after the user's “saved” reply:** the configured value had a recognized modern auth-key format and runtime equality with the project `.env` was verified without exposing it. Google returned JSON HTTP 401 `UNAUTHENTICATED`, reason `ACCESS_TOKEN_TYPE_UNSUPPORTED`, message “API key not valid. Please pass a valid API key.” Both actual SDK smoke calls failed with this response. A direct `gemini-2.5-flash-lite:generateContent` probe also returned 401, so changing only the model did not resolve authentication at that point. Earlier HTTP 400 notes below are historical.
 
 Google support discusses this exact pattern [here](https://discuss.ai.google.dev/t/401-access-token-type-unsupported-for-all-new-aq-auth-keys-fresh-project-all-endpoints-latest-sdk/198104): check environment overrides/copy fidelity, use the native API key header, test Flash Lite, then verify AI Studio origin/active status if 401 persists. We already explicitly pass `x-goog-api-key`, have checked the file/runtime match, and tested Flash Lite. No Bearer/OAuth workaround or account-permission change was made. The user has been asked only for key origin/active status, not its value.
 
@@ -196,11 +195,9 @@ Suggested demo sequence: WNY stargazing decision → compare locations/time wind
 - **Latest verification:** combined suite 123 passed, 1 skipped; Gemini live and direct API checks failed with HTTP 400 HTML; user is running safe diagnosis. No DB/deployment success or real-photo accuracy is claimed.
 - **Gemini follow-up:** user confirmed the same failure outside the agent. Added safe configuration helper and an offline test for replacing duplicate assignments without altering model/other settings. Removed an overly narrow legacy-key assumption. Next action requires a complete AI Studio credential entered privately, followed by endpoint verification.
 - **Follow-up verification:** combined suite **124 passed, 1 skipped** after adding the configuration helper test.
-<<<<<<< HEAD
 - **New credential verification:** key presence/modern format and file/runtime equality verified; direct listing, both SDK smoke calls, and a Flash Lite probe returned **401 ACCESS_TOKEN_TYPE_UNSUPPORTED**. Updated `data/live_gemini_report.json`; added an optional `--probe-model` diagnostic flag without changing the configured model. Waiting for AI Studio active/origin status before further credential requests.
 - **User-requested retry:** reran `data/diagnose_gemini.py`; runtime still matches the project `.env`, but Google again returned JSON **401 UNAUTHENTICATED / ACCESS_TOKEN_TYPE_UNSUPPORTED**. Did not repeat generation calls after authentication failed. No credentials printed or changed.
 - **Subsequent “try now” check:** direct model listing still returns **401 ACCESS_TOKEN_TYPE_UNSUPPORTED** with file/runtime credential equality confirmed. Generation tests remain deferred until authentication succeeds.
-=======
 - **Role B grid ingestion (Nov 7):**
   - Added the `ingest grid [--reset]` and `ingest bootstrap [--reset-grid]` jobs, the `GRID_GEOJSON_PATH` setting, and a bootstrap step in `deploy.sh`.
   - Relabelled `seed_dev_grid.py` as a synthetic fallback.
@@ -222,6 +219,5 @@ Suggested demo sequence: WNY stargazing decision → compare locations/time wind
   - Live check: one `explain_score` call for Zoar Valley (cell 363, Nov 10 4 AM, score 50) returned grounded text and three tips in about 6 s. Nothing was written to the DB.
   - All 85 cached explanations in the local DB are template text from before the key was loaded. Clear them to see Gemini text for those cells and hours.
   - Role A frontend: spot panel (explanation, factors, history and drift charts), Tonight's best, Sky tonight, and user location now call `/spots/:id`, `/history`, `/drift`, `/best`, and `/sky-events`.
->>>>>>> 316d78010979697cd916b8318a9824a734ab9056
 
 See [data/README.md](data/README.md) for detailed run commands, manifest schema, data retrieval, scientific references, and attribution.

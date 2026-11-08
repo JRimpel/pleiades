@@ -71,7 +71,8 @@ export default function ObjectExplorerModal({ object, requestedName, observation
                 {availability.rise && <div><dt>Rise</dt><dd>{localTime(availability.rise)}</dd></div>}{availability.set && <div><dt>Set</dt><dd>{localTime(availability.set)}</dd></div>}
                 {conditions?.cloudCoverPercent !== undefined && <div><dt>Cloud cover</dt><dd>{conditions.cloudCoverPercent}%</dd></div>}
                 {conditions?.bortle !== undefined && <div><dt>Approx. Bortle</dt><dd>{conditions.bortle}</dd></div>}</dl>
-              {!conditions && <p className="explore-small">Weather and sky brightness have not been checked in this separate viewer.</p>}
+              {conditions?.cloudCoverPercent === undefined && <p className="explore-small">Cloud cover is unavailable for this location and time.</p>}
+              {conditions?.bortle === undefined && <p className="explore-small">Sky brightness is unavailable for this location.</p>}
               {conditions?.source && <p className="explore-small">Conditions: {conditions.source}</p>}
             </section>
             <section><span className="eyebrow">At the telescope</span><p>{object.observingTip}</p></section>
@@ -80,7 +81,7 @@ export default function ObjectExplorerModal({ object, requestedName, observation
               {object.id === 'pleiades' && <> · <a href="https://github.com/astronexus/HYG-Database/blob/main/hyg/README.md" target="_blank" rel="noreferrer">HYG catalog ↗</a></>}</footer>
           </aside>
         </div>
-      </> : <div className="explore-unsupported"><h3>No supported model for this object yet</h3><p>The explorer currently supports Saturn, Jupiter, Vega, the Pleiades cluster and an illustrative Andromeda galaxy. No substitute object has been displayed.</p><button type="button" className="explore-button" onClick={onClose}>Back to objects</button></div>}
+      </> : <div className="explore-unsupported"><h3>No supported model for this object yet</h3><p>Search the atlas for planets, the Moon, bright stars, Messier objects and WNY constellations.</p><button type="button" className="explore-button" onClick={onClose}>Back to objects</button></div>}
     </div>
   </dialog>
 }

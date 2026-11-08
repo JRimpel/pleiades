@@ -6,7 +6,10 @@ from typing import Any
 
 from flask import Flask, jsonify
 from pydantic import ValidationError
+from psycopg import OperationalError
+from psycopg_pool import PoolTimeout
 from werkzeug.exceptions import HTTPException
+from .db import DatabaseNotConfigured
 
 log = logging.getLogger(__name__)
 
@@ -40,6 +43,14 @@ def _body(code: str, message: str, details: Any = None) -> dict:
 
 
 def register_error_handlers(app: Flask) -> None:
+    def _database_unavailable(e: Exception):
+        # Keep connection details and credentials out of the public response.
+        log.warning('Database unavailable (%s)', type(e).__name__)
+        return jsonify(_body('database_unavailable', 'The backend cannot connect to its database.')), 503
+
+    for error_type in (DatabaseNotConfigured, PoolTimeout, OperationalError):
+        app.register_error_handler(error_type, _database_unavailable)
+
     @app.errorhandler(ApiError)
     def _api_error(e: ApiError):
         return jsonify(_body(e.code, e.message, e.details)), e.status

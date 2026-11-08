@@ -40,7 +40,7 @@ def preview(page):
     return match.group(1).replace('&amp;', '&')
 
 
-def glb(name, positions, indices, colors, nodes=None):
+def glb(name, positions, indices, colors, nodes=None, transparent=False, texture=None, uvs=None):
     binary = bytearray()
     views, accessors = [], []
 
@@ -51,7 +51,7 @@ def glb(name, positions, indices, colors, nodes=None):
         flat = [x for row in values for x in row] if components > 1 else values
         binary.extend(struct.pack('<' + fmt * len(flat), *flat))
         views.append({'buffer': 0, 'byteOffset': start, 'byteLength': len(binary) - start, 'target': target})
-        component_type = {'f': 5126, 'H': 5123, 'B': 5121}[fmt]
+        component_type = {'f': 5126, 'H': 5123, 'I': 5125, 'B': 5121}[fmt]
         accessor = {'bufferView': len(views) - 1, 'componentType': component_type, 'count': len(values), 'type': kind}
         if kind == 'VEC3':
             accessor['min'] = [min(row[i] for row in values) for i in range(3)]
@@ -62,8 +62,14 @@ def glb(name, positions, indices, colors, nodes=None):
         return len(accessors) - 1
 
     p = add(positions, 'f', 3, 'VEC3', 34962)
-    ix = add(indices, 'H', 1, 'SCALAR', 34963)
+    ix = add(indices, 'I' if len(positions) > 65535 else 'H', 1, 'SCALAR', 34963)
     c = add(colors, 'B', 4, 'VEC4', 34962)
+    uv = add(uvs, 'f', 2, 'VEC2', 34962) if uvs else None
+    if texture:
+        binary.extend(b'\x00' * (-len(binary) % 4))
+        texture_view = len(views)
+        views.append({'buffer': 0, 'byteOffset': len(binary), 'byteLength': len(texture)})
+        binary.extend(texture)
     nodes = nodes or [{'mesh': 0}]
     document = {'asset': {'version': '2.0', 'generator': 'Pleiades educational schematic generator'},
                 'extensionsUsed': ['KHR_materials_unlit'], 'scene': 0,
@@ -72,6 +78,13 @@ def glb(name, positions, indices, colors, nodes=None):
                 'materials': [{'extensions': {'KHR_materials_unlit': {}}, 'doubleSided': True,
                                'pbrMetallicRoughness': {'baseColorFactor': [1, 1, 1, 1], 'metallicFactor': 0}}],
                 'buffers': [{'byteLength': len(binary)}], 'bufferViews': views, 'accessors': accessors}
+    if transparent:
+        document['materials'][0]['alphaMode'] = 'BLEND'
+    if texture:
+        document['images'] = [{'bufferView': texture_view, 'mimeType': 'image/jpeg'}]
+        document['textures'] = [{'source': 0}]
+        document['meshes'][0]['primitives'][0]['attributes']['TEXCOORD_0'] = uv
+        document['materials'][0]['pbrMetallicRoughness']['baseColorTexture'] = {'index': 0}
     encoded = json.dumps(document, separators=(',', ':')).encode()
     encoded += b' ' * (-len(encoded) % 4)
     binary.extend(b'\x00' * (-len(binary) % 4))

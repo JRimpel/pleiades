@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useId, useMemo, useState } from 'react'
-import { useScoreRange, useScores, useSkyEvents } from './api/hooks'
+import { useScoreRange, useScores, useSkyEvents, useSpot } from './api/hooks'
 import type { BestSpot } from './api/types'
+import { ApiError } from './api/client'
 import BestSpots from './components/BestSpots'
 import ScoreLegend from './components/ScoreLegend'
 import SkyPanel from './components/SkyPanel'
 import SpotPanel from './components/SpotPanel'
 import StargazingMap from './components/StargazingMap'
-<<<<<<< HEAD
 import { ExploreIn3D } from './explore'
-=======
 import type { MapFocus } from './components/StargazingMap'
 import TimeSlider from './components/TimeSlider'
 import { nearestCell } from './lib/nearestCell'
@@ -16,7 +15,8 @@ import { isWithinBounds } from './lib/region'
 import { scoreToRgb } from './lib/scoreColors'
 import { HOUR_MS, toIsoHour } from './lib/time'
 import { useUserLocation } from './lib/useUserLocation'
->>>>>>> 316d78010979697cd916b8318a9824a734ab9056
+import { resolveObservingContext } from './lib/observingContext'
+import { nightDate } from './explore/astronomy'
 import './App.css'
 
 /** How long the "outside Western New York" notice stays up. */
@@ -42,7 +42,6 @@ function App() {
   }, [showOutsideNotice])
 
   const range = useScoreRange()
-  const sky = useSkyEvents(true, regionLocation ?? undefined)
   // Hour chosen on the slider (epoch ms). Undefined until the range loads → backend default (current hour).
   const [selectedMs, setSelectedMs] = useState<number>()
   // Wait for the slider to settle briefly before requesting a new hour.
@@ -52,6 +51,7 @@ function App() {
   const [skyOpen, setSkyOpen] = useState(false)
   // A picked spot's best hour, shown in the panel until the slider moves (it may be before the slider's range).
   const [panelTime, setPanelTime] = useState<string>()
+  const [initialHour] = useState(() => toIsoHour(Math.floor(Date.now() / HOUR_MS) * HOUR_MS))
 
   const minMs = range.data?.min_time ? Date.parse(range.data.min_time) : undefined
   const maxMs = range.data?.max_time ? Date.parse(range.data.max_time) : undefined
@@ -68,8 +68,17 @@ function App() {
     return () => window.clearTimeout(timer)
   }, [selectedMs])
 
-  const requestedTime = requestedMs === undefined ? undefined : toIsoHour(requestedMs)
+  const requestHour = requestedMs ?? defaultMs
+  const requestedTime = requestHour === undefined ? undefined : toIsoHour(requestHour)
   const scores = useScores(requestedTime)
+  const spotTime = panelTime ?? requestedTime ?? scores.data?.time
+  const selectedSpot = useSpot(selectedCellId, spotTime)
+  const observing = resolveObservingContext(
+    panelTime ?? (sliderMs === undefined ? scores.data?.time ?? initialHour : toIsoHour(sliderMs)),
+    selectedCellId, selectedSpot.data, scores.data, regionLocation,
+  )
+  const observingNight = nightDate(observing.observation.time)
+  const sky = useSkyEvents(true, observing.observation, observingNight)
   // The score at the user's spot for the hour on the slider.
   const yourCell = useMemo(
     () => (regionLocation ? nearestCell(scores.data, regionLocation.lat, regionLocation.lon) : null),
@@ -110,7 +119,12 @@ function App() {
 
   let status = ''
   if (scores.isError || range.isError) {
-    status = 'Scores unavailable. Is the backend running? (Vite proxies /api to localhost:5001.)'
+      const error = scores.error ?? range.error
+      status = error instanceof ApiError && error.code === 'database_unavailable'
+        ? 'Scores unavailable: the backend cannot connect to its database.'
+        : error instanceof ApiError
+          ? 'Scores unavailable: the backend returned an error. Try again shortly.'
+          : 'Scores unavailable: the API could not be reached. Check that the backend is running.'
   } else if (scores.isLoading) {
     status = 'Loading scores…'
   } else if (scores.isFetching) {
@@ -121,6 +135,7 @@ function App() {
 
   return (
     <main className={selectedCellId === null ? 'app' : 'app has-spot-panel'}>
+      <div className="app-map-shell">
       <header className="app-header">
         <div className="app-header-row">
           <div>
@@ -128,6 +143,9 @@ function App() {
             <p>Find your next constellation lookout in Western New York</p>
           </div>
           <div className="app-header-buttons">
+            <button type="button" className="pill-button" onClick={() => document.getElementById('explore-title')?.scrollIntoView()}>
+              Explore in 3D
+            </button>
             <button
               type="button"
               className="pill-button"
@@ -135,7 +153,7 @@ function App() {
               aria-controls={skyPanelId}
               onClick={() => setSkyOpen((open) => !open)}
             >
-              {skyOpen ? 'Hide sky' : 'Sky tonight'}
+              {skyOpen ? 'Hide sky' : 'Sky details'}
             </button>
             {yourCell && (
               <button
@@ -159,12 +177,8 @@ function App() {
             )}
           </div>
         </div>
-        {skyOpen && <SkyPanel id={skyPanelId} at={regionLocation ?? undefined} />}
+        {skyOpen && <SkyPanel id={skyPanelId} at={observing.observation} date={observingNight} />}
       </header>
-<<<<<<< HEAD
-      <StargazingMap />
-      <ExploreIn3D />
-=======
       <StargazingMap
         scores={scores.data}
         onSelectCell={selectCell}
@@ -199,12 +213,13 @@ function App() {
       {selectedCellId !== null && (
         <SpotPanel
           cellId={selectedCellId}
-          time={panelTime ?? requestedTime ?? scores.data?.time}
+          time={spotTime}
           onClose={closeSpot}
           userLocation={location}
         />
       )}
->>>>>>> 316d78010979697cd916b8318a9824a734ab9056
+      </div>
+      <ExploreIn3D observation={observing.observation} conditions={observing.conditions} contextLabel={observing.label} hideControls />
     </main>
   )
 }

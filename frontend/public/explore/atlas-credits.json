@@ -1,0 +1,15 @@
+{
+  "sources": [
+    "https://raw.githubusercontent.com/ofrohn/d3-celestial/master/",
+    "https://raw.githubusercontent.com/astronexus/HYG-Database/main/hyg/CURRENT/hygdata_v40.csv.gz",
+    "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/lroc_color_2k.jpg",
+    "https://svs.gsfc.nasa.gov/4720/"
+  ],
+  "selection": "Constellations whose J2000 boundary reaches declination > -48 degrees; bright named HYG stars (V <= 2.5, dec > -48); all Messier objects above -48; seven other planets and Moon.",
+  "licenses": [
+    "d3-celestial: BSD-3-Clause; see d3-celestial-LICENSE.txt",
+    "HYG: CC BY-SA 4.0; derived constellation/star layouts retain attribution",
+    "Original models: CC BY 4.0; catalog-derived layouts: CC BY-SA 4.0"
+  ],
+  "geometry": "Enhanced educational illustrations, not measured 3D reconstructions. Moon: NASA SVS LRO/LROC real surface mosaic; other new planetary surfaces procedural. Existing Jupiter/Saturn NASA models retained."
+}

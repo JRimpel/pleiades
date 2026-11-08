@@ -90,7 +90,7 @@ export function fetchBest(
   return getJson<BestResponse>(withQuery('/api/best', params), signal)
 }
 
-/** Moon, twilight, planets, and events for tonight, at `at` or else the region centroid. */
-export function fetchSkyEvents(signal?: AbortSignal, at?: { lat: number; lon: number }) {
-  return getJson<SkyEventsResponse>(withQuery('/api/sky-events', { lat: at?.lat, lon: at?.lon }), signal)
+/** Moon, twilight, planets, and events for a local night (defaults to tonight). */
+export function fetchSkyEvents(signal?: AbortSignal, at?: { lat: number; lon: number }, date?: string) {
+  return getJson<SkyEventsResponse>(withQuery('/api/sky-events', { lat: at?.lat, lon: at?.lon, date }), signal)
 }

@@ -1,0 +1,1317 @@
+[
+  {
+    "id": "saturn",
+    "file": "saturn.svg",
+    "alt": "2D preview of Saturn"
+  },
+  {
+    "id": "jupiter",
+    "file": "jupiter.svg",
+    "alt": "2D preview of Jupiter"
+  },
+  {
+    "id": "vega",
+    "file": "vega.svg",
+    "alt": "2D preview of Vega"
+  },
+  {
+    "id": "pleiades",
+    "file": "pleiades.svg",
+    "alt": "2D preview of Pleiades"
+  },
+  {
+    "id": "andromeda",
+    "file": "andromeda.svg",
+    "alt": "2D preview of Andromeda Galaxy"
+  },
+  {
+    "id": "constellation-and",
+    "file": "constellation-and.svg",
+    "alt": "2D preview of Andromeda"
+  },
+  {
+    "id": "constellation-ant",
+    "file": "constellation-ant.svg",
+    "alt": "2D preview of Antlia"
+  },
+  {
+    "id": "constellation-aqr",
+    "file": "constellation-aqr.svg",
+    "alt": "2D preview of Aquarius"
+  },
+  {
+    "id": "constellation-aql",
+    "file": "constellation-aql.svg",
+    "alt": "2D preview of Aquila"
+  },
+  {
+    "id": "constellation-ara",
+    "file": "constellation-ara.svg",
+    "alt": "2D preview of Ara"
+  },
+  {
+    "id": "constellation-ari",
+    "file": "constellation-ari.svg",
+    "alt": "2D preview of Aries"
+  },
+  {
+    "id": "constellation-aur",
+    "file": "constellation-aur.svg",
+    "alt": "2D preview of Auriga"
+  },
+  {
+    "id": "constellation-boo",
+    "file": "constellation-boo.svg",
+    "alt": "2D preview of Boötes"
+  },
+  {
+    "id": "constellation-cae",
+    "file": "constellation-cae.svg",
+    "alt": "2D preview of Caelum"
+  },
+  {
+    "id": "constellation-cam",
+    "file": "constellation-cam.svg",
+    "alt": "2D preview of Camelopardalis"
+  },
+  {
+    "id": "constellation-cnc",
+    "file": "constellation-cnc.svg",
+    "alt": "2D preview of Cancer"
+  },
+  {
+    "id": "constellation-cvn",
+    "file": "constellation-cvn.svg",
+    "alt": "2D preview of Canes Venatici"
+  },
+  {
+    "id": "constellation-cma",
+    "file": "constellation-cma.svg",
+    "alt": "2D preview of Canis Major"
+  },
+  {
+    "id": "constellation-cmi",
+    "file": "constellation-cmi.svg",
+    "alt": "2D preview of Canis Minor"
+  },
+  {
+    "id": "constellation-cap",
+    "file": "constellation-cap.svg",
+    "alt": "2D preview of Capricornus"
+  },
+  {
+    "id": "constellation-cas",
+    "file": "constellation-cas.svg",
+    "alt": "2D preview of Cassiopeia"
+  },
+  {
+    "id": "constellation-cen",
+    "file": "constellation-cen.svg",
+    "alt": "2D preview of Centaurus"
+  },
+  {
+    "id": "constellation-cep",
+    "file": "constellation-cep.svg",
+    "alt": "2D preview of Cepheus"
+  },
+  {
+    "id": "constellation-cet",
+    "file": "constellation-cet.svg",
+    "alt": "2D preview of Cetus"
+  },
+  {
+    "id": "constellation-col",
+    "file": "constellation-col.svg",
+    "alt": "2D preview of Columba"
+  },
+  {
+    "id": "constellation-com",
+    "file": "constellation-com.svg",
+    "alt": "2D preview of Coma Berenices"
+  },
+  {
+    "id": "constellation-cra",
+    "file": "constellation-cra.svg",
+    "alt": "2D preview of Corona Austrina"
+  },
+  {
+    "id": "constellation-crb",
+    "file": "constellation-crb.svg",
+    "alt": "2D preview of Corona Borealis"
+  },
+  {
+    "id": "constellation-crv",
+    "file": "constellation-crv.svg",
+    "alt": "2D preview of Corvus"
+  },
+  {
+    "id": "constellation-crt",
+    "file": "constellation-crt.svg",
+    "alt": "2D preview of Crater"
+  },
+  {
+    "id": "constellation-cyg",
+    "file": "constellation-cyg.svg",
+    "alt": "2D preview of Cygnus"
+  },
+  {
+    "id": "constellation-del",
+    "file": "constellation-del.svg",
+    "alt": "2D preview of Delphinus"
+  },
+  {
+    "id": "constellation-dra",
+    "file": "constellation-dra.svg",
+    "alt": "2D preview of Draco"
+  },
+  {
+    "id": "constellation-equ",
+    "file": "constellation-equ.svg",
+    "alt": "2D preview of Equuleus"
+  },
+  {
+    "id": "constellation-eri",
+    "file": "constellation-eri.svg",
+    "alt": "2D preview of Eridanus"
+  },
+  {
+    "id": "constellation-for",
+    "file": "constellation-for.svg",
+    "alt": "2D preview of Fornax"
+  },
+  {
+    "id": "constellation-gem",
+    "file": "constellation-gem.svg",
+    "alt": "2D preview of Gemini"
+  },
+  {
+    "id": "constellation-gru",
+    "file": "constellation-gru.svg",
+    "alt": "2D preview of Grus"
+  },
+  {
+    "id": "constellation-her",
+    "file": "constellation-her.svg",
+    "alt": "2D preview of Hercules"
+  },
+  {
+    "id": "constellation-hor",
+    "file": "constellation-hor.svg",
+    "alt": "2D preview of Horologium"
+  },
+  {
+    "id": "constellation-hya",
+    "file": "constellation-hya.svg",
+    "alt": "2D preview of Hydra"
+  },
+  {
+    "id": "constellation-ind",
+    "file": "constellation-ind.svg",
+    "alt": "2D preview of Indus"
+  },
+  {
+    "id": "constellation-lac",
+    "file": "constellation-lac.svg",
+    "alt": "2D preview of Lacerta"
+  },
+  {
+    "id": "constellation-leo",
+    "file": "constellation-leo.svg",
+    "alt": "2D preview of Leo"
+  },
+  {
+    "id": "constellation-lmi",
+    "file": "constellation-lmi.svg",
+    "alt": "2D preview of Leo Minor"
+  },
+  {
+    "id": "constellation-lep",
+    "file": "constellation-lep.svg",
+    "alt": "2D preview of Lepus"
+  },
+  {
+    "id": "constellation-lib",
+    "file": "constellation-lib.svg",
+    "alt": "2D preview of Libra"
+  },
+  {
+    "id": "constellation-lup",
+    "file": "constellation-lup.svg",
+    "alt": "2D preview of Lupus"
+  },
+  {
+    "id": "constellation-lyn",
+    "file": "constellation-lyn.svg",
+    "alt": "2D preview of Lynx"
+  },
+  {
+    "id": "constellation-lyr",
+    "file": "constellation-lyr.svg",
+    "alt": "2D preview of Lyra"
+  },
+  {
+    "id": "constellation-mic",
+    "file": "constellation-mic.svg",
+    "alt": "2D preview of Microscopium"
+  },
+  {
+    "id": "constellation-mon",
+    "file": "constellation-mon.svg",
+    "alt": "2D preview of Monoceros"
+  },
+  {
+    "id": "constellation-nor",
+    "file": "constellation-nor.svg",
+    "alt": "2D preview of Norma"
+  },
+  {
+    "id": "constellation-oph",
+    "file": "constellation-oph.svg",
+    "alt": "2D preview of Ophiuchus"
+  },
+  {
+    "id": "constellation-ori",
+    "file": "constellation-ori.svg",
+    "alt": "2D preview of Orion"
+  },
+  {
+    "id": "constellation-peg",
+    "file": "constellation-peg.svg",
+    "alt": "2D preview of Pegasus"
+  },
+  {
+    "id": "constellation-per",
+    "file": "constellation-per.svg",
+    "alt": "2D preview of Perseus"
+  },
+  {
+    "id": "constellation-phe",
+    "file": "constellation-phe.svg",
+    "alt": "2D preview of Phoenix"
+  },
+  {
+    "id": "constellation-pic",
+    "file": "constellation-pic.svg",
+    "alt": "2D preview of Pictor"
+  },
+  {
+    "id": "constellation-psc",
+    "file": "constellation-psc.svg",
+    "alt": "2D preview of Pisces"
+  },
+  {
+    "id": "constellation-psa",
+    "file": "constellation-psa.svg",
+    "alt": "2D preview of Piscis Austrinus"
+  },
+  {
+    "id": "constellation-pup",
+    "file": "constellation-pup.svg",
+    "alt": "2D preview of Puppis"
+  },
+  {
+    "id": "constellation-pyx",
+    "file": "constellation-pyx.svg",
+    "alt": "2D preview of Pyxis"
+  },
+  {
+    "id": "constellation-sge",
+    "file": "constellation-sge.svg",
+    "alt": "2D preview of Sagitta"
+  },
+  {
+    "id": "constellation-sgr",
+    "file": "constellation-sgr.svg",
+    "alt": "2D preview of Sagittarius"
+  },
+  {
+    "id": "constellation-sco",
+    "file": "constellation-sco.svg",
+    "alt": "2D preview of Scorpius"
+  },
+  {
+    "id": "constellation-scl",
+    "file": "constellation-scl.svg",
+    "alt": "2D preview of Sculptor"
+  },
+  {
+    "id": "constellation-sct",
+    "file": "constellation-sct.svg",
+    "alt": "2D preview of Scutum"
+  },
+  {
+    "id": "constellation-ser",
+    "file": "constellation-ser.svg",
+    "alt": "2D preview of Serpens Cauda"
+  },
+  {
+    "id": "constellation-sex",
+    "file": "constellation-sex.svg",
+    "alt": "2D preview of Sextans"
+  },
+  {
+    "id": "constellation-tau",
+    "file": "constellation-tau.svg",
+    "alt": "2D preview of Taurus"
+  },
+  {
+    "id": "constellation-tel",
+    "file": "constellation-tel.svg",
+    "alt": "2D preview of Telescopium"
+  },
+  {
+    "id": "constellation-tri",
+    "file": "constellation-tri.svg",
+    "alt": "2D preview of Triangulum"
+  },
+  {
+    "id": "constellation-uma",
+    "file": "constellation-uma.svg",
+    "alt": "2D preview of Ursa Major"
+  },
+  {
+    "id": "constellation-umi",
+    "file": "constellation-umi.svg",
+    "alt": "2D preview of Ursa Minor"
+  },
+  {
+    "id": "constellation-vel",
+    "file": "constellation-vel.svg",
+    "alt": "2D preview of Vela"
+  },
+  {
+    "id": "constellation-vir",
+    "file": "constellation-vir.svg",
+    "alt": "2D preview of Virgo"
+  },
+  {
+    "id": "constellation-vul",
+    "file": "constellation-vul.svg",
+    "alt": "2D preview of Vulpecula"
+  },
+  {
+    "id": "m64",
+    "file": "m64.svg",
+    "alt": "2D preview of Blackeye Galaxy (M64)"
+  },
+  {
+    "id": "m81",
+    "file": "m81.svg",
+    "alt": "2D preview of Bode´s Galaxy (M81)"
+  },
+  {
+    "id": "m94",
+    "file": "m94.svg",
+    "alt": "2D preview of Cat’s Eye Galaxy (M94)"
+  },
+  {
+    "id": "m77",
+    "file": "m77.svg",
+    "alt": "2D preview of Cetus A (M77)"
+  },
+  {
+    "id": "m82",
+    "file": "m82.svg",
+    "alt": "2D preview of Cigar Galaxy (M82)"
+  },
+  {
+    "id": "m100",
+    "file": "m100.svg",
+    "alt": "2D preview of M100"
+  },
+  {
+    "id": "m105",
+    "file": "m105.svg",
+    "alt": "2D preview of M105"
+  },
+  {
+    "id": "m106",
+    "file": "m106.svg",
+    "alt": "2D preview of M106"
+  },
+  {
+    "id": "m108",
+    "file": "m108.svg",
+    "alt": "2D preview of M108"
+  },
+  {
+    "id": "m109",
+    "file": "m109.svg",
+    "alt": "2D preview of M109"
+  },
+  {
+    "id": "m110",
+    "file": "m110.svg",
+    "alt": "2D preview of M110"
+  },
+  {
+    "id": "m32",
+    "file": "m32.svg",
+    "alt": "2D preview of M32"
+  },
+  {
+    "id": "m49",
+    "file": "m49.svg",
+    "alt": "2D preview of M49"
+  },
+  {
+    "id": "m58",
+    "file": "m58.svg",
+    "alt": "2D preview of M58"
+  },
+  {
+    "id": "m59",
+    "file": "m59.svg",
+    "alt": "2D preview of M59"
+  },
+  {
+    "id": "m60",
+    "file": "m60.svg",
+    "alt": "2D preview of M60"
+  },
+  {
+    "id": "m61",
+    "file": "m61.svg",
+    "alt": "2D preview of M61"
+  },
+  {
+    "id": "m65",
+    "file": "m65.svg",
+    "alt": "2D preview of M65"
+  },
+  {
+    "id": "m66",
+    "file": "m66.svg",
+    "alt": "2D preview of M66"
+  },
+  {
+    "id": "m74",
+    "file": "m74.svg",
+    "alt": "2D preview of M74"
+  },
+  {
+    "id": "m84",
+    "file": "m84.svg",
+    "alt": "2D preview of M84"
+  },
+  {
+    "id": "m85",
+    "file": "m85.svg",
+    "alt": "2D preview of M85"
+  },
+  {
+    "id": "m86",
+    "file": "m86.svg",
+    "alt": "2D preview of M86"
+  },
+  {
+    "id": "m88",
+    "file": "m88.svg",
+    "alt": "2D preview of M88"
+  },
+  {
+    "id": "m89",
+    "file": "m89.svg",
+    "alt": "2D preview of M89"
+  },
+  {
+    "id": "m90",
+    "file": "m90.svg",
+    "alt": "2D preview of M90"
+  },
+  {
+    "id": "m91",
+    "file": "m91.svg",
+    "alt": "2D preview of M91"
+  },
+  {
+    "id": "m95",
+    "file": "m95.svg",
+    "alt": "2D preview of M95"
+  },
+  {
+    "id": "m96",
+    "file": "m96.svg",
+    "alt": "2D preview of M96"
+  },
+  {
+    "id": "m98",
+    "file": "m98.svg",
+    "alt": "2D preview of M98"
+  },
+  {
+    "id": "m99",
+    "file": "m99.svg",
+    "alt": "2D preview of M99"
+  },
+  {
+    "id": "m101",
+    "file": "m101.svg",
+    "alt": "2D preview of Pinwheel (M101)"
+  },
+  {
+    "id": "m104",
+    "file": "m104.svg",
+    "alt": "2D preview of Sombrero (M104)"
+  },
+  {
+    "id": "m83",
+    "file": "m83.svg",
+    "alt": "2D preview of Southern Pinwheel (M83)"
+  },
+  {
+    "id": "m102",
+    "file": "m102.svg",
+    "alt": "2D preview of Spindle (M102)"
+  },
+  {
+    "id": "m63",
+    "file": "m63.svg",
+    "alt": "2D preview of Sunflower Galaxy (M63)"
+  },
+  {
+    "id": "m33",
+    "file": "m33.svg",
+    "alt": "2D preview of Triangulum (M33)"
+  },
+  {
+    "id": "m87",
+    "file": "m87.svg",
+    "alt": "2D preview of Virgo A (M87)"
+  },
+  {
+    "id": "m51",
+    "file": "m51.svg",
+    "alt": "2D preview of Whirlpool (M51)"
+  },
+  {
+    "id": "moon",
+    "file": "moon.svg",
+    "alt": "2D preview of Moon"
+  },
+  {
+    "id": "m1",
+    "file": "m1.svg",
+    "alt": "2D preview of Crab Nebula (M1)"
+  },
+  {
+    "id": "m27",
+    "file": "m27.svg",
+    "alt": "2D preview of Dumbbell Nebula (M27)"
+  },
+  {
+    "id": "m16",
+    "file": "m16.svg",
+    "alt": "2D preview of Eagle Nebula (M16)"
+  },
+  {
+    "id": "m8",
+    "file": "m8.svg",
+    "alt": "2D preview of Lagoon Nebula (M8)"
+  },
+  {
+    "id": "m76",
+    "file": "m76.svg",
+    "alt": "2D preview of Little Dumbbell Nebula (M76)"
+  },
+  {
+    "id": "m43",
+    "file": "m43.svg",
+    "alt": "2D preview of M43"
+  },
+  {
+    "id": "m78",
+    "file": "m78.svg",
+    "alt": "2D preview of M78"
+  },
+  {
+    "id": "m17",
+    "file": "m17.svg",
+    "alt": "2D preview of Omega Nebula (M17)"
+  },
+  {
+    "id": "m42",
+    "file": "m42.svg",
+    "alt": "2D preview of Orion Nebula (M42)"
+  },
+  {
+    "id": "m97",
+    "file": "m97.svg",
+    "alt": "2D preview of Owl Nebula (M97)"
+  },
+  {
+    "id": "m57",
+    "file": "m57.svg",
+    "alt": "2D preview of Ring Nebula (M57)"
+  },
+  {
+    "id": "m20",
+    "file": "m20.svg",
+    "alt": "2D preview of Trifid Nebula (M20)"
+  },
+  {
+    "id": "mars",
+    "file": "mars.svg",
+    "alt": "2D preview of Mars"
+  },
+  {
+    "id": "mercury",
+    "file": "mercury.svg",
+    "alt": "2D preview of Mercury"
+  },
+  {
+    "id": "neptune",
+    "file": "neptune.svg",
+    "alt": "2D preview of Neptune"
+  },
+  {
+    "id": "uranus",
+    "file": "uranus.svg",
+    "alt": "2D preview of Uranus"
+  },
+  {
+    "id": "venus",
+    "file": "venus.svg",
+    "alt": "2D preview of Venus"
+  },
+  {
+    "id": "star-adhara",
+    "file": "star-adhara.svg",
+    "alt": "2D preview of Adhara"
+  },
+  {
+    "id": "star-aldebaran",
+    "file": "star-aldebaran.svg",
+    "alt": "2D preview of Aldebaran"
+  },
+  {
+    "id": "star-alderamin",
+    "file": "star-alderamin.svg",
+    "alt": "2D preview of Alderamin"
+  },
+  {
+    "id": "star-algieba",
+    "file": "star-algieba.svg",
+    "alt": "2D preview of Algieba"
+  },
+  {
+    "id": "star-algol",
+    "file": "star-algol.svg",
+    "alt": "2D preview of Algol"
+  },
+  {
+    "id": "star-alhena",
+    "file": "star-alhena.svg",
+    "alt": "2D preview of Alhena"
+  },
+  {
+    "id": "star-alioth",
+    "file": "star-alioth.svg",
+    "alt": "2D preview of Alioth"
+  },
+  {
+    "id": "star-aljanah",
+    "file": "star-aljanah.svg",
+    "alt": "2D preview of Aljanah"
+  },
+  {
+    "id": "star-alkaid",
+    "file": "star-alkaid.svg",
+    "alt": "2D preview of Alkaid"
+  },
+  {
+    "id": "star-almach",
+    "file": "star-almach.svg",
+    "alt": "2D preview of Almach"
+  },
+  {
+    "id": "star-alnair",
+    "file": "star-alnair.svg",
+    "alt": "2D preview of Alnair"
+  },
+  {
+    "id": "star-alnilam",
+    "file": "star-alnilam.svg",
+    "alt": "2D preview of Alnilam"
+  },
+  {
+    "id": "star-alnitak",
+    "file": "star-alnitak.svg",
+    "alt": "2D preview of Alnitak"
+  },
+  {
+    "id": "star-alphard",
+    "file": "star-alphard.svg",
+    "alt": "2D preview of Alphard"
+  },
+  {
+    "id": "star-alphecca",
+    "file": "star-alphecca.svg",
+    "alt": "2D preview of Alphecca"
+  },
+  {
+    "id": "star-alpheratz",
+    "file": "star-alpheratz.svg",
+    "alt": "2D preview of Alpheratz"
+  },
+  {
+    "id": "star-altair",
+    "file": "star-altair.svg",
+    "alt": "2D preview of Altair"
+  },
+  {
+    "id": "star-aludra",
+    "file": "star-aludra.svg",
+    "alt": "2D preview of Aludra"
+  },
+  {
+    "id": "star-ankaa",
+    "file": "star-ankaa.svg",
+    "alt": "2D preview of Ankaa"
+  },
+  {
+    "id": "star-antares",
+    "file": "star-antares.svg",
+    "alt": "2D preview of Antares"
+  },
+  {
+    "id": "star-arcturus",
+    "file": "star-arcturus.svg",
+    "alt": "2D preview of Arcturus"
+  },
+  {
+    "id": "star-bellatrix",
+    "file": "star-bellatrix.svg",
+    "alt": "2D preview of Bellatrix"
+  },
+  {
+    "id": "star-betelgeuse",
+    "file": "star-betelgeuse.svg",
+    "alt": "2D preview of Betelgeuse"
+  },
+  {
+    "id": "star-capella",
+    "file": "star-capella.svg",
+    "alt": "2D preview of Capella"
+  },
+  {
+    "id": "star-caph",
+    "file": "star-caph.svg",
+    "alt": "2D preview of Caph"
+  },
+  {
+    "id": "star-castor",
+    "file": "star-castor.svg",
+    "alt": "2D preview of Castor"
+  },
+  {
+    "id": "star-cih",
+    "file": "star-cih.svg",
+    "alt": "2D preview of Cih"
+  },
+  {
+    "id": "star-deneb",
+    "file": "star-deneb.svg",
+    "alt": "2D preview of Deneb"
+  },
+  {
+    "id": "star-denebola",
+    "file": "star-denebola.svg",
+    "alt": "2D preview of Denebola"
+  },
+  {
+    "id": "star-diphda",
+    "file": "star-diphda.svg",
+    "alt": "2D preview of Diphda"
+  },
+  {
+    "id": "star-dschubba",
+    "file": "star-dschubba.svg",
+    "alt": "2D preview of Dschubba"
+  },
+  {
+    "id": "star-dubhe",
+    "file": "star-dubhe.svg",
+    "alt": "2D preview of Dubhe"
+  },
+  {
+    "id": "star-elnath",
+    "file": "star-elnath.svg",
+    "alt": "2D preview of Elnath"
+  },
+  {
+    "id": "star-eltanin",
+    "file": "star-eltanin.svg",
+    "alt": "2D preview of Eltanin"
+  },
+  {
+    "id": "star-enif",
+    "file": "star-enif.svg",
+    "alt": "2D preview of Enif"
+  },
+  {
+    "id": "star-fomalhaut",
+    "file": "star-fomalhaut.svg",
+    "alt": "2D preview of Fomalhaut"
+  },
+  {
+    "id": "star-hamal",
+    "file": "star-hamal.svg",
+    "alt": "2D preview of Hamal"
+  },
+  {
+    "id": "star-izar",
+    "file": "star-izar.svg",
+    "alt": "2D preview of Izar"
+  },
+  {
+    "id": "star-kaus-australis",
+    "file": "star-kaus-australis.svg",
+    "alt": "2D preview of Kaus Australis"
+  },
+  {
+    "id": "star-kochab",
+    "file": "star-kochab.svg",
+    "alt": "2D preview of Kochab"
+  },
+  {
+    "id": "star-larawag",
+    "file": "star-larawag.svg",
+    "alt": "2D preview of Larawag"
+  },
+  {
+    "id": "star-markab",
+    "file": "star-markab.svg",
+    "alt": "2D preview of Markab"
+  },
+  {
+    "id": "star-menkalinan",
+    "file": "star-menkalinan.svg",
+    "alt": "2D preview of Menkalinan"
+  },
+  {
+    "id": "star-menkent",
+    "file": "star-menkent.svg",
+    "alt": "2D preview of Menkent"
+  },
+  {
+    "id": "star-merak",
+    "file": "star-merak.svg",
+    "alt": "2D preview of Merak"
+  },
+  {
+    "id": "star-mintaka",
+    "file": "star-mintaka.svg",
+    "alt": "2D preview of Mintaka"
+  },
+  {
+    "id": "star-mirach",
+    "file": "star-mirach.svg",
+    "alt": "2D preview of Mirach"
+  },
+  {
+    "id": "star-mirfak",
+    "file": "star-mirfak.svg",
+    "alt": "2D preview of Mirfak"
+  },
+  {
+    "id": "star-mirzam",
+    "file": "star-mirzam.svg",
+    "alt": "2D preview of Mirzam"
+  },
+  {
+    "id": "star-mizar",
+    "file": "star-mizar.svg",
+    "alt": "2D preview of Mizar"
+  },
+  {
+    "id": "star-naos",
+    "file": "star-naos.svg",
+    "alt": "2D preview of Naos"
+  },
+  {
+    "id": "star-nunki",
+    "file": "star-nunki.svg",
+    "alt": "2D preview of Nunki"
+  },
+  {
+    "id": "star-phecda",
+    "file": "star-phecda.svg",
+    "alt": "2D preview of Phecda"
+  },
+  {
+    "id": "star-polaris",
+    "file": "star-polaris.svg",
+    "alt": "2D preview of Polaris"
+  },
+  {
+    "id": "star-pollux",
+    "file": "star-pollux.svg",
+    "alt": "2D preview of Pollux"
+  },
+  {
+    "id": "star-procyon",
+    "file": "star-procyon.svg",
+    "alt": "2D preview of Procyon"
+  },
+  {
+    "id": "star-rasalhague",
+    "file": "star-rasalhague.svg",
+    "alt": "2D preview of Rasalhague"
+  },
+  {
+    "id": "star-regulus",
+    "file": "star-regulus.svg",
+    "alt": "2D preview of Regulus"
+  },
+  {
+    "id": "star-rigel",
+    "file": "star-rigel.svg",
+    "alt": "2D preview of Rigel"
+  },
+  {
+    "id": "star-sabik",
+    "file": "star-sabik.svg",
+    "alt": "2D preview of Sabik"
+  },
+  {
+    "id": "star-sadr",
+    "file": "star-sadr.svg",
+    "alt": "2D preview of Sadr"
+  },
+  {
+    "id": "star-saiph",
+    "file": "star-saiph.svg",
+    "alt": "2D preview of Saiph"
+  },
+  {
+    "id": "star-sargas",
+    "file": "star-sargas.svg",
+    "alt": "2D preview of Sargas"
+  },
+  {
+    "id": "star-scheat",
+    "file": "star-scheat.svg",
+    "alt": "2D preview of Scheat"
+  },
+  {
+    "id": "star-schedar",
+    "file": "star-schedar.svg",
+    "alt": "2D preview of Schedar"
+  },
+  {
+    "id": "star-shaula",
+    "file": "star-shaula.svg",
+    "alt": "2D preview of Shaula"
+  },
+  {
+    "id": "star-sirius",
+    "file": "star-sirius.svg",
+    "alt": "2D preview of Sirius"
+  },
+  {
+    "id": "star-spica",
+    "file": "star-spica.svg",
+    "alt": "2D preview of Spica"
+  },
+  {
+    "id": "star-suhail",
+    "file": "star-suhail.svg",
+    "alt": "2D preview of Suhail"
+  },
+  {
+    "id": "star-tiaki",
+    "file": "star-tiaki.svg",
+    "alt": "2D preview of Tiaki"
+  },
+  {
+    "id": "star-wezen",
+    "file": "star-wezen.svg",
+    "alt": "2D preview of Wezen"
+  },
+  {
+    "id": "m6",
+    "file": "m6.svg",
+    "alt": "2D preview of Butterfly Cluster (M6)"
+  },
+  {
+    "id": "m13",
+    "file": "m13.svg",
+    "alt": "2D preview of Great Hercules Cluster (M13)"
+  },
+  {
+    "id": "m10",
+    "file": "m10.svg",
+    "alt": "2D preview of M10"
+  },
+  {
+    "id": "m103",
+    "file": "m103.svg",
+    "alt": "2D preview of M103"
+  },
+  {
+    "id": "m107",
+    "file": "m107.svg",
+    "alt": "2D preview of M107"
+  },
+  {
+    "id": "m12",
+    "file": "m12.svg",
+    "alt": "2D preview of M12"
+  },
+  {
+    "id": "m14",
+    "file": "m14.svg",
+    "alt": "2D preview of M14"
+  },
+  {
+    "id": "m15",
+    "file": "m15.svg",
+    "alt": "2D preview of M15"
+  },
+  {
+    "id": "m18",
+    "file": "m18.svg",
+    "alt": "2D preview of M18"
+  },
+  {
+    "id": "m19",
+    "file": "m19.svg",
+    "alt": "2D preview of M19"
+  },
+  {
+    "id": "m2",
+    "file": "m2.svg",
+    "alt": "2D preview of M2"
+  },
+  {
+    "id": "m21",
+    "file": "m21.svg",
+    "alt": "2D preview of M21"
+  },
+  {
+    "id": "m22",
+    "file": "m22.svg",
+    "alt": "2D preview of M22"
+  },
+  {
+    "id": "m23",
+    "file": "m23.svg",
+    "alt": "2D preview of M23"
+  },
+  {
+    "id": "m25",
+    "file": "m25.svg",
+    "alt": "2D preview of M25"
+  },
+  {
+    "id": "m26",
+    "file": "m26.svg",
+    "alt": "2D preview of M26"
+  },
+  {
+    "id": "m28",
+    "file": "m28.svg",
+    "alt": "2D preview of M28"
+  },
+  {
+    "id": "m29",
+    "file": "m29.svg",
+    "alt": "2D preview of M29"
+  },
+  {
+    "id": "m3",
+    "file": "m3.svg",
+    "alt": "2D preview of M3"
+  },
+  {
+    "id": "m30",
+    "file": "m30.svg",
+    "alt": "2D preview of M30"
+  },
+  {
+    "id": "m34",
+    "file": "m34.svg",
+    "alt": "2D preview of M34"
+  },
+  {
+    "id": "m35",
+    "file": "m35.svg",
+    "alt": "2D preview of M35"
+  },
+  {
+    "id": "m36",
+    "file": "m36.svg",
+    "alt": "2D preview of M36"
+  },
+  {
+    "id": "m37",
+    "file": "m37.svg",
+    "alt": "2D preview of M37"
+  },
+  {
+    "id": "m38",
+    "file": "m38.svg",
+    "alt": "2D preview of M38"
+  },
+  {
+    "id": "m39",
+    "file": "m39.svg",
+    "alt": "2D preview of M39"
+  },
+  {
+    "id": "m4",
+    "file": "m4.svg",
+    "alt": "2D preview of M4"
+  },
+  {
+    "id": "m41",
+    "file": "m41.svg",
+    "alt": "2D preview of M41"
+  },
+  {
+    "id": "m46",
+    "file": "m46.svg",
+    "alt": "2D preview of M46"
+  },
+  {
+    "id": "m47",
+    "file": "m47.svg",
+    "alt": "2D preview of M47"
+  },
+  {
+    "id": "m48",
+    "file": "m48.svg",
+    "alt": "2D preview of M48"
+  },
+  {
+    "id": "m5",
+    "file": "m5.svg",
+    "alt": "2D preview of M5"
+  },
+  {
+    "id": "m50",
+    "file": "m50.svg",
+    "alt": "2D preview of M50"
+  },
+  {
+    "id": "m52",
+    "file": "m52.svg",
+    "alt": "2D preview of M52"
+  },
+  {
+    "id": "m53",
+    "file": "m53.svg",
+    "alt": "2D preview of M53"
+  },
+  {
+    "id": "m54",
+    "file": "m54.svg",
+    "alt": "2D preview of M54"
+  },
+  {
+    "id": "m55",
+    "file": "m55.svg",
+    "alt": "2D preview of M55"
+  },
+  {
+    "id": "m56",
+    "file": "m56.svg",
+    "alt": "2D preview of M56"
+  },
+  {
+    "id": "m62",
+    "file": "m62.svg",
+    "alt": "2D preview of M62"
+  },
+  {
+    "id": "m67",
+    "file": "m67.svg",
+    "alt": "2D preview of M67"
+  },
+  {
+    "id": "m68",
+    "file": "m68.svg",
+    "alt": "2D preview of M68"
+  },
+  {
+    "id": "m69",
+    "file": "m69.svg",
+    "alt": "2D preview of M69"
+  },
+  {
+    "id": "m70",
+    "file": "m70.svg",
+    "alt": "2D preview of M70"
+  },
+  {
+    "id": "m71",
+    "file": "m71.svg",
+    "alt": "2D preview of M71"
+  },
+  {
+    "id": "m72",
+    "file": "m72.svg",
+    "alt": "2D preview of M72"
+  },
+  {
+    "id": "m75",
+    "file": "m75.svg",
+    "alt": "2D preview of M75"
+  },
+  {
+    "id": "m79",
+    "file": "m79.svg",
+    "alt": "2D preview of M79"
+  },
+  {
+    "id": "m80",
+    "file": "m80.svg",
+    "alt": "2D preview of M80"
+  },
+  {
+    "id": "m9",
+    "file": "m9.svg",
+    "alt": "2D preview of M9"
+  },
+  {
+    "id": "m92",
+    "file": "m92.svg",
+    "alt": "2D preview of M92"
+  },
+  {
+    "id": "m93",
+    "file": "m93.svg",
+    "alt": "2D preview of M93"
+  },
+  {
+    "id": "m44",
+    "file": "m44.svg",
+    "alt": "2D preview of Praesepe (M44)"
+  },
+  {
+    "id": "m7",
+    "file": "m7.svg",
+    "alt": "2D preview of Ptolemy´s Cluster (M7)"
+  },
+  {
+    "id": "m11",
+    "file": "m11.svg",
+    "alt": "2D preview of Wild Duck Cluster (M11)"
+  },
+  {
+    "id": "m73",
+    "file": "m73.svg",
+    "alt": "2D preview of 4 Star asterism (M73)"
+  },
+  {
+    "id": "m40",
+    "file": "m40.svg",
+    "alt": "2D preview of M40"
+  },
+  {
+    "id": "m24",
+    "file": "m24.svg",
+    "alt": "2D preview of Milky Way patch (M24)"
+  }
+]

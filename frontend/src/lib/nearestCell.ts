@@ -13,7 +13,7 @@ export interface NearestCell {
 }
 
 /** Centre of a feature as [lon, lat]: the point itself, or the middle of a polygon's bounding box. */
-function featureCenter(geometry: ScoresResponse['features'][number]['geometry']): [number, number] | null {
+export function featureCenter(geometry: ScoresResponse['features'][number]['geometry']): [number, number] | null {
   if (geometry.type === 'Point') return [geometry.coordinates[0], geometry.coordinates[1]]
   const ring = geometry.coordinates[0]
   if (!ring?.length) return null

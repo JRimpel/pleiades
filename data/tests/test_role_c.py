@@ -168,8 +168,15 @@ def test_gemini_single_attempt_timeout_and_validation(monkeypatch):
     monkeypatch.setattr(explain.genai, 'Client', Client)
     result = explain._generate_json('test prompt', Explanation)
     assert result.summary == 'A test summary'
-    assert calls['options'].timeout == 6500 and calls['options'].retry_options.attempts == 1
+    assert calls['options'].timeout == 10_000 and calls['options'].retry_options.attempts == 1
     assert calls['request']['config'].response_mime_type == 'application/json'
+    ctx = ExplainContext(cell_id=1, spot_name=None, valid_time=WHEN, local_time='Test night',
+                         score=12, nelm=4, factors={}, bortle=None)
+    explain.explain_score(ctx)
+    assert calls['options'].timeout == 10_000  # Provider minimum even with an 8s caller budget.
+    settings.explain_timeout_s = 12
+    explain.explain_score(ctx)
+    assert calls['options'].timeout == 11_750
 
 
 def test_explanation_fallback_and_configured_failure(monkeypatch):

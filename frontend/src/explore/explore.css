@@ -1,6 +1,6 @@
 .explore-section { padding: 54px 28px 42px; border-top: 1px solid #303745; background: radial-gradient(ellipse at 100% 0, #1b28433b, transparent 60%), #101622; }
 .explore-section * { box-sizing: border-box; }
-.explore-section button, .object-dialog button, .explore-section input { font: inherit; }
+.explore-section button, .object-dialog button, .explore-section input, .explore-section select { font: inherit; }
 .eyebrow { color: #a9bfff; font-size: 11px; font-weight: 650; letter-spacing: .14em; text-transform: uppercase; }
 .explore-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; max-width: 1440px; margin: 0 auto 28px; }
 .explore-heading h2 { margin: 9px 0 10px; font-size: clamp(30px, 3.4vw, 44px); letter-spacing: -1.6px; line-height: 1.1; font-weight: 600; }
@@ -31,9 +31,11 @@
 .explore-object-card { border: 1px solid #35415a; border-radius: 12px; background: #172033; overflow: hidden; transition: border-color .18s, transform .18s; }
 .explore-object-card:hover { border-color: #778bb4; transform: translateY(-3px); }
 .explore-card-image { height: 172px; background: radial-gradient(ellipse at center, #253b5d, #080f1c 75%); position: relative; overflow: hidden; }
-.explore-card-image img { width: 100%; height: 100%; object-fit: cover; }
-.object-jupiter .explore-card-image img { object-fit: contain; }
-.object-vega .explore-card-image img { object-fit: cover; object-position: center 35%; }
+.explore-card-image img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.explore-thumbnail-fallback { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; width: 100%; height: 100%; padding: 30px 12px 10px; color: #c7d8f1; text-align: center; }
+.explore-thumbnail-fallback svg { width: 90px; height: 65px; fill: #253d61; stroke: #a9c8f1; stroke-width: 1.5; }
+.explore-thumbnail-fallback span { font-size: 12px; }
+.explore-thumbnail-fallback small { font-size: 10px; color: #aebed9; }
 .explore-card-image > span { position: absolute; left: 12px; top: 12px; background: #0e172be8; border: 1px solid #62708b; border-radius: 20px; padding: 4px 9px; font-size: 10px; color: #e1e9f9; }
 .explore-card-body { padding: 17px; }
 .explore-card-status { display: block; font-size: 10px; line-height: 1.5; min-height: 16px; }
@@ -45,7 +47,7 @@
 .explore-open-button { width: 100%; background: #233350; border-color: #52678f; color: #e3eaff; display: flex; align-items: center; justify-content: space-between; font-size: 12px; }
 .explore-open-button:hover { background: #33496e; }
 .explore-footnote { max-width: 1440px; margin: 20px auto 0; font-size: 12px; line-height: 1.7; color: #aebad0; }
-.explore-section :is(button,input):focus-visible, .object-dialog :is(button,a,model-viewer):focus-visible { outline: 3px solid #b3cbff; outline-offset: 3px; }
+.explore-section :is(button,input,select):focus-visible, .object-dialog :is(button,a,model-viewer):focus-visible { outline: 3px solid #b3cbff; outline-offset: 3px; }
 .object-dialog { padding: 0; width: min(1180px, calc(100% - 32px)); max-width: none; max-height: 92dvh; border: 1px solid #52607b; border-radius: 16px; color: #f1f5ff; background: #111a2a; box-shadow: 0 30px 120px #0009; }
 .object-dialog::backdrop { background: #040813db; backdrop-filter: blur(6px); }
 .object-dialog-inner { padding: 26px; }
@@ -96,6 +98,18 @@
 .explore-static-fallback img { width: 100%; max-height: 390px; object-fit: contain; }
 .explore-static-fallback p { padding: 0 15px 15px; font-size: 12px; }
 .explore-unsupported { padding: 35px 0; line-height: 1.7; color: #cfdaec; }
+.explore-atlas-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 24px; max-width: 1440px; margin: 24px auto 12px; }
+.explore-atlas-tools label { display: grid; gap: 8px; flex: 1 1 280px; color: #c4d3eb; font-size: 12px; }
+.explore-atlas-tools input { width: 100%; box-sizing: border-box; background: #111c30; border: 1px solid #52678f; color: #f0f5ff; border-radius: 8px; padding: 12px 14px; font: inherit; }
+.explore-atlas-tools p { flex: 1 1 280px; color: #b4c1d7; font-size: 12px; line-height: 1.8; }
+.explore-sort { display: flex; align-items: center; gap: 8px; margin-left: auto; color: #c4d3eb; font-size: 12px; white-space: nowrap; }
+.explore-sort select { min-width: 126px; padding: 9px 12px; background: #111c30; border: 1px solid #52678f; border-radius: 8px; color: #f0f5ff; color-scheme: dark; cursor: pointer; }
+.explore-sort-note { max-width: 1440px; margin: -6px auto 20px; color: #b4c1d7; font-size: 12px; line-height: 1.7; }
+@media (max-width: 960px) { .explore-sort { margin-left: 0; } }
+.explore-filters { flex-wrap: wrap; }
+.explore-load-more { display: block; margin: 24px auto; background: #233350; border: 1px solid #52678f; border-radius: 8px; padding: 12px 20px; color: #e3eaff; cursor: pointer; }
+.explore-star-label { background: #101a2bd9; border: 1px solid #6d95c3; border-radius: 6px; padding: 3px 6px; color: #e8f3ff; font: 10px system-ui; pointer-events: none; }
+.explore-star-label[hidden] { display: none; }
 @media (min-width: 1500px) { .explore-section { padding-inline: 4vw; } }
 @media (max-width: 960px) { .explore-context-fields { grid-template-columns: 1fr 1fr; }.explore-filter-row { align-items: flex-start; flex-direction: column; gap: 2px; }.explore-object-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); } }
 @media (max-width: 720px) { .explore-section { padding: 32px 18px; }.explore-heading { gap: 12px; }.explore-independent-badge { display: none; }.explore-context { padding: 15px; }.explore-context-heading { align-items: flex-start; flex-direction: column; gap: 7px; }.explore-context-fields { gap: 12px; }.explore-time-input { grid-column: 1 / -1; }.explore-context-fields .explore-button { grid-column: 1 / -1; }.explore-object-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }.explore-card-image { height: 140px; }.explore-card-body { padding: 13px; }.explore-card-body h3 { font-size: 18px; }.explore-card-status { min-height: 30px; }.object-dialog { width: calc(100% - 18px); max-height: 95dvh; border-radius: 12px; }.object-dialog-inner { padding: 18px; }.object-dialog-layout { grid-template-columns: 1fr; gap: 20px; }.object-dialog-visual { position: static; }.explore-stage { height: 320px; }.explore-camera-controls button { min-height: 40px; }.explore-close { width: 42px; height: 42px; }.explore-detail-reference img { max-height: 260px; } }

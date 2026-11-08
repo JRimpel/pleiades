@@ -1,6 +1,7 @@
 import starCatalog from './star-catalog.json'
+import expandedCatalog from './expanded-catalog.json'
 
-export type ObjectCategory = 'Planet' | 'Star' | 'Star cluster' | 'Galaxy'
+export type ObjectCategory = 'Planet' | 'Moon' | 'Star' | 'Star cluster' | 'Star field' | 'Galaxy' | 'Nebula' | 'Constellation'
 export interface CelestialObject {
   id: string
   name: string
@@ -10,6 +11,8 @@ export interface CelestialObject {
   model: string
   image: string
   imageAlt: string
+  thumbnail: string
+  thumbnailAlt: string
   imageCaption: string
   modelCredit: string
   modelNote: string
@@ -18,13 +21,15 @@ export interface CelestialObject {
   cameraOrbit: string
   observingTip: string
   catalogPosition?: { raHours: number; decDeg: number }
+  labels?: { name: string; position: number[] }[]
+  partialFromWny?: boolean
 }
 
 const base = import.meta.env.BASE_URL + 'explore/'
 const vega = starCatalog.stars.find(star => star.name === 'Vega')!
 const members = starCatalog.stars.filter(star => star.name !== 'Vega')
 export const clusterMembers = members
-export const catalog: CelestialObject[] = [
+const objects: Omit<CelestialObject, 'thumbnail' | 'thumbnailAlt'>[] = [
   {
     id: 'saturn', name: 'Saturn', category: 'Planet', subtitle: 'A world framed by rings',
     description: 'Saturn is a gas giant surrounded by rings made of countless pieces of ice and rock. This NASA model lets you examine the planet and its ring system from different angles.',
@@ -47,7 +52,7 @@ export const catalog: CelestialObject[] = [
   },
   {
     id: 'vega', name: 'Vega', category: 'Star', subtitle: 'A bright point in Lyra',
-    description: 'Vega is a bright star in the constellation Lyra and a corner of the Summer Triangle. This deliberately simple illustration distinguishes an individual star from a planetary system or star cluster.',
+    description: 'Vega is a bright star in the constellation Lyra and a corner of the Summer Triangle. Explore an enlarged blue-white stellar illustration with surface variation and a soft luminous halo.',
     model: base + 'vega-illustration.glb', image: base + 'vega.svg', imageAlt: 'Illustration of a blue-white star, not a resolved photograph of Vega',
     imageCaption: 'Original star illustration · Pleiades · CC BY 4.0', modelCredit: 'Original 3D star illustration: Pleiades · CC BY 4.0',
     modelNote: 'Illustration only. The apparent surface, colors and size are not resolved measurements of Vega.',
@@ -58,7 +63,7 @@ export const catalog: CelestialObject[] = [
   },
   {
     id: 'pleiades', name: 'Pleiades', category: 'Star cluster', subtitle: 'Meet the namesake of our map',
-    description: 'The Pleiades, also called Messier 45, is an open star cluster in Taurus. This scene places nine named members according to their cataloged angular positions, with simplified depth so you can explore their arrangement.',
+    description: 'The Pleiades, also called Messier 45, is an open star cluster in Taurus. This scene places nine named members according to their cataloged angular positions and adds enhanced blue reflection-nebula clouds. Cloud depth is illustrative.',
     model: base + 'pleiades.glb', image: base + 'pleiades.jpg', imageAlt: 'Infrared WISE image of the Pleiades star cluster and surrounding dust',
     imageCaption: 'Infrared reference image · NASA/JPL-Caltech/UCLA · WISE',
     modelCredit: 'Angular coordinates: David Nash / Astronexus HYG v4.0 · CC BY-SA 4.0; adapted by Pleiades',
@@ -78,8 +83,17 @@ export const catalog: CelestialObject[] = [
     modelNote: 'Illustrative spiral only. Star positions, arm structure, depth and scale are not reconstructed measurements of Andromeda.',
     source: 'https://science.nasa.gov/photojournal/andromeda/', sourceLabel: 'NASA · Andromeda / GALEX',
     cameraOrbit: '0deg 45deg 110%', observingTip: 'Dark skies and binoculars can help. Long-exposure and ultraviolet imagery show detail and colors that are not an unaided-eye view.',
+    catalogPosition: { raHours: .712, decDeg: 41.269 },
   },
+  ...expandedCatalog.map(object => ({ ...object, category: object.category as ObjectCategory,
+    model: base + object.model, image: base + object.image })),
 ]
+
+export const catalog: CelestialObject[] = objects.map(object => ({
+  ...object,
+  thumbnail: `${base}thumbnails/${object.id}.svg`,
+  thumbnailAlt: `2D preview of ${object.name}`,
+}))
 
 export function findObject(id: string) {
   return catalog.find(object => object.id === id || object.name.toLowerCase() === id.toLowerCase())

@@ -1,149 +1,229 @@
-# Explore in 3D — frontend handoff
+# Explore in 3D: current integration handoff
 
-Updated November 8, 2026. Work is confined to `frontend/`.
+Updated November 8, 2026 (America/New_York). This is the current guide for the atlas, thumbnails, visibility sorting and viewer. It replaces the original five-object/standalone-only directions.
 
-## User decisions and scope
+Documentation validation: checked 70 local links across seven updated Markdown files, command/script paths, code fences, catalog counts and the 7-unit/14-browser test definitions; no errors. Markdown whitespace checks passed. Application tests were not rerun for this documentation-only pass; the recorded results below are from the latest implementation checks.
 
-- Six or more hours available.
-- Polished planets and stars, with simpler clusters and galaxies.
-- Keep this feature separate from map selection for now; expose an integration interface.
+The implementation and documentation are present in the working tree; this task has not committed or deployed them. Include untracked runtime assets, generated metadata, new components/scripts/tests and their manifests when preparing an integration commit. Use `git status --short --untracked-files=normal` rather than relying only on `git diff`.
 
-Read `Architecture.md`, `backend-documentation.md`, `AI_ML_HANDOFF.md`, the actual sky route/types, and the existing frontend before implementation. No backend endpoints, schemas, or shared contracts were changed.
+Read [project integration](../INTEGRATION_HANDOFF.md) for API/database startup and map wiring, [frontend documentation](../frontend-documentation.md) for the surrounding UI, and [AI/ML handoff](../AI_ML_HANDOFF.md) for scoring and backend astronomy ownership.
 
-## Implemented
+## Current behavior and accepted decisions
 
-- Separate Explore section below the existing map, with its own WNY latitude/longitude and UTC time controls and an America/New_York time preview.
-- Five object cards: Saturn, Jupiter, Vega, Pleiades (correctly labeled a star cluster), and Andromeda Galaxy.
-- Responsive native-dialog viewer with rotation, zoom, reset, optional auto-rotation, keyboard camera buttons, Escape/backdrop/close behavior, focus restoration, and body scroll locking.
-- Lazy viewer/library loading; GLBs load only after an object is opened. Model cache is disabled, disconnected elements are removed, rotation/animation is stopped, and source references are cleared on teardown.
-- User-selectable reference image mode plus loading, failed-asset, unavailable-WebGL, unsupported-object, failed-reference-image and viewer-library-failure views.
-- Reduced-motion preference disables automatic rotation and snaps programmatic camera changes.
-- Sourced descriptions, equipment guidance, model/image credit, educational-view labels, and optional uncertain-photo-identification text.
-- Existing `/api/sky-events` integration, request cancellation/timeout and stale-context protection. No Gemini dependency.
+| Area | Implemented behavior |
+| --- | --- |
+| Coverage | 263 objects: 73 constellations, 7 planets other than Earth, the Moon, 72 named stars, 55 clusters, 3 star fields/asterisms, 40 galaxies and 12 nebulae |
+| Messier targets | All 110; M31 uses ID `andromeda`, M45 uses `pleiades` |
+| Visual style | Detailed educational geometry with enhanced nebula colors/clouds; schematic depth, not measured volumetric reconstruction |
+| Planet/Moon models | Existing NASA Jupiter/Saturn; NASA LRO/LROC lunar surface texture; other new planetary surfaces are procedural |
+| Constellations | Catalog angular patterns, connecting lines, enlarged color-coded stars, toggleable named-star/nebula labels; appropriate Messier nebulae also appear in constellation scenes |
+| Rotation | Starts automatically at 12 degrees/second with no startup delay, including reduced-motion mode, per explicit user preference; Pause / Resume is always available |
+| Thumbnails | Dedicated, self-contained 400 x 300 SVG for every object; lazy card images, independent of detail reference images and GLBs |
+| Default order | Visibility: above horizon first, unknown next, below horizon last; Name (A–Z) is optional |
+| Browsing | Search, category filters, 24-card batches and Show more; filter and sort apply before pagination |
+| Shared context | Selected spot/cell, then valid WNY GPS, then region center; selected forecast time follows the map |
+| Dependencies | Existing Flask sky endpoint and local assets; no Gemini, score calculation or photo service required to open models |
 
-## Files
+Coverage is year-round. The constellation filter includes regions whose J2000 boundary reaches declination greater than -48 degrees: a northern portion can rise from WNY's southern edge at 42 N. Partial southern figures are marked. Bright named stars use HYG visual magnitude <= 2.5 and declination > -48; the Sun is excluded. This is the selected observing catalog, not every detectable star or deep-sky object.
 
-| Path | Purpose |
-|---|---|
-| `src/explore/ExploreIn3D.tsx` | Standalone feature and object selection/filtering |
-| `src/explore/ObservationControls.tsx` | Independent observing-context form |
-| `src/explore/ObjectExplorerModal.tsx` | Accessible dialog, educational content, observing context, credits |
-| `src/explore/ObjectModelViewer.tsx` | Lazy model-viewer registration, camera controls, teardown and reference fallbacks |
-| `src/explore/catalog.ts` | Supported objects, source links, representations and observing guidance |
-| `src/explore/star-catalog.json` | Bundled HYG coordinate subset, mirrored from the public attribution copy by the generator |
-| `src/explore/astronomy.ts` | Existing-response validation, local-night dates and conservative rise/set estimates |
-| `src/explore/useNightSummary.ts` | Abortable, timeout-bounded existing API fetch |
-| `src/explore/explore.css` | Scoped dark-theme and mobile styles |
-| `src/explore/index.ts` | Reusable component/type exports |
-| `public/explore/` | Local models, reference images, coordinate subset and source manifest |
-| `scripts/prepare-explore-assets.py` | Reproducible asset download and schematic GLB generation; standard-library Python |
-| `tests/astronomy.test.ts` | Date/DST, event, stale-response and invalid-context checks |
-| `tests/browser/explore.spec.ts` | Real rendering, mobile, focus, reduced motion, context and failure checks |
-| `tests/fixture.html`, `tests/fixture.tsx` | Development/test integration fixture; not an application build entry |
-| `playwright.config.ts`, `scripts/install-browser.mjs` | Browser verification with project-local Chromium |
+## Integration entry points
 
-`src/App.tsx` mounts `<ExploreIn3D />` after the map. The existing map constructor-failure handler had a pre-existing lint error; its state update is now queued and canceled on unmount. Map navigation/reset behavior was preserved. `vite.config.ts` now proxies the existing `/api` namespace to `http://127.0.0.1:5000` in development; `PLEIADES_DEV_API_TARGET` can override that development target. Production remains same-origin `/api`.
-
-## Integrate with shared map/time state later
+Import public feature exports from `src/explore/index.ts`:
 
 ```tsx
-import { ExploreIn3D } from './explore'
-import { useState } from 'react'
-import type { ObservationContext } from './explore'
+import { ExploreIn3D, ObjectExplorerModal, catalog, findObject } from './explore'
+import type {
+  ObservationContext, ObservingConditions, PhotoIdentification, CelestialObject,
+} from './explore'
+```
 
-// Inside the parent component. Timestamp includes UTC Z or an explicit offset.
-const [observingContext, setObservingContext] = useState<ObservationContext>({
+The app already mounts the explorer below its full-height map. Preserve that arrangement and reuse `src/lib/observingContext.ts` rather than introducing another location/time state.
+
+```tsx
+// Within a parent component; derive these from shared map/forecast state.
+const observation: ObservationContext = {
   lat: 42.7,
   lon: -78.4,
   time: '2026-11-08T04:00:00Z',
-})
+}
+const conditions: ObservingConditions = {
+  cloudCoverPercent: 20,
+  bortle: 4,
+  source: 'Selected spot forecast and static light-pollution estimate',
+}
 
 <ExploreIn3D
-  observation={observingContext}
-  onObservationChange={setObservingContext}
+  observation={observation}
+  conditions={conditions}
+  contextLabel="Selected map spot"
   hideControls
-  conditions={{ cloudCoverPercent: 20, bortle: 4, source: 'selected spot forecast' }}
 />
 ```
 
-When `observation` is supplied, the parent owns it. Without a callback, shared context is displayed read-only. Without the prop, the explorer uses internal state; changing it does not move the map. Supplied invalid/out-of-WNY context displays an error instead of fetching misleading astronomy.
+| Prop | Contract |
+| --- | --- |
+| `observation?` | `{ lat: number; lon: number; time: string }`; use an ISO timestamp with UTC Z or an explicit offset |
+| `onObservationChange?` | `(context: ObservationContext) => void`; required if a parent-controlled standalone form should edit shared state |
+| `hideControls?` | Hides the standalone coordinate/time form and displays the selected-context caption |
+| `contextLabel?` | Human-readable context origin, e.g. Selected map spot |
+| `conditions?` | `{ cloudCoverPercent?: number; bortle?: number; source?: string }`; cloud cover is percent, not a 0–1 fraction |
+| `initialObjectId?` | Opens an object at mount; later prop changes do not change selection |
+| `photoIdentification?` | `{ name: string; confidence?: number }`; confidence is displayed as a fraction converted to percent, with explicit uncertainty |
 
-For photo integration, `ObjectExplorerModal`, `catalog`, `findObject` and the context/identification types are exported. A parent can open a supported object with `identification={{name, confidence}}`; the dialog describes it as a possible identification and never treats model confidence as a calibrated probability. `ExploreIn3D` also accepts `initialObjectId` and `photoIdentification` for an initially opened object. Re-key the component for a new initial selection, or use the exported modal for ongoing controlled selection. Unknown objects show an explicit unsupported state.
+Without `observation`, the feature owns internal context. With `observation` but no callback, it is read-only. Validation accepts latitude 42 through 43.4 and longitude -79.8 through -77, with a parseable timestamp; invalid context shows an error. Use timezone-qualified timestamps even though the parser itself accepts any parseable date.
 
-## Honest astronomy behavior and backend needs
+`resolveObservingContext(time, cellId, spot, scores, location)` returns `{ observation, conditions, label }`. Priority: matching selected spot, selected score-cell center, in-coverage GPS, WNY center (42.7, -78.4). Navigation/panning bounds extend farther and must not be used as observing coverage. Weather/Bortle details are passed only when spot ID, coordinates and forecast hour match; stale cached weather is omitted.
 
-- Existing endpoint: `GET /api/sky-events?lat=...&lon=...&date=YYYY-MM-DD`.
-- `date` is the New York local night-start date. Before local noon it is the previous date; DST transitions are handled through Intl time-zone formatting.
-- The endpoint returns a nightly planet list and rise/set events, **not exact altitude/azimuth at the selected instant**.
-- When both rise and set crossings are provided, the UI estimates above/below horizon at the selected time and labels it “estimated.” Incomplete crossings are shown as nightly listing only. Omission from the list is not treated as exact selected-time invisibility.
-- Vega, Pleiades and Andromeda explicitly show **“Visibility not calculated”**. Their static models can still be explored. No fixed “visible tonight” claims are used.
-- Backend failure, timeout, stale date, or mismatched coordinates results in unknown visibility, not fabricated conditions.
-- Weather/Bortle context is displayed only if the parent supplies it; standalone mode says it has not been checked.
-- Future Role B/C integration: provide a coordinated exact-time object-position response containing canonical name, altitude/azimuth, computation time/location/source, and uncertain photo provenance. No new route was invented here.
+For later photo or controlled-modal integration:
 
-## Assets, science and attribution
+- `findObject` accepts a stable ID or case-insensitive full display name. Messier aliases are not generally resolved; translate M31/M45 to the existing IDs.
+- `initialObjectId` initializes selection once. Re-key the explorer for a new initial selection, or control the exported `ObjectExplorerModal` directly.
+- Direct modal props are `object` (possibly undefined), `observation`, `availability`, `onClose`, and optional `requestedName`, `conditions`, `identification`.
+- Import `availabilityFor` and the `Availability` type directly from `./explore/astronomy`; they are not barrel exports.
+- Unknown objects show an unsupported state. The explorer passes photo metadata only when its name matches the selected object's display name (case-insensitive). A possible photo match is not confirmation, and provider confidence is not a calibrated probability.
 
-`public/explore/sources.json` records original URLs, NASA model checksums, credits and generated-model provenance. All runtime model/image requests are same-origin local files. No decoder CDN is required by the shipped GLBs.
+## Visibility and API contract
 
-- Saturn GLB: unchanged [NASA VTAD model](https://science.nasa.gov/resource/saturn-3d-model/), about 5.5 MB. Reference from [NASA Saturn](https://science.nasa.gov/saturn/), Cassini image credited to NASA/JPL-Caltech/Space Science Institute.
-- Jupiter GLB: unchanged [NASA VTAD model](https://science.nasa.gov/resource/jupiter-3d-model/), about 11.5 MB. Reference from [NASA Jupiter](https://science.nasa.gov/jupiter/). These are educational close-ups, not time-synchronized cloud, lighting, ring-orientation, or rotation simulations.
-- Vega: original schematic blue-white sphere/gradient and SVG poster, CC BY 4.0. It is **not** a resolved surface image. [NASA educational source](https://science.nasa.gov/solar-system/skywatching/night-sky-network/summer-triangle-corner-vega/).
-- Pleiades: nine named members from [HYG v4.0](https://github.com/astronexus/HYG-Database/blob/main/hyg/README.md), David Nash/Astronexus, **CC BY-SA 4.0**. Angular layout uses J2000 RA/declination. Displayed depth and enlarged radii are schematic; no parallax reconstruction is claimed. Coordinate subset and derived GLB are CC BY-SA 4.0; preserve attribution, change notice, and share-alike terms. [WISE reference](https://science.nasa.gov/photojournal/seven-sisters-get-wise/) is infrared, NASA/JPL-Caltech/UCLA.
-- Andromeda: original procedural illustrative spiral, CC BY 4.0. Its arms, stars, depth and scale are not measured Andromeda geometry. [GALEX reference](https://science.nasa.gov/photojournal/andromeda/) is ultraviolet, NASA/JPL-Caltech. Both representation and wavelength are labeled in the UI.
-- NASA media use: [official guidance](https://www.nasa.gov/nasa-brand-center/images-and-media/). Acknowledge NASA and item-specific credits; no endorsement is implied. No NASA logos were added.
-- `@google/model-viewer`: Apache 2.0; its renderer dependency Three.js is MIT. Keep package license notices with distribution.
+The existing endpoint is:
 
-Regenerate assets from repository root:
+```text
+GET /api/sky-events?lat=42.7&lon=-78.4&date=2026-11-07
+```
+
+`date` is the America/New_York night-start date: before local noon use the preceding local date. Use `nightDate`; do not derive it by slicing the UTC timestamp. The hook reuses a response for hour changes within one local night, cancels superseded requests, times out after 10 seconds, and rejects mismatched date/location responses.
+
+The frontend consumes these existing response fields:
+
+```ts
+{
+  date: string; lat: number; lon: number;
+  twilight: {
+    sunset: string | null; astronomical_dusk: string | null;
+    astronomical_dawn: string | null; sunrise: string | null;
+  };
+  moon: {
+    illumination: number; phase_name: string;
+    rise: string | null; set: string | null;
+  };
+  planets: {
+    name: string; rise: string | null; set: string | null;
+    max_alt_deg: number | null;
+  }[];
+}
+```
+
+Additional backend fields are allowed. No new endpoint, database schema, scoring seam or AI contract was introduced by the atlas work.
+
+- Fixed stars, clusters, galaxies, nebulae and constellation centers use `catalogPosition: { raHours, decDeg }` and `catalogAltitude` to estimate geometric altitude at the selected time/location. These estimates continue when the API is unavailable.
+- The implementation uses approximate mean sidereal time and spherical altitude. UTC approximates UT1; precession, nutation, proper motion and atmospheric refraction are omitted. Formula references: [USNO sidereal time](https://aa.usno.navy.mil/faq/GAST), [USNO altitude](https://aa.usno.navy.mil/faq/alt_az).
+- Constellation availability describes its catalog center. Parts of the extended figure can be on either side of the horizon.
+- Planets/Moon use matched local-night rise/set crossings. Missing/identical/unparseable crossings, unlisted planets, stale responses or API failure remain unknown. The nightly maximum altitude is not the selected-hour altitude.
+- `Availability` adds optional `aboveHorizon: boolean | null` and `altitudeDeg: number` to the existing label/detail/tone/rise/set fields. Missing or null horizon state sorts as unknown.
+- `sortByVisibility` returns a new array. It groups above / unknown / below, then uses descending altitude where available (missing altitude sorts after computed altitudes within that group), then numeric-aware English name order and ID. It does not mutate `catalog`.
+- The UI recomputes sorting for selected context and sky-summary changes, before the 24-item slice. Do not sort only the displayed page or use label text/color as a data contract.
+
+An above-horizon estimate is not guaranteed observability. Weather, daylight, terrain, brightness and equipment still matter. Exact ephemeris-based fixed-object positions and selected-time planetary altitudes remain future work.
+
+## Viewer lifecycle and controls
+
+Opening an object lazy-loads the viewer/library and its GLB. Merely browsing thumbnails fetches no GLBs. WebGL2 unavailable, failed assets, timeout or library failure shows the detail reference image; the user can switch to image mode and retry 3D with a fresh query-string URL.
+
+- Auto-rotation is on for each newly opened model. Left/right camera buttons and Reset pause it. Pointer dragging does not set the pause state; use Pause rotation to stop it.
+- Reduced motion still snaps programmatic camera changes and removes card transitions. It does not suppress automatic turntable rotation, per the user's explicit instruction.
+- Reset restores camera orbit/FOV and turntable orientation. Image mode/retry leaves rotation paused until resumed.
+- Modal close/Escape/backdrop restores opener focus and body scroll. Tab cycling remains inside the dialog. Escape closes a 3D dialog before the underlying spot panel.
+- Teardown disables rotation, pauses animation, detaches listeners, clears the source, removes the element and disables the model cache. Preserve cleanup when changing the renderer.
+- `labels[].position` is a local GLB-space coordinate in metres for model-viewer hotspots. It is separate from celestial RA/declination and must not be used for visibility.
+
+## Files and boundaries
+
+Paths below are relative to `frontend/`, except the map bridge reference.
+
+| Path | Responsibility |
+| --- | --- |
+| `src/App.tsx`, `src/lib/observingContext.ts` | Shared map/forecast context and matching conditions |
+| `src/explore/ExploreIn3D.tsx` | Search, category, sort, pagination and selected object |
+| `src/explore/catalog.ts` | Types, original five records, merged generated records, thumbnail URLs and lookup |
+| `src/explore/expanded-catalog.json` | Generated expanded metadata; edit its generator instead of hand-editing this file |
+| `src/explore/star-catalog.json` | Original HYG member subset used by Vega/Pleiades |
+| `src/explore/astronomy.ts` | Context validation, local night, horizon estimates and sorting |
+| `src/explore/useNightSummary.ts` | Existing API request lifecycle and context validation |
+| `src/explore/ObservationControls.tsx` | Optional standalone UTC coordinate/time form |
+| `src/explore/ObjectThumbnail.tsx` | Lazy 2D image and accessible failure fallback |
+| `src/explore/ObjectExplorerModal.tsx` | Dialog, object facts, observing context and credits |
+| `src/explore/ObjectModelViewer.tsx` | Model-viewer, rotation/camera controls, labels and cleanup |
+| `src/explore/explore.css` | Feature styles, responsive layouts and focus indicators |
+| `public/explore/` | Runtime GLBs, reference images, SVG illustrations and provenance |
+| `public/explore/thumbnails/` | 263 standalone card SVGs plus manifest |
+| `scripts/prepare-explore-assets.py` | Original downloads, HYG subset and base schematic generation |
+| `scripts/expand-explore-assets.py` | Expanded catalog/models, improved base models and lunar texture |
+| `scripts/prepare-explore-thumbnails.py` | Complete dedicated 2D thumbnail set |
+| `scripts/verify-explore-assets.py` | Coverage, SVG, finite-coordinate and GLB buffer/index validation |
+
+## IDs, assets and extension workflow
+
+Stable IDs are part of integration: `saturn`, `jupiter`, `vega`, `pleiades`, `andromeda`; new planets/Moon use lowercase names; other Messier targets use `m1` through `m110`; constellations use `constellation-<three-letter-code>`; new named stars use `star-<slug>`.
+
+`catalog.ts` prefixes models/images with `import.meta.env.BASE_URL + 'explore/'`. Card thumbnails always use `thumbnails/<object-id>.svg`. Model filenames can differ from IDs (`vega-illustration.glb`, `andromeda-illustration.glb`); use the metadata, not guessed filenames. `thumbnail/thumbnailAlt` are separate from `image/imageAlt/imageCaption`; do not overwrite scientific reference imagery to change card art.
+
+To add/change an object:
+
+1. Change original-five metadata in `catalog.ts`, or expanded generation in `expand-explore-assets.py`. Keep IDs unique/stable and add a valid catalog position for fixed-object estimates.
+2. Supply model, reference/illustration, source, credit, model limitations, camera orbit and observing guidance. Label procedural/color-enhanced material honestly.
+3. Update `prepare-explore-thumbnails.py` if changing original-five metadata or introducing a category/rendering style. It contains a small original-five record list separate from the expanded JSON.
+4. Run the generators in the order below; running original prep alone overwrites the improved Vega/Pleiades/Andromeda models with earlier schematics.
+5. Run verification and relevant browser checks. Coverage assertions currently expect 263 objects and 73 constellations; update counts deliberately if the selected catalog changes.
+6. Include generated runtime assets/metadata, thumbnail manifest and provenance/licenses with the source change. Download caches, node_modules, dist, test-results and secrets are not integration artifacts.
+
+From repository root, with standard-library Python:
 
 ```powershell
 python frontend/scripts/prepare-explore-assets.py
+python frontend/scripts/expand-explore-assets.py
+python frontend/scripts/prepare-explore-thumbnails.py
+python frontend/scripts/verify-explore-assets.py
 ```
 
-Raw HYG catalog cache stays under ignored `frontend/scripts/.cache/`; only the ten-star subset and generated runtime files are shipped. The generator does not edit downloaded NASA imagery or models. The Vega/galaxy schematics are code-native geometry, not AI-generated photographs.
+Normal app startup uses the shipped local assets and does not need regeneration. Regeneration downloads missing NASA/HYG/d3-celestial sources, requires network access if caches are absent, and uses `frontend/scripts/.cache/`. The source catalogs come from upstream URLs; preserve source manifests and recheck upstream changes when refreshing.
 
-## Setup and checks
+Attribution: keep [asset attribution](public/explore/ATTRIBUTION.md), `sources.json`, `atlas-credits.json`, `d3-celestial-LICENSE.txt` and thumbnail manifest. HYG-derived layouts retain CC BY-SA 4.0 attribution/share-alike; d3-celestial includes its BSD license; original illustrations use CC BY 4.0. NASA assets retain item-specific credit and [NASA media guidance](https://www.nasa.gov/nasa-brand-center/images-and-media/). Nebula clouds, stellar surface detail, galaxy arms/depth and new procedural planetary surfaces are educational; the lunar texture is [NASA SVS CGI Moon Kit](https://svs.gsfc.nasa.gov/4720/).
 
-From `frontend/`:
+## Setup, verification and troubleshooting
+
+From repository root:
 
 ```powershell
-npm install
+Set-Location frontend
+# Stop an existing Vite process before npm ci on Windows to avoid native-file locks.
+npm ci
 npm run dev
-npm run build
-npm run lint
-npm run test:unit
-npm run test:browser:install
-npm run test:browser
 ```
 
-The browser install uses ignored `node_modules/.cache/playwright/`. Browser checks use a mocked existing astronomy response and real local GLBs; no DB or Gemini key is needed. Test-only unknown/photo states use `tests/fixture.html`, which is not part of the production build. Screenshots/traces are under ignored `test-results/`.
+Run Flask separately on 5001; see the project handoff. Vite proxy precedence is `API_PROXY_TARGET`, then `PLEIADES_DEV_API_TARGET`, then `http://127.0.0.1:5001`. Restart Vite after changing those variables. Production requests remain same-origin `/api`, with nginx/Gunicorn internally on 8000.
 
-Verification completed November 8, 2026:
+Latest application verification before this documentation-only pass, November 8, 2026:
 
-- `npm run build`: passed; TypeScript and production bundling succeeded.
-- `npm run lint`: passed.
-- `npm run test:unit`: **4 passed** (DST/night date, rise/set, stale/incomplete summaries, invalid context).
-- `npm run test:browser`: **6 passed**, Chromium with software WebGL, about 30 seconds in the final run. Real local GLBs rendered for all five objects. Assertions verify camera angle changes, zoom changes, reset, Saturn pointer-drag rotation, no GLB requests before opening, no remaining model-viewer after closing, and focus restoration.
-- Mobile checks: 390×844 viewport, reduced motion, keyboard focus containment, scroll lock, no horizontal overflow. Desktop screenshots: 1440×1000. Visually reviewed all five desktop views plus the top and lower content of the mobile Pleiades dialog.
-- Failure checks: blocked GLB request shows its reference image, retry successfully renders; WebGL disabled + astronomy HTTP 503 still allows educational exploration; unsupported objects and uncertain photo identification have explicit states.
-- Existing API mock verifies updated coordinates and correct local-night date. These tests do **not** establish live backend availability or scientifically validate an exact-time position engine.
-- `git diff --check`: passed (only pre-existing Windows line-ending notices outside this frontend change).
+| Command / working directory | Recorded result |
+| --- | --- |
+| `npm run build` / frontend | Passed; existing large-bundle advisory |
+| `npm run test:unit` / frontend | 7 passed |
+| `npm run test:browser -- visibility-sort.spec.ts explore.spec.ts integration.spec.ts thumbnails.spec.ts` / frontend | 14 passed |
+| `python frontend/scripts/verify-explore-assets.py` / repo root | Passed; all models, full Messier coverage and 263 thumbnails |
+| `git diff --check` | Passed; Windows line-ending notices are informational |
 
-Screenshots include `test-results/saturn-desktop.png`, `jupiter-desktop.png`, `vega-desktop.png`, `pleiades-desktop.png`, `andromeda-galaxy-desktop.png`, `pleiades-mobile-top.png` and `pleiades-mobile.png`. They are ignored local QA artifacts, regenerated by browser tests. The expected failed-fetch console error in the blocked-asset test is intentional. Development builds also log model-viewer/Lit warnings and the existing map's missing `circle-11` sprite warning.
+Browser breakdown: 7 explorer, 3 map/API integration, 2 thumbnail and 2 sorting checks. They cover actual rotation/pause/resume, real GLBs, mobile/focus, fallback/retry, shared coordinates/time, all thumbnail decoding with no GLB requests, default visibility order, context-time updates and sorting before pagination/filtering. Seven unit checks cover DST/night dates, rise/set, stale contexts, invalid inputs, altitude geometry, non-mutating grouping and Moon/planet availability. Lint passed during an earlier integration pass; it was not rerun for the latest atlas/sorting changes. These fixture-based browser tests do not prove current live database, Gemini, storage or deployment availability.
 
-## Limits and operational notes
+If Chromium is missing, from `frontend/`:
 
-- Largest assets are the unchanged NASA planet models; only the opened object downloads its GLB. Future optimization can reduce texture resolution/mesh size with visual comparison against the originals.
-- Existing map bundle is already large. New renderer is a separate lazy chunk (~291 KB gzip at the first build), not part of the initial map bundle. Vite reports its standard large-chunk warning.
-- Installation audit reported ten moderate advisories in the existing ESLint/TypeScript-ESLint/minimatch development-tool chain; no high/critical advisory was reported. A forced major-version audit fix was not applied as part of this feature.
-- Browser tests verify representative desktop/mobile sizes in Chromium, not every device. Model-viewer provides touch rotation/pinch controls; physical touch/pinch and actual handset GPU limits should still be checked before the demo.
-- Live backend availability and exact-time object data remain integration work. Educational exploration remains functional when the astronomy API is down.
+```powershell
+npm run test:browser:install
+npm run test:browser -- visibility-sort.spec.ts explore.spec.ts integration.spec.ts thumbnails.spec.ts
+```
 
-## Work log
+Playwright uses project-local `node_modules/.cache/playwright/` and starts a Vite test server at 127.0.0.1:4173. Free that port before testing; the configuration does not reuse another server. Screenshots/traces are ignored under `frontend/test-results/`. Desktop/mobile screenshots, including the new thumbnail grid and lunar/nebula scenes, were visually reviewed. The blocked-asset test deliberately logs a failed fetch. Existing Lit development, missing `circle-11` map-sprite and large-bundle warnings remain. A sandboxed run once stalled during process teardown; the final normally permitted browser run exited successfully.
 
-- Inspected docs/frontend and obtained user decisions before expanding beyond planet MVP.
-- Baseline build passed; baseline lint failed in the map constructor error handler. Fixed that small existing issue.
-- Added local NASA GLBs/reference images, verified HYG subset, and generated transparent schematic star/cluster/galaxy representations.
-- Added standalone UI, reusable interfaces, API-state handling, native dialog and lazy model lifecycle.
-- Browser checks found a cached rejected GLB request during retry and focus escaping at the end of the tab sequence. Added a fresh local retry URL, explicit dialog tab cycling, and opener capture before autofocus. Retested successfully.
-- Moved the imported catalog subset into `src/explore/` to remove Vite's public-file import warning; the reproducible script maintains both copies.
-- Completed production build, lint, four unit checks, six real-browser checks and screenshot review. This feature is ready for frontend review and shared location/time integration; exact-time star/cluster/galaxy visibility remains an explicitly documented backend need.
+Score proxy `ECONNREFUSED` means Flask is not listening at the proxy target. A structured 503 `database_unavailable` means the API is reachable but its configured database is not. Inspect `/api/scores/range` and `/api/scores`; health can be degraded only because photo storage is unconfigured. A missing thumbnail requires checking its stable-ID file/manifest; a missing model requires checking `object.model`, not its thumbnail URL.
+
+## Remaining integration work
+
+Exact ephemeris-based fixed-object positions, selected-time planetary altitudes, physical phase/orientation synchronization, real volumetric reconstructions, real-handset GPU/touch verification, photo upload/voting and end-to-end storage/vision, and deployment remain outside this implementation. Preserve the working score model/API contracts when extending the explorer.

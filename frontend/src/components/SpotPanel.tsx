@@ -271,7 +271,7 @@ function SpotBody({
         <div className="spot-summary-text">
           {spot.nelm !== null && spot.score !== null && (
             <p>
-              You'll see stars down to magnitude <strong>{spot.nelm.toFixed(1)}</strong>.
+              Estimated sky-background limiting magnitude: <strong>{spot.nelm.toFixed(1)}</strong>.
             </p>
           )}
           <p className="spot-muted">
@@ -279,6 +279,7 @@ function SpotBody({
             {spot.sky_brightness_mpsas !== null && ` · ${spot.sky_brightness_mpsas.toFixed(1)} mag/arcsec²`}
             {spot.elevation_m !== null && ` · ${Math.round(spot.elevation_m * 3.281).toLocaleString()} ft`}
           </p>
+          {spot.model_version !== null && <p className="spot-muted">Relative observing index · model v{spot.model_version}</p>}
           {milesAway !== null && (
             <p className="spot-muted">
               {milesAway < 0.5 ? "You're here" : `About ${formatMiles(milesAway)} from you (straight line)`}
@@ -355,7 +356,7 @@ function SpotPanel({ cellId, time, onClose, userLocation }: SpotPanelProps) {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose()
+      if (event.key === 'Escape' && !document.querySelector('dialog[open]')) onClose()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)

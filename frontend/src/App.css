@@ -1,4 +1,8 @@
 .app {
+  min-height: 100svh;
+}
+
+.app-map-shell {
   position: relative;
   height: 100svh;
   display: flex;
@@ -275,7 +279,7 @@ button:focus-visible,
 
   .score-legend {
     right: 8px;
-    bottom: 148px;
+    bottom: 200px;
     width: 180px;
     font-size: 11px;
   }

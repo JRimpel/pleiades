@@ -10,7 +10,7 @@ export interface NightSummary {
   moon: { illumination: number; phase_name: string; rise: string | null; set: string | null }
   planets: PlanetVisibility[]
 }
-export interface Availability { label: string; detail: string; tone: 'positive' | 'neutral' | 'muted'; rise?: string | null; set?: string | null }
+export interface Availability { label: string; detail: string; tone: 'positive' | 'neutral' | 'muted'; rise?: string | null; set?: string | null; aboveHorizon?: boolean | null; altitudeDeg?: number }
 export const REGION_TIMEZONE = 'America/New_York'
 
 export function nightDate(iso: string): string {
@@ -46,19 +46,61 @@ export function aboveFromEvents(time: string, rise: string | null, set: string |
   return r < s ? t >= r && t < s : t >= r || t < s
 }
 
+// Approximate geometric altitude using J2000 catalog coordinates and mean sidereal
+// time. UTC approximates UT1; precession, nutation, proper motion and refraction
+// are omitted. This is a horizon estimate for browsing, not pointing precision.
+// Formulae: https://aa.usno.navy.mil/faq/GAST and /faq/alt_az
+export function catalogAltitude(position: CelestialObject['catalogPosition'], context: ObservationContext): number | null {
+  if (!position || !isObservation(context) || !Number.isFinite(position.raHours) || !Number.isFinite(position.decDeg)
+    || position.raHours < 0 || position.raHours >= 24 || Math.abs(position.decDeg) > 90) return null
+  const jd = Date.parse(context.time) / 86400000 + 2440587.5
+  const midnight = Math.floor(jd - .5) + .5
+  const hours = (jd - midnight) * 24
+  const centuries = (jd - 2451545) / 36525
+  const gmst = 6.697375 + .065709824279 * (midnight - 2451545) + 1.0027379 * hours + .0000258 * centuries ** 2
+  const radians = Math.PI / 180
+  const hourAngle = ((gmst - position.raHours) * 15 + context.lon) * radians
+  const dec = position.decDeg * radians
+  const lat = context.lat * radians
+  const sine = Math.cos(hourAngle) * Math.cos(dec) * Math.cos(lat) + Math.sin(dec) * Math.sin(lat)
+  return Math.asin(Math.max(-1, Math.min(1, sine))) / radians
+}
+
 export function availabilityFor(object: CelestialObject, context: ObservationContext, summary: NightSummary | null): Availability {
+  if (object.category !== 'Planet' && object.category !== 'Moon') {
+    const altitude = catalogAltitude(object.catalogPosition, context)
+    if (altitude !== null) {
+      const above = altitude > 0
+      const center = object.category === 'Constellation'
+      return {
+        label: center ? `Center ${above ? 'above' : 'below'} horizon · estimated` : `${above ? 'Above' : 'Below'} horizon · estimated`,
+        detail: `${center ? 'Constellation center' : 'Catalog position'} is approximately ${Math.round(Math.abs(altitude))}° ${above ? 'above' : 'below'} a flat horizon at the selected time. ${center ? 'Parts of the constellation may be on either side of the horizon. ' : ''}This approximate catalog-based estimate excludes refraction and small coordinate changes since J2000. Daylight, weather, terrain, brightness and equipment still limit observing.`,
+        tone: above ? 'positive' : 'neutral', aboveHorizon: above, altitudeDeg: altitude,
+      }
+    }
+  }
   if (!summary || summary.date !== nightDate(context.time) || Math.abs(summary.lat - context.lat) > .0001 || Math.abs(summary.lon - context.lon) > .0001) {
     return { label: 'Visibility not calculated', detail: 'Explore the educational model while astronomy information is unavailable.', tone: 'muted' }
   }
-  if (object.category !== 'Planet') {
-    return { label: 'Visibility not calculated', detail: 'The current API provides planet and Moon summaries. It does not supply this object’s selected-time position.', tone: 'muted' }
+  if (object.category !== 'Planet' && object.category !== 'Moon') {
+    return { label: 'Visibility not calculated', detail: 'No usable catalog position is available for this object.', tone: 'muted' }
   }
-  const planet = summary.planets.find(p => p.name.toLowerCase() === object.name.toLowerCase())
+  const planet = object.category === 'Moon' ? { name: 'Moon', ...summary.moon } : summary.planets.find(p => p.name.toLowerCase() === object.name.toLowerCase())
   if (!planet) return { label: 'Not listed for this night', detail: 'The nightly response does not list this planet. This is not an exact selected-time altitude calculation.', tone: 'muted' }
   const above = aboveFromEvents(context.time, planet.rise, planet.set)
   return {
     label: above === null ? 'Listed during this night' : above ? 'Above horizon · estimated' : 'Below horizon · estimated',
     detail: above === null ? 'Rise/set information is incomplete, so availability at the selected hour is not calculated.' : 'Estimated from the backend’s local-night rise/set crossings. Weather, daylight, terrain and equipment can still limit observing.',
-    tone: above ? 'positive' : 'neutral', rise: planet.rise, set: planet.set,
+    tone: above ? 'positive' : 'neutral', rise: planet.rise, set: planet.set, aboveHorizon: above,
   }
+}
+
+export function sortByVisibility(objects: readonly CelestialObject[], context: ObservationContext, summary: NightSummary | null): CelestialObject[] {
+  const rank = (above: boolean | null | undefined) => above === true ? 0 : above === false ? 2 : 1
+  return objects.map(object => ({ object, visibility: availabilityFor(object, context, summary) }))
+    .sort((a, b) => rank(a.visibility.aboveHorizon) - rank(b.visibility.aboveHorizon)
+      || (b.visibility.altitudeDeg ?? -90) - (a.visibility.altitudeDeg ?? -90)
+      || a.object.name.localeCompare(b.object.name, 'en', { numeric: true })
+      || a.object.id.localeCompare(b.object.id))
+    .map(({ object }) => object)
 }

@@ -35,7 +35,7 @@ export const FACTOR_LABELS: Record<string, string> = {
   haze: 'Haze',
   twilight: 'Twilight',
   elevation: 'Elevation',
-  calibration: 'Calibration',
+  calibration: 'Observational calibration',
 }
 
 export function factorLabel(key: string | null): string {

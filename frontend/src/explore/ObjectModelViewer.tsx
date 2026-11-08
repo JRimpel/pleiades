@@ -27,12 +27,13 @@ export default function ObjectModelViewer({ object }: { object: CelestialObject 
   const [state, setState] = useState<'loading' | 'ready' | 'failed'>( 'loading')
   const [referenceOnly, setReferenceOnly] = useState(false)
   const [attempt, setAttempt] = useState(0)
-  const [rotating, setRotating] = useState(false)
+  const [rotating, setRotating] = useState(true)
+  const [showLabels, setShowLabels] = useState(true)
   const [reduceMotion, setReduceMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
 
   useEffect(() => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const change = () => { setReduceMotion(query.matches); if (query.matches) setRotating(false) }
+    const change = () => setReduceMotion(query.matches)
     query.addEventListener('change', change)
     return () => query.removeEventListener('change', change)
   }, [])
@@ -61,10 +62,21 @@ export default function ObjectModelViewer({ object }: { object: CelestialObject 
       element.setAttribute('loading', 'eager')
       element.setAttribute('reveal', 'auto')
       element.setAttribute('shadow-intensity', '0')
+      element.autoRotate = true
+      element.autoRotateDelay = 0
+      element.setAttribute('rotation-per-second', '12deg')
       element.setAttribute('exposure', '1.1')
       element.addEventListener('load', loaded)
       element.addEventListener('error', failed)
       element.addEventListener('webglcontextlost', failed)
+      for (const [index, label] of (object.labels ?? []).entries()) {
+        const marker = document.createElement('span')
+        marker.slot = `hotspot-star-${index}`
+        marker.className = 'explore-star-label'
+        marker.textContent = label.name
+        marker.dataset.position = label.position.map(value => `${value}m`).join(' ')
+        element.appendChild(marker)
+      }
       // A rejected request is cached by model-viewer. A retry needs a fresh URL.
       element.src = attempt ? `${object.model}?retry=${attempt}` : object.model
       viewer.current = element
@@ -85,7 +97,8 @@ export default function ObjectModelViewer({ object }: { object: CelestialObject 
     }
   }, [available, referenceOnly, object, attempt])
 
-  useEffect(() => { if (viewer.current) viewer.current.autoRotate = rotating && !reduceMotion && state === 'ready' }, [rotating, reduceMotion, state])
+  useEffect(() => { if (viewer.current) viewer.current.autoRotate = rotating && state === 'ready' }, [rotating, state])
+  useEffect(() => { viewer.current?.querySelectorAll<HTMLElement>('.explore-star-label').forEach(label => { label.hidden = !showLabels }) }, [showLabels, state])
 
   function rotate(delta: number) {
     const element = viewer.current
@@ -110,7 +123,7 @@ export default function ObjectModelViewer({ object }: { object: CelestialObject 
     <div className={`explore-stage ${ready ? 'is-ready' : ''}`}>
       {!ready && <div className="explore-stage-reference"><ReferenceImage object={object} caption={false} /></div>}
       {!fallback && <div className="explore-model-host" ref={host} />}
-      <div className="explore-stage-label">{object.category === 'Planet' ? 'NASA 3D model' : 'Educational illustration'}</div>
+      <div className="explore-stage-label">{['saturn', 'jupiter'].includes(object.id) ? 'NASA 3D model' : 'Educational illustration'}</div>
       {!fallback && state === 'loading' && <p className="explore-stage-status" role="status">Loading interactive view…</p>}
       {fallback && <p className="explore-stage-status" role="status">{!available ? '3D is unavailable in this browser. Showing the reference image.' : state === 'failed' ? 'The 3D model could not load. Showing the reference image.' : 'Reference image view'}</p>}
     </div>
@@ -120,7 +133,8 @@ export default function ObjectModelViewer({ object }: { object: CelestialObject 
       <button type="button" disabled={!ready} onClick={() => { viewer.current?.zoom(2); if (reduceMotion) viewer.current?.jumpCameraToGoal() }} aria-label="Zoom in">+</button>
       <button type="button" disabled={!ready} onClick={() => { viewer.current?.zoom(-2); if (reduceMotion) viewer.current?.jumpCameraToGoal() }} aria-label="Zoom out">−</button>
       <button type="button" disabled={!ready} onClick={reset}>Reset view</button>
-      {!reduceMotion && <button type="button" disabled={!ready} aria-pressed={rotating} onClick={() => setRotating(value => !value)}>{rotating ? 'Pause rotation' : 'Auto-rotate'}</button>}
+      <button type="button" disabled={!ready} aria-pressed={rotating} onClick={() => setRotating(value => !value)}>{rotating ? 'Pause rotation' : 'Resume rotation'}</button>
+      {!!object.labels?.length && <button type="button" aria-pressed={showLabels} onClick={() => setShowLabels(value => !value)}>{showLabels ? 'Hide star labels' : 'Show star labels'}</button>}
       {available && <button type="button" onClick={() => { setReferenceOnly(value => state === 'failed' ? false : !value); setRotating(false); setState('loading'); setAttempt(value => value + 1) }}>{referenceOnly || state === 'failed' ? 'Try 3D view' : 'Use image'}</button>}
     </div>
     <p className="explore-camera-hint">{ready ? 'Drag to rotate · pinch or scroll to zoom · camera buttons also work with a keyboard.' : 'You can still explore the object facts, observing context and source image.'}</p>

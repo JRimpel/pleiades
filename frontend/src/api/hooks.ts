@@ -70,15 +70,15 @@ export function useBest(enabled: boolean, limit = 5, near?: { lat: number; lon: 
   })
 }
 
-/** Tonight's sky at `at` (rounded to ~10 km; twilight times barely change over that) or the region centroid. */
-export function useSkyEvents(enabled = true, at?: { lat: number; lon: number }) {
+/** Selected local night's sky at `at` (rounded to ~10 km), or tonight at the region centroid. */
+export function useSkyEvents(enabled = true, at?: { lat: number; lon: number }, date?: string) {
   const rounded = at ? { lat: roundTo(at.lat, 1), lon: roundTo(at.lon, 1) } : undefined
   return useQuery({
-    queryKey: ['sky-events', 'tonight', rounded?.lat ?? 'centroid', rounded?.lon ?? 'centroid'],
-    queryFn: ({ signal }) => fetchSkyEvents(signal, rounded),
+    queryKey: ['sky-events', date ?? 'tonight', rounded?.lat ?? 'centroid', rounded?.lon ?? 'centroid'],
+    queryFn: ({ signal }) => fetchSkyEvents(signal, rounded, date),
     enabled,
-    // Keep the previous answer visible (and the slider's Dark/Dawn ticks) while a new location loads.
-    placeholderData: keepPreviousData,
+    // Reuse nearby-location data only within the same night; never carry old-night ticks forward.
+    placeholderData: previous => previous?.date === date ? previous : undefined,
     staleTime: 30 * 60 * 1000,
   })
 }
